@@ -19,6 +19,8 @@
 </script>
 
 <main class="container">
+  <h1 class="text-3xl font-bold underline">Disk Analyzer</h1>
+
   <form class="row" onsubmit={greet}>
     <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
     <button type="submit">Greet</button>
@@ -33,3 +35,10 @@
     <p>{disk}</p>
   {/each}
 </main>
+
+<style lang="postcss">
+  @reference "tailwindcss";
+  :global(html) {
+    background-color: theme(--color-gray-100);
+  }
+</style>
