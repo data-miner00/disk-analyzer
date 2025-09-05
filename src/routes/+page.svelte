@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   let name = $state("");
   let greetMsg = $state("");
@@ -23,12 +24,12 @@
 
   <form class="row" onsubmit={greet}>
     <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+    <Button type="submit">Greet</Button>
   </form>
   <p>{greetMsg}</p>
 
   <form class="row" onsubmit={get_disks}>
-    <button type="submit">Get disk info</button>
+    <Button type="submit">Get disk info</Button>
   </form>
 
   {#each diskInfo as disk}
