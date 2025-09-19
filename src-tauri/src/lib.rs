@@ -92,3 +92,17 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+mod tests {
+    #[test]
+    fn test_greet() {
+        let greeting = super::greet("World");
+        assert_eq!(greeting, "Hello, World! You've been greeted from Rust!");
+    }
+
+    #[test]
+    fn test_hostname() {
+        let name = super::hostname();
+        assert!(!name.is_empty());
+    }
+}
