@@ -3,25 +3,30 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import * as Menubar from "$lib/components/ui/menubar";
   import * as Avatar from "$lib/components/ui/avatar";
-  import { Bell } from "@lucide/svelte";
+  import { Bell, HardDrive } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   let hostname = $state("Unknown");
   let name = $state("");
-  let diskInfo = $state<string[]>([]);
+  let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
 
-  async function greet(event: Event) {
-    event.preventDefault();
+  async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    const greetMsg = await invoke("greet", { name });
+    const greetMsg = await invoke("greet", { name: hostname });
+    console.log(hostname);
     window.alert(greetMsg);
   }
 
-  async function get_disks(event: Event) {
-    event.preventDefault();
+  type Disk = {
+    name: string;
+    total_space: number;
+    available_space: number;
+  };
+
+  async function get_disks() {
     const disks = await invoke("get_disks");
-    diskInfo = disks as string[];
+    diskInfo = disks as Disk[];
   }
 
   async function get_folder_size(event: Event) {
@@ -37,8 +42,17 @@
 
   onMount(async () => {
     await get_hostname();
+    await get_disks();
     isLoading = false;
   });
+
+  function toGB(bytes: number): string {
+    return (bytes / 1024 ** 3).toFixed(2) + " GB";
+  }
+
+  function toPercentage(used: number, total: number): number {
+    return (used / total) * 100;
+  }
 </script>
 
 <header class="flex justify-between items-center">
@@ -73,7 +87,7 @@
     </Menubar.Root>
   </div>
 
-  <div class="flex items-center gap-4">
+  <button class="flex items-center gap-4" onclick={greet}>
     <div>
       <Bell color="#999" strokeWidth={2} size={20} />
     </div>
@@ -85,35 +99,46 @@
       <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
       <Avatar.Fallback>CN</Avatar.Fallback>
     </Avatar.Root>
-  </div>
+  </button>
 </header>
 
-<main class="container">
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <Button type="submit">Greet</Button>
-  </form>
-  <form class="row" onsubmit={get_folder_size}>
-    <Button type="submit">Get folder size</Button>
-  </form>
-  <form class="row" onsubmit={get_disks}>
-    <Button type="submit">Get disk info</Button>
-  </form>
+<main class="container mt-6">
+  <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
-  {#each diskInfo as disk}
-    <p>{JSON.stringify(disk)}</p>
-  {/each}
-
-  <!-- Disk usage (lower is better) -->
-  <meter value="75" min="0" max="100" low="70" high="90" optimum="0">75%</meter>
-
-  <!-- Battery level (higher is better) -->
-  <meter value="35" min="0" max="100" low="20" high="60" optimum="100"
-    >35%</meter
-  >
-
-  <!-- CPU usage (lower is better) -->
-  <meter value="82" min="0" max="100" low="60" high="80" optimum="0">82%</meter>
+  <ul class="flex gap-4 items-center flex-wrap">
+    {#each diskInfo as disk}
+      <li>
+        <article class="flex gap-4 border p-4 rounded-md shadow-xs">
+          <div class="pt-1">
+            <HardDrive color="#999" strokeWidth={2} size={20} />
+          </div>
+          <div>
+            <div class="font-semibold">{disk.name}</div>
+            <div>
+              {toGB(disk.total_space - disk.available_space)} / {toGB(
+                disk.total_space
+              )}
+            </div>
+            <meter
+              value={toPercentage(
+                disk.total_space - disk.available_space,
+                disk.total_space
+              )}
+              min="0"
+              max="100"
+              low="30"
+              high="90"
+              optimum="0"
+              >{toPercentage(
+                disk.total_space - disk.available_space,
+                disk.total_space
+              )}%</meter
+            >
+          </div>
+        </article>
+      </li>
+    {/each}
+  </ul>
 </main>
 
 <style lang="postcss">
