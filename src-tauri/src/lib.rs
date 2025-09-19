@@ -1,17 +1,49 @@
+use serde::{Deserialize, Serialize};
 use sysinfo::{
     Disks,
     System,
 };
 
+#[derive(Debug, Serialize, Deserialize)]
+struct DiskInfo {
+    name: String,
+    total_space: u64,
+    available_space: u64,
+}
+
+impl DiskInfo {
+    fn new(name: String, total_space: u64, available_space: u64) -> Self {
+        Self {
+            name,
+            total_space,
+            available_space,
+        }
+    }
+
+    fn from_disk(disk: &sysinfo::Disk) -> Self {
+        let name = if disk.name().to_string_lossy().is_empty() {
+            "Unnamed".to_string()
+        } else {
+            disk.name().to_string_lossy().into_owned()
+        };
+
+        Self {
+            name: name,
+            total_space: disk.total_space(),
+            available_space: disk.available_space(),
+        }
+    }
+}
+
 #[tauri::command]
-fn get_disks() -> Vec<String> {
+fn get_disks() -> Vec<DiskInfo> {
     let mut sys = System::new_all();
 
     sys.refresh_all();
 
     Disks::new_with_refreshed_list()
         .iter()
-        .map(|disk| format!("{}: Total: {} bytes Available: {}", disk.name().to_str().unwrap_or_else(|| "Unnamed"), disk.total_space(), disk.available_space()))
+        .map(|disk| DiskInfo::from_disk(disk))
         .collect()
 }
 

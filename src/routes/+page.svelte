@@ -4,9 +4,12 @@
   import * as Menubar from "$lib/components/ui/menubar";
   import * as Avatar from "$lib/components/ui/avatar";
   import { Bell } from "@lucide/svelte";
+  import { onMount } from "svelte";
 
+  let hostname = $state("Unknown");
   let name = $state("");
   let diskInfo = $state<string[]>([]);
+  let isLoading = $state(true);
 
   async function greet(event: Event) {
     event.preventDefault();
@@ -26,6 +29,16 @@
     const size = await invoke("folder_size", { path: name });
     window.alert(`Folder size: ${size} bytes`);
   }
+
+  async function get_hostname() {
+    const retrieved_hostname = await invoke("hostname");
+    hostname = retrieved_hostname as string;
+  }
+
+  onMount(async () => {
+    await get_hostname();
+    isLoading = false;
+  });
 </script>
 
 <header class="flex justify-between items-center">
@@ -60,11 +73,19 @@
     </Menubar.Root>
   </div>
 
-  <Bell color="#999" strokeWidth={2} size={20} />
-  <Avatar.Root>
-    <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
-    <Avatar.Fallback>CN</Avatar.Fallback>
-  </Avatar.Root>
+  <div class="flex items-center gap-4">
+    <div>
+      <Bell color="#999" strokeWidth={2} size={20} />
+    </div>
+    <div class="text-end leading-4">
+      <span class="block">{hostname}</span>
+      <span class="block text-sm text-gray-400">hostname</span>
+    </div>
+    <Avatar.Root>
+      <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
+      <Avatar.Fallback>CN</Avatar.Fallback>
+    </Avatar.Root>
+  </div>
 </header>
 
 <main class="container">
@@ -80,7 +101,7 @@
   </form>
 
   {#each diskInfo as disk}
-    <p>{disk}</p>
+    <p>{JSON.stringify(disk)}</p>
   {/each}
 
   <!-- Disk usage (lower is better) -->
