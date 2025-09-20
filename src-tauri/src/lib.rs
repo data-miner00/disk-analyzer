@@ -3,12 +3,85 @@ use sysinfo::{
     Disks,
     System,
 };
+use std::{error::Error, io};
+use std::fs;
+
+trait DiskInfoRepository {
+    fn get_all_disks(&self) -> Result<Vec<DiskDto>, Box<dyn Error>>;
+    fn add_disk(&mut self, disk: DiskDto) -> Result<(), Box<dyn Error>>;
+    fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct DiskInfo {
     name: String,
     total_space: u64,
     available_space: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct DiskDto {
+    id: u32,
+    name: String,
+    available_space: u64,
+    date: String,
+}
+
+struct CsvDiskInfoRepository {
+    disks: Vec<DiskDto>,
+    file_path: String,
+}
+
+impl CsvDiskInfoRepository {
+    fn new(file_path: String) -> Self {
+        Self {
+            disks: Vec::new(),
+            file_path,
+        }
+    }
+
+    fn init(&self) -> Result<(), io::Error> {
+        if !std::path::Path::new(&self.file_path).exists() {
+            fs::File::create(&self.file_path)?;
+        }
+        Ok(())
+    }
+}
+
+impl DiskInfoRepository for CsvDiskInfoRepository {
+    fn get_all_disks(&self) -> Result<Vec<DiskDto>, Box<dyn Error>> {
+        let mut results: Vec<DiskDto> = Vec::new();
+        let mut rdr = csv::Reader::from_reader(fs::File::open(&self.file_path)?);
+        for result in rdr.deserialize() {
+            let record: DiskDto = result?;
+            println!("{:?}", &record);
+            results.push(record);
+        }
+
+        Ok(results)
+    }
+
+    fn add_disk(&mut self, disk: DiskDto) -> Result<(), Box<dyn Error>> {
+        self.disks.append(&mut self.get_all_disks()?);
+        self.disks.push(disk);
+        let mut wtr = csv::Writer::from_writer(fs::File::create(&self.file_path)?);
+        for disk in &self.disks {
+            wtr.serialize(disk)?;
+        }
+        wtr.flush()?;
+        Ok(())
+    }
+
+    fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>> {
+        self.disks.append(&mut self.get_all_disks()?);
+        self.disks.extend(disks);
+        let mut wtr = csv::Writer::from_writer(fs::File::create(&self.file_path)?);
+        for disk in &self.disks {
+            wtr.serialize(disk)?;
+        }
+        wtr.flush()?;
+        Ok(())
+    }
 }
 
 impl DiskInfo {
@@ -32,6 +105,45 @@ impl DiskInfo {
             total_space: disk.total_space(),
             available_space: disk.available_space(),
         }
+    }
+}
+
+#[tauri::command]
+fn read_disk_dtos() -> Vec<DiskDto> {
+    let repo = CsvDiskInfoRepository::new("disks.csv".to_string());
+    
+    if let Err(_) = repo.init() {
+        return vec![];
+    }
+
+    if let Ok(disks) = repo.get_all_disks() {
+        return disks;
+    }
+
+    vec![]
+}
+
+#[tauri::command]
+fn add_disk_dto(disk: DiskDto) {
+    let mut repo = CsvDiskInfoRepository::new("disks.csv".to_string());
+    if let Err(_) = repo.init() {
+        return;
+    }
+
+    if let Err(_) = repo.add_disk(disk) {
+        return;
+    }
+}
+
+#[tauri::command]
+fn add_disk_dtos(disks: Vec<DiskDto>) {
+    let mut repo = CsvDiskInfoRepository::new("disks.csv".to_string());
+    if let Err(_) = repo.init() {
+        return;
+    }
+
+    if let Err(_) = repo.add_disks(disks) {
+        return;
     }
 }
 
@@ -88,6 +200,9 @@ pub fn run() {
             get_disks,
             hostname,
             folder_size,
+            read_disk_dtos,
+            add_disk_dto,
+            add_disk_dtos,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

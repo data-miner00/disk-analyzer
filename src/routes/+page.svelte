@@ -13,6 +13,13 @@
     available_space: number;
   };
 
+  type DiskDto = {
+    id: number;
+    name: string;
+    available_space: number;
+    date: string;
+  };
+
   async function get_disks() {
     const disks = await invoke("get_disks");
     diskInfo = disks as Disk[];
@@ -24,8 +31,39 @@
     window.alert(`Folder size: ${size} bytes`);
   }
 
+  async function process_daily_disk_info() {
+    const disksHistory = (await invoke("read_disk_dtos")) as DiskDto[];
+    const lastEntry = disksHistory[disksHistory.length - 1];
+    let newIndex = lastEntry ? lastEntry.id + 1 : 1;
+    const lastRecordedDate = lastEntry ? new Date(lastEntry.date) : null;
+    const today = new Date();
+
+    if (
+      lastRecordedDate &&
+      lastRecordedDate.toDateString() === today.toDateString()
+    ) {
+      window.alert("Today's disk info has already been recorded.");
+      return;
+    }
+
+    const newDiskDtos: DiskDto[] = [];
+
+    for (let disk of diskInfo) {
+      newDiskDtos.push({
+        id: newIndex++,
+        name:
+          disk.name === "Unnamed" ? `Unnamed_${disk.total_space}` : disk.name,
+        available_space: disk.available_space,
+        date: today.toISOString().split("T")[0],
+      });
+    }
+
+    await invoke("add_disk_dtos", { disks: newDiskDtos });
+  }
+
   onMount(async () => {
     await get_disks();
+    await process_daily_disk_info();
     isLoading = false;
   });
 
