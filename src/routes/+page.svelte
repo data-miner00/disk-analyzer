@@ -81,6 +81,11 @@
 
   <ul class="flex gap-4 items-center flex-wrap">
     {#each diskInfo as disk}
+      {@const usedSpacePercentage = toPercentage(
+        disk.total_space - disk.available_space,
+        disk.total_space
+      )}
+
       <li>
         <article class="flex gap-4 border p-4 rounded-md shadow-xs">
           <div class="pt-1">
@@ -94,19 +99,12 @@
               )}
             </div>
             <meter
-              value={toPercentage(
-                disk.total_space - disk.available_space,
-                disk.total_space
-              )}
+              value={usedSpacePercentage}
               min="0"
               max="100"
               low="30"
               high="80"
-              optimum="0"
-              >{toPercentage(
-                disk.total_space - disk.available_space,
-                disk.total_space
-              )}%</meter
+              optimum="0">{usedSpacePercentage}%</meter
             >
           </div>
         </article>
