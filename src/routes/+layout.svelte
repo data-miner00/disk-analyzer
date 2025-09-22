@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Menubar from "$lib/components/ui/menubar";
   import * as Avatar from "$lib/components/ui/avatar";
-  import { Bell } from "@lucide/svelte";
+  import { Bell, Home } from "@lucide/svelte";
   import { invoke } from "@tauri-apps/api/core";
 
   let { children } = $props();
@@ -28,9 +28,14 @@
 <div class="p-2">
   <header class="flex justify-between items-center">
     <div class="flex items-center gap-1">
-      <div
-        class="bg-gray-300 shadow-xs flex h-9 w-9 items-center gap-1 rounded-md border p-1"
-      ></div>
+      <div class="shadow-xs h-9 w-9 p-1 rounded-md border">
+        <a
+          href="/"
+          class="flex items-center justify-center w-full h-full hover:bg-gray-100 rounded-md"
+        >
+          <Home size={18} />
+        </a>
+      </div>
       <Menubar.Root class="w-fit">
         <Menubar.Menu>
           <Menubar.Trigger>File</Menubar.Trigger>
