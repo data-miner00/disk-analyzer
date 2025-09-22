@@ -41,9 +41,11 @@
             </Menubar.Item>
             <Menubar.Item>New Window</Menubar.Item>
             <Menubar.Separator />
-            <Menubar.Item>Share</Menubar.Item>
+            <Menubar.Item>Export</Menubar.Item>
             <Menubar.Separator />
             <Menubar.Item>Print</Menubar.Item>
+            <Menubar.Separator />
+            <Menubar.Item>Exit</Menubar.Item>
           </Menubar.Content>
         </Menubar.Menu>
         <Menubar.Menu>
@@ -51,6 +53,17 @@
         </Menubar.Menu>
         <Menubar.Menu>
           <Menubar.Trigger>View</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.Item>
+              Dashboard
+              <Menubar.Shortcut>⌘D</Menubar.Shortcut>
+            </Menubar.Item>
+            <Menubar.Item>Alerts</Menubar.Item>
+            <Menubar.Item>
+              <a href="/charts">Charts</a>
+            </Menubar.Item>
+            <Menubar.Item>Utils</Menubar.Item>
+          </Menubar.Content>
         </Menubar.Menu>
         <Menubar.Menu>
           <Menubar.Trigger>
