@@ -50,7 +50,7 @@
   }
 
   async function process_daily_disk_info() {
-    disksHistory = (await invoke("read_disk_dtos")) as DiskDto[];
+    disksHistory = (await invoke("read_disk_dtos", { count: 20 })) as DiskDto[];
     const lastEntry = disksHistory[disksHistory.length - 1];
     let newIndex = lastEntry ? lastEntry.id + 1 : 1;
     const lastRecordedDate = lastEntry ? new Date(lastEntry.date) : null;
@@ -80,8 +80,8 @@
   }
 
   onMount(async () => {
-    await get_disks();
     await process_daily_disk_info();
+    await get_disks();
     aggregateDiskHistoryData();
     isLoading = false;
   });

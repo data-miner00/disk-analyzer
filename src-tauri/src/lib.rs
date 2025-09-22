@@ -85,6 +85,7 @@ impl DiskInfoRepository for CsvDiskInfoRepository {
 }
 
 impl DiskInfo {
+    #[allow(dead_code)]
     fn new(name: String, total_space: u64, available_space: u64) -> Self {
         Self {
             name,
@@ -109,15 +110,21 @@ impl DiskInfo {
 }
 
 #[tauri::command]
-fn read_disk_dtos() -> Vec<DiskDto> {
+fn read_disk_dtos(count: Option<i32>) -> Vec<DiskDto> {
     let repo = CsvDiskInfoRepository::new("disks.csv".to_string());
-    
+
     if let Err(_) = repo.init() {
         return vec![];
     }
 
     if let Ok(disks) = repo.get_all_disks() {
-        return disks;
+        let size = disks.len();
+
+        return match count {
+            Some(n) if n > 0 => disks.into_iter().rev().take(n as usize).collect(),
+            Some(n) if n < 0 => disks.into_iter().skip(size.saturating_sub((-n) as usize)).collect(),
+            _ => disks,
+        };
     }
 
     vec![]
