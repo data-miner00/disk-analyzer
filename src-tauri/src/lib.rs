@@ -121,7 +121,7 @@ fn read_disk_dtos(count: Option<i32>) -> Vec<DiskDto> {
         let size = disks.len();
 
         return match count {
-            Some(n) if n > 0 => disks.into_iter().rev().take(n as usize).collect(),
+            Some(n) if n > 0 => disks.into_iter().rev().take(n as usize).rev().collect(),
             Some(n) if n < 0 => disks.into_iter().skip(size.saturating_sub((-n) as usize)).collect(),
             _ => disks,
         };

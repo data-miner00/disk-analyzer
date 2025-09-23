@@ -80,8 +80,8 @@
   }
 
   onMount(async () => {
-    await process_daily_disk_info();
     await get_disks();
+    await process_daily_disk_info();
     aggregateDiskHistoryData();
     isLoading = false;
   });
@@ -201,7 +201,21 @@
         }}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip hideLabel />
+          <Chart.Tooltip hideLabel>
+            {#snippet formatter({ name, value })}
+              <div
+                class="text-muted-foreground flex min-w-[130px] items-center text-xs"
+              >
+                {name.substring(0, 15)}
+                <div
+                  class="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums"
+                >
+                  {value}
+                  <span class="text-muted-foreground font-normal"> GB </span>
+                </div>
+              </div>
+            {/snippet}
+          </Chart.Tooltip>
         {/snippet}
       </LineChart>
     </Chart.Container>
