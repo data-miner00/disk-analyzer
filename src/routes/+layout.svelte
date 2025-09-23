@@ -20,6 +20,10 @@
     hostname = retrieved_hostname as string;
   }
 
+  async function exit_app() {
+    await invoke("exit", { code: 0 });
+  }
+
   onMount(async () => {
     await get_hostname();
   });
@@ -50,7 +54,9 @@
             <Menubar.Separator />
             <Menubar.Item>Print</Menubar.Item>
             <Menubar.Separator />
-            <Menubar.Item>Exit</Menubar.Item>
+            <Menubar.Item>
+              <button onclick={exit_app}>Exit</button>
+            </Menubar.Item>
           </Menubar.Content>
         </Menubar.Menu>
         <Menubar.Menu>

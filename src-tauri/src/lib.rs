@@ -198,6 +198,11 @@ fn folder_size(path: &str) -> u64 {
     size
 }
 
+#[tauri::command]
+fn exit(code: i32) {
+    std::process::exit(code);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -210,6 +215,7 @@ pub fn run() {
             read_disk_dtos,
             add_disk_dto,
             add_disk_dtos,
+            exit,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
