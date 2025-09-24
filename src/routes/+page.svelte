@@ -15,7 +15,6 @@
     color: string;
   };
 
-  let name = $state("");
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
   let disksHistory = $state<DiskDto[]>([]);
@@ -23,7 +22,9 @@
     {} satisfies Chart.ChartConfig
   );
   let chartConfig = $state<ChartConfig[]>([]);
-  let aggregatedData = $state<any[]>([]);
+  let aggregatedAvailableData = $state<any[]>([]);
+  let aggregatedUsedData = $state<any[]>([]);
+  let aggregatedUsedPctData = $state<any[]>([]);
 
   type Disk = {
     name: string;
@@ -103,7 +104,7 @@
       const days = new Set(diskEntries.map((entry) => entry.date));
 
       days.forEach((day) => {
-        const currentAgg = aggregatedData.find(
+        const currentAgg = aggregatedAvailableData.find(
           (entry) => entry.date.toISOString().split("T")[0] === day
         );
         const aggregatedEntry: any = currentAgg || { date: new Date(day) };
@@ -115,7 +116,39 @@
         }
 
         if (!currentAgg) {
-          aggregatedData.push(aggregatedEntry);
+          aggregatedAvailableData.push(aggregatedEntry);
+        }
+
+        const currentUsedAgg = aggregatedUsedData.find(
+          (entry) => entry.date.toISOString().split("T")[0] === day
+        );
+        const aggregatedUsedEntry: any = currentUsedAgg || {
+          date: new Date(day),
+        };
+
+        const currentUsedPctAgg = aggregatedUsedPctData.find(
+          (entry) => entry.date.toISOString().split("T")[0] === day
+        );
+        const aggregatedUsedPctEntry: any = currentUsedPctAgg || {
+          date: new Date(day),
+        };
+
+        if (entryForDay) {
+          const diskInfoEntry = diskInfo.find((disk) =>
+            diskName.startsWith(disk.name)
+          );
+          aggregatedUsedEntry[idDiskName] = toGBNumber(
+            diskInfoEntry!.total_space - entryForDay.available_space
+          );
+          aggregatedUsedPctEntry[idDiskName] = toPercentage(
+            diskInfoEntry!.total_space - entryForDay.available_space,
+            diskInfoEntry!.total_space
+          );
+        }
+
+        if (!currentUsedAgg) {
+          aggregatedUsedData.push(aggregatedUsedEntry);
+          aggregatedUsedPctData.push(aggregatedUsedPctEntry);
         }
       });
 
@@ -172,15 +205,16 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Disk Usages in Percentage</Card.Title>
+    <Card.Title>Disk Available Space</Card.Title>
     <Card.Description
-      >Showing a breakdown of individual disk usages for the current captured PC</Card.Description
+      >Showing a breakdown of individual disk available space for the current
+      captured PC</Card.Description
     >
   </Card.Header>
   <Card.Content>
     <Chart.Container config={containerConfig}>
       <LineChart
-        data={aggregatedData}
+        data={aggregatedAvailableData}
         x="date"
         xScale={scaleUtc()}
         axis="x"
@@ -206,6 +240,127 @@
                 >
                   {value}
                   <span class="text-muted-foreground font-normal"> GB </span>
+                </div>
+              </div>
+            {/snippet}
+          </Chart.Tooltip>
+        {/snippet}
+      </LineChart>
+    </Chart.Container>
+  </Card.Content>
+  <Card.Footer>
+    <div class="flex w-full items-start gap-2 text-sm">
+      <div class="grid gap-2">
+        <div class="flex items-center gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
+        </div>
+        <div class="text-muted-foreground flex items-center gap-2 leading-none">
+          January - June 2024
+        </div>
+      </div>
+    </div>
+  </Card.Footer>
+</Card.Root>
+
+<div class="py-6"></div>
+
+<Card.Root>
+  <Card.Header>
+    <Card.Title>Disk Usage</Card.Title>
+    <Card.Description
+      >Showing a breakdown of individual disk usages for the current captured PC</Card.Description
+    >
+  </Card.Header>
+  <Card.Content>
+    <Chart.Container config={containerConfig}>
+      <LineChart
+        data={aggregatedUsedData}
+        x="date"
+        xScale={scaleUtc()}
+        axis="x"
+        series={chartConfig}
+        props={{
+          spline: { curve: curveNatural, motion: "tween", strokeWidth: 2 },
+          xAxis: {
+            format: (v: Date) =>
+              v.toLocaleDateString("en-US", { day: "2-digit" }),
+          },
+          highlight: { points: { r: 4 } },
+        }}
+      >
+        {#snippet tooltip()}
+          <Chart.Tooltip hideLabel>
+            {#snippet formatter({ name, value })}
+              <div
+                class="text-muted-foreground flex min-w-[130px] items-center text-xs"
+              >
+                {name.substring(0, 15)}
+                <div
+                  class="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums"
+                >
+                  {value}
+                  <span class="text-muted-foreground font-normal"> GB </span>
+                </div>
+              </div>
+            {/snippet}
+          </Chart.Tooltip>
+        {/snippet}
+      </LineChart>
+    </Chart.Container>
+  </Card.Content>
+  <Card.Footer>
+    <div class="flex w-full items-start gap-2 text-sm">
+      <div class="grid gap-2">
+        <div class="flex items-center gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
+        </div>
+        <div class="text-muted-foreground flex items-center gap-2 leading-none">
+          January - June 2024
+        </div>
+      </div>
+    </div>
+  </Card.Footer>
+</Card.Root>
+
+<div class="py-6"></div>
+
+<Card.Root>
+  <Card.Header>
+    <Card.Title>Disk Usage in Percentage</Card.Title>
+    <Card.Description
+      >Showing a breakdown of individual disk usages in percentage for the
+      current captured PC</Card.Description
+    >
+  </Card.Header>
+  <Card.Content>
+    <Chart.Container config={containerConfig}>
+      <LineChart
+        data={aggregatedUsedPctData}
+        x="date"
+        xScale={scaleUtc()}
+        axis="x"
+        series={chartConfig}
+        props={{
+          spline: { curve: curveNatural, motion: "tween", strokeWidth: 2 },
+          xAxis: {
+            format: (v: Date) =>
+              v.toLocaleDateString("en-US", { day: "2-digit" }),
+          },
+          highlight: { points: { r: 4 } },
+        }}
+      >
+        {#snippet tooltip()}
+          <Chart.Tooltip hideLabel>
+            {#snippet formatter({ name, value })}
+              <div
+                class="text-muted-foreground flex min-w-[130px] items-center text-xs"
+              >
+                {name.substring(0, 15)}
+                <div
+                  class="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums"
+                >
+                  {(value as number).toFixed(2)}
+                  <span class="text-muted-foreground font-normal"> % </span>
                 </div>
               </div>
             {/snippet}
