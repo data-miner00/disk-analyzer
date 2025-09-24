@@ -73,7 +73,9 @@
             <Menubar.Item>
               <a href="/charts">Charts</a>
             </Menubar.Item>
-            <Menubar.Item>Utils</Menubar.Item>
+            <Menubar.Item>
+              <a href="/utils">Utils</a>
+            </Menubar.Item>
           </Menubar.Content>
         </Menubar.Menu>
         <Menubar.Menu>

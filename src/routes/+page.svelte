@@ -43,12 +43,6 @@
     diskInfo = disks as Disk[];
   }
 
-  async function get_folder_size(event: Event) {
-    event.preventDefault();
-    const size = await invoke("folder_size", { path: name });
-    window.alert(`Folder size: ${size} bytes`);
-  }
-
   async function process_daily_disk_info() {
     disksHistory = (await invoke("read_disk_dtos", { count: 20 })) as DiskDto[];
     const lastEntry = disksHistory[disksHistory.length - 1];
