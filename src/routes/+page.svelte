@@ -211,13 +211,12 @@
       captured PC</Card.Description
     >
   </Card.Header>
-  <Card.Content>
+  <Card.Content class="pl-12">
     <Chart.Container config={containerConfig}>
       <LineChart
         data={aggregatedAvailableData}
         x="date"
         xScale={scaleUtc()}
-        axis="x"
         series={chartConfig}
         props={{
           spline: { curve: curveNatural, motion: "tween", strokeWidth: 2 },
@@ -225,12 +224,19 @@
             format: (v: Date) =>
               v.toLocaleDateString("en-US", { day: "2-digit" }),
           },
+          yAxis: {
+            format: (v: number) => `${v} GB`,
+          },
           highlight: { points: { r: 4 } },
         }}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip hideLabel>
-            {#snippet formatter({ name, value })}
+          <Chart.Tooltip label="Available Space">
+            {#snippet formatter({ name, value, item })}
+              <div
+                class="w-3 h-3 rounded"
+                style={`background: ${item.color}`}
+              ></div>
               <div
                 class="text-muted-foreground flex min-w-[130px] items-center text-xs"
               >
@@ -271,13 +277,12 @@
       >Showing a breakdown of individual disk usages for the current captured PC</Card.Description
     >
   </Card.Header>
-  <Card.Content>
+  <Card.Content class="pl-12">
     <Chart.Container config={containerConfig}>
       <LineChart
         data={aggregatedUsedData}
         x="date"
         xScale={scaleUtc()}
-        axis="x"
         series={chartConfig}
         props={{
           spline: { curve: curveNatural, motion: "tween", strokeWidth: 2 },
@@ -285,12 +290,19 @@
             format: (v: Date) =>
               v.toLocaleDateString("en-US", { day: "2-digit" }),
           },
+          yAxis: {
+            format: (v: number) => `${v} GB`,
+          },
           highlight: { points: { r: 4 } },
         }}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip hideLabel>
-            {#snippet formatter({ name, value })}
+          <Chart.Tooltip label="Used Space">
+            {#snippet formatter({ name, value, item })}
+              <div
+                class="w-3 h-3 rounded"
+                style={`background: ${item.color}`}
+              ></div>
               <div
                 class="text-muted-foreground flex min-w-[130px] items-center text-xs"
               >
@@ -332,13 +344,12 @@
       current captured PC</Card.Description
     >
   </Card.Header>
-  <Card.Content>
+  <Card.Content class="pl-12">
     <Chart.Container config={containerConfig}>
       <LineChart
         data={aggregatedUsedPctData}
         x="date"
         xScale={scaleUtc()}
-        axis="x"
         series={chartConfig}
         props={{
           spline: { curve: curveNatural, motion: "tween", strokeWidth: 2 },
@@ -346,12 +357,19 @@
             format: (v: Date) =>
               v.toLocaleDateString("en-US", { day: "2-digit" }),
           },
+          yAxis: {
+            format: (v: number) => `${v}%`,
+          },
           highlight: { points: { r: 4 } },
         }}
       >
         {#snippet tooltip()}
-          <Chart.Tooltip hideLabel>
-            {#snippet formatter({ name, value })}
+          <Chart.Tooltip label="Usage Percentage">
+            {#snippet formatter({ name, value, item })}
+              <div
+                class="w-3 h-3 rounded"
+                style={`background: ${item.color}`}
+              ></div>
               <div
                 class="text-muted-foreground flex min-w-[130px] items-center text-xs"
               >
