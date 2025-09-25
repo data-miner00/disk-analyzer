@@ -1,8 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sysinfo::{
-    Disks,
-    System,
-};
+use sysinfo::{Disks, System};
 use std::{error::Error, io};
 use std::fs;
 
@@ -17,6 +14,10 @@ struct DiskInfo {
     name: String,
     total_space: u64,
     available_space: u64,
+    file_system: String,
+    is_removable: bool,
+    is_read_only: bool,
+    kind: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -85,15 +86,6 @@ impl DiskInfoRepository for CsvDiskInfoRepository {
 }
 
 impl DiskInfo {
-    #[allow(dead_code)]
-    fn new(name: String, total_space: u64, available_space: u64) -> Self {
-        Self {
-            name,
-            total_space,
-            available_space,
-        }
-    }
-
     fn from_disk(disk: &sysinfo::Disk) -> Self {
         let name = if disk.name().to_string_lossy().is_empty() {
             "Unnamed".to_string()
@@ -105,6 +97,10 @@ impl DiskInfo {
             name: name,
             total_space: disk.total_space(),
             available_space: disk.available_space(),
+            file_system: disk.file_system().to_str().unwrap_or_default().to_string(),
+            is_removable: disk.is_removable(),
+            is_read_only: disk.is_read_only(),
+            kind: disk.kind().to_string(),
         }
     }
 }

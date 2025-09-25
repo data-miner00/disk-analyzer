@@ -8,6 +8,10 @@ export type Disk = {
   name: string;
   total_space: number;
   available_space: number;
+  file_system: string;
+  is_removable: boolean;
+  is_read_only: boolean;
+  kind: string;
 };
 
 export type DiskDto = {

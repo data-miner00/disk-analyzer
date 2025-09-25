@@ -8,6 +8,7 @@
   import { curveNatural } from "d3-shape";
   import * as Chart from "$lib/components/ui/chart/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
+  import { type Disk } from "$lib/types";
 
   type ChartConfig = {
     key: string;
@@ -25,12 +26,6 @@
   let aggregatedAvailableData = $state<any[]>([]);
   let aggregatedUsedData = $state<any[]>([]);
   let aggregatedUsedPctData = $state<any[]>([]);
-
-  type Disk = {
-    name: string;
-    total_space: number;
-    available_space: number;
-  };
 
   type DiskDto = {
     id: number;
