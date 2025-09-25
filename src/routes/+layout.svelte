@@ -24,6 +24,10 @@
     await invoke("exit", { code: 0 });
   }
 
+  async function open_file_explorer() {
+    await invoke("open_file_explorer", { path: "." });
+  }
+
   onMount(async () => {
     await get_hostname();
   });
@@ -61,6 +65,12 @@
         </Menubar.Menu>
         <Menubar.Menu>
           <Menubar.Trigger>Edit</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.Item onclick={open_file_explorer}>
+              Open Explorer
+              <Menubar.Shortcut>⌘E</Menubar.Shortcut>
+            </Menubar.Item>
+          </Menubar.Content>
         </Menubar.Menu>
         <Menubar.Menu>
           <Menubar.Trigger>View</Menubar.Trigger>

@@ -203,6 +203,15 @@ fn exit(code: i32) {
     std::process::exit(code);
 }
 
+#[tauri::command]
+fn open_file_explorer(path: &str) {
+    let res = tauri_plugin_opener::open_path(path, None::<&str>);
+
+    if let Err(e) = res {
+        eprintln!("Failed to open path {}: {}", path, e);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -216,6 +225,7 @@ pub fn run() {
             add_disk_dto,
             add_disk_dtos,
             exit,
+            open_file_explorer,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
