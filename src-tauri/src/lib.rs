@@ -11,6 +11,16 @@ use tauri::{Builder, Manager, State};
 #[derive(Default)]
 struct AppState {
     counter: u32,
+    disks: Vec<DiskInfo>,
+}
+
+impl AppState {
+    fn new(counter: u32, disks: Vec<DiskInfo>) -> Self {
+        Self {
+            counter,
+            disks,
+        }
+    }
 }
 
 enum ReportType {
@@ -61,7 +71,7 @@ trait DiskInfoRepository {
     fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct DiskInfo {
     name: String,
     total_space: u64,
@@ -214,6 +224,15 @@ fn get_disks() -> Vec<DiskInfo> {
         .collect()
 }
 
+#[tauri::command]
+fn get_disks_rust(state: State<'_, Mutex<AppState>>) -> Vec<DiskInfo> {
+    let state = state.lock().unwrap();
+
+    println!("{:?}", state.disks);
+
+    state.disks.clone()
+}
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -277,13 +296,14 @@ fn get_counter(state: State<'_, Mutex<AppState>>) -> u32 {
 pub fn run() {
     Builder::default()
         .setup(|app| {
-            app.manage(Mutex::new(AppState::default()));
+            app.manage(Mutex::new(AppState::new(0, get_disks())));
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             greet,
             get_disks,
+            get_disks_rust,
             hostname,
             folder_size,
             read_disk_dtos,

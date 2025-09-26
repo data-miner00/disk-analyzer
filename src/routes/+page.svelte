@@ -35,7 +35,7 @@
   };
 
   async function get_disks() {
-    const disks = await invoke("get_disks");
+    const disks = await invoke("get_disks_rust");
     diskInfo = disks as Disk[];
   }
 
