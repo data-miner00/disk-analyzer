@@ -1,7 +1,59 @@
 use serde::{Deserialize, Serialize};
 use sysinfo::{Disks, System};
+use std::sync::Mutex;
 use std::{error::Error, io};
 use std::fs;
+use std::ops::{Add, Sub, Mul};
+use std::collections::HashMap;
+use serde_json::json;
+use tauri::{Builder, Manager, State};
+
+#[derive(Default)]
+struct AppState {
+    counter: u32,
+}
+
+enum ReportType {
+    AvailableSpace,
+    UsedSpace,
+    UsedSpacePct,
+    ChangeInUsedSpace,
+    ChangeInUsedSpacePct,
+}
+
+struct Stat<T>
+where T: Add<Output = T> + Mul<Output = T> + Copy, {
+    date_or_range: String,
+    value: T,
+}
+
+struct Report {
+    report_type: ReportType,
+    data: Vec<LayerChartReportData<f64>>,
+    average: Stat<f64>,
+    median: Stat<f64>,
+    min: Stat<u64>,
+    max: Stat<u64>,
+    container_config: HashMap<String, LayerChartContainerConfigItem>,
+    chart_config: Vec<LayerChartConfigItem>,
+}
+
+struct LayerChartReportData<T>
+where T: Add<Output = T> + Mul<Output = T> + Copy, {
+    date: String,
+    values: HashMap<String, T>
+}
+
+struct LayerChartConfigItem {
+    key: String,
+    label: String,
+    color: String,
+}
+
+struct LayerChartContainerConfigItem {
+    label: String,
+    color: String,
+}
 
 trait DiskInfoRepository {
     fn get_all_disks(&self) -> Result<Vec<DiskDto>, Box<dyn Error>>;
@@ -208,9 +260,26 @@ fn open_file_explorer(path: &str) {
     }
 }
 
+#[tauri::command]
+fn increment_counter(state: State<'_, Mutex<AppState>>) -> u32 {
+    let mut state = state.lock().unwrap();
+    state.counter += 1;
+    state.counter
+}
+
+#[tauri::command]
+fn get_counter(state: State<'_, Mutex<AppState>>) -> u32 {
+    let state = state.lock().unwrap();
+    state.counter
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    Builder::default()
+        .setup(|app| {
+            app.manage(Mutex::new(AppState::default()));
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             greet,
@@ -222,6 +291,8 @@ pub fn run() {
             add_disk_dtos,
             exit,
             open_file_explorer,
+            increment_counter,
+            get_counter,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
