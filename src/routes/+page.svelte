@@ -172,27 +172,29 @@
       )}
 
       <li>
-        <article class="flex gap-4 border p-4 rounded-md shadow-xs">
-          <div class="pt-1">
-            <HardDrive color="#999" strokeWidth={2} size={20} />
-          </div>
-          <div>
-            <div class="font-semibold">{disk.name}</div>
-            <div>
-              {toGB(disk.total_space - disk.available_space)} / {toGB(
-                disk.total_space
-              )}
+        <a href={`/disk/${disk.name}`} class="cursor-pointer">
+          <article class="flex gap-4 border p-4 rounded-md shadow-xs">
+            <div class="pt-1">
+              <HardDrive color="#999" strokeWidth={2} size={20} />
             </div>
-            <meter
-              value={usedSpacePercentage}
-              min="0"
-              max="100"
-              low="30"
-              high="80"
-              optimum="0">{usedSpacePercentage}%</meter
-            >
-          </div>
-        </article>
+            <div>
+              <div class="font-semibold">{disk.name}</div>
+              <div>
+                {toGB(disk.total_space - disk.available_space)} / {toGB(
+                  disk.total_space
+                )}
+              </div>
+              <meter
+                value={usedSpacePercentage}
+                min="0"
+                max="100"
+                low="30"
+                high="80"
+                optimum="0">{usedSpacePercentage}%</meter
+              >
+            </div>
+          </article>
+        </a>
       </li>
     {/each}
   </ul>
