@@ -11,3 +11,8 @@ export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
 export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "children"> : T;
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
+
+// Custom utility
+export function toGBNumber(bytes: number, floatingPoint = 2): number {
+	return parseFloat((bytes / 1024 ** 3).toFixed(floatingPoint));
+}

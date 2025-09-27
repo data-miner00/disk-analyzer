@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use std::{error::Error, io};
 use std::fs;
 use std::ops::{Add, Sub, Mul};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use serde_json::json;
 use tauri::{Builder, Manager, State};
 
@@ -23,6 +23,7 @@ impl AppState {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 enum ReportType {
     AvailableSpace,
     UsedSpace,
@@ -31,35 +32,44 @@ enum ReportType {
     ChangeInUsedSpacePct,
 }
 
-struct Stat<T>
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct Report<T>
 where T: Add<Output = T> + Mul<Output = T> + Copy, {
-    date_or_range: String,
-    value: T,
-}
-
-struct Report {
     report_type: ReportType,
-    data: Vec<LayerChartReportData<f64>>,
-    average: Stat<f64>,
-    median: Stat<f64>,
-    min: Stat<u64>,
-    max: Stat<u64>,
+    data: Vec<LayerChartReportData<T>>,
     container_config: HashMap<String, LayerChartContainerConfigItem>,
     chart_config: Vec<LayerChartConfigItem>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct LayerChartReportData<T>
 where T: Add<Output = T> + Mul<Output = T> + Copy, {
     date: String,
     values: HashMap<String, T>
 }
 
+impl<T> LayerChartReportData<T>
+where T: Add<Output = T> + Mul<Output = T> + Copy, {
+    pub fn empty(date: String) -> Self {
+        Self::new(date, HashMap::new())
+    }
+
+    pub fn new(date: String, values: HashMap<String, T>) -> Self {
+        Self {
+            date,
+            values,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct LayerChartConfigItem {
     key: String,
     label: String,
     color: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct LayerChartContainerConfigItem {
     label: String,
     color: String,
@@ -82,7 +92,7 @@ struct DiskInfo {
     kind: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct DiskDto {
     id: u32,
     name: String,
@@ -117,7 +127,6 @@ impl DiskInfoRepository for CsvDiskInfoRepository {
         let mut rdr = csv::Reader::from_reader(fs::File::open(&self.file_path)?);
         for result in rdr.deserialize() {
             let record: DiskDto = result?;
-            println!("{:?}", &record);
             results.push(record);
         }
 
@@ -164,6 +173,58 @@ impl DiskInfo {
             is_read_only: disk.is_read_only(),
             kind: disk.kind().to_string(),
         }
+    }
+}
+
+#[tauri::command]
+fn aggregate_disk_available_space_history() -> Report<u64> {
+    let disk_history = read_disk_dtos(Some(20));
+    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
+    let mut aggregated_data: Vec<LayerChartReportData<u64>> = vec![];
+    let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
+    let mut chart_config: Vec<LayerChartConfigItem> = Vec::new();
+    let mut counter = 1; // Start with 1 because the CSS starts with 1
+
+    for disk_name in distinct_disks {
+        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
+        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: Vec<String> = distinct_days.into_iter().collect();
+
+        for day in distinct_days {
+            if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    current_agg.values.insert(id_disk_name.clone(), history.available_space);
+                }
+            } else {
+                let mut new_entry = LayerChartReportData::empty(day.clone());
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    new_entry.values.insert(id_disk_name.clone(), history.available_space);
+                }
+                aggregated_data.push(new_entry)
+            }
+        }
+
+        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
+            label: disk_name.clone(),
+            color: format!("var(--chart-{})", counter),
+        });
+
+        chart_config.push(LayerChartConfigItem {
+            key: id_disk_name,
+            label: disk_name,
+            color: format!("var(--chart-{})", counter),
+        });
+
+        counter += 1;
+    }
+    
+    Report::<u64> {
+        report_type: ReportType::AvailableSpace,
+        data: aggregated_data,
+        container_config,
+        chart_config,
     }
 }
 
@@ -227,8 +288,6 @@ fn get_disks() -> Vec<DiskInfo> {
 #[tauri::command]
 fn get_disks_rust(state: State<'_, Mutex<AppState>>) -> Vec<DiskInfo> {
     let state = state.lock().unwrap();
-
-    println!("{:?}", state.disks);
 
     state.disks.clone()
 }
@@ -313,6 +372,7 @@ pub fn run() {
             open_file_explorer,
             increment_counter,
             get_counter,
+            aggregate_disk_available_space_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
