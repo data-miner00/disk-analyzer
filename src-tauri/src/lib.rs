@@ -4,6 +4,7 @@ use std::sync::Mutex;
 use std::{error::Error, io};
 use std::fs;
 use std::ops::{Add, Sub, Mul};
+use std::convert::Into;
 use std::collections::{HashMap, HashSet};
 use serde_json::json;
 use tauri::{Builder, Manager, State};
@@ -219,9 +220,125 @@ fn aggregate_disk_available_space_history() -> Report<u64> {
 
         counter += 1;
     }
-    
+
     Report::<u64> {
         report_type: ReportType::AvailableSpace,
+        data: aggregated_data,
+        container_config,
+        chart_config,
+    }
+}
+
+#[tauri::command]
+fn aggregate_disk_usage_history(state: State<'_, Mutex<AppState>>) -> Report<u64> {
+    let state = state.lock().unwrap();
+    let disk_history = read_disk_dtos(Some(20));
+    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
+    let mut aggregated_data: Vec<LayerChartReportData<u64>> = vec![];
+    let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
+    let mut chart_config: Vec<LayerChartConfigItem> = Vec::new();
+    let mut counter = 1; // Start with 1 because the CSS starts with 1
+
+    for disk_name in distinct_disks {
+        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
+        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: Vec<String> = distinct_days.into_iter().collect();
+        let disk_general_info: Option<&DiskInfo> = state.disks.iter().find(|info| disk_name.starts_with(&info.name));
+
+        for day in distinct_days {
+            if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(info) = disk_general_info {
+                        current_agg.values.insert(id_disk_name.clone(), info.total_space - history.available_space);
+                    }
+                }
+            } else {
+                let mut new_entry = LayerChartReportData::empty(day.clone());
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(info) = disk_general_info {
+                        new_entry.values.insert(id_disk_name.clone(), info.total_space - history.available_space);
+                    }
+                }
+                aggregated_data.push(new_entry)
+            }
+        }
+
+        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
+            label: disk_name.clone(),
+            color: format!("var(--chart-{})", counter),
+        });
+
+        chart_config.push(LayerChartConfigItem {
+            key: id_disk_name,
+            label: disk_name,
+            color: format!("var(--chart-{})", counter),
+        });
+
+        counter += 1;
+    }
+
+    Report::<u64> {
+        report_type: ReportType::UsedSpace,
+        data: aggregated_data,
+        container_config,
+        chart_config,
+    }
+}
+
+#[tauri::command]
+fn aggregate_disk_usage_pct_history(state: State<'_, Mutex<AppState>>) -> Report<f64> {
+    let state = state.lock().unwrap();
+    let disk_history = read_disk_dtos(Some(20));
+    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
+    let mut aggregated_data: Vec<LayerChartReportData<f64>> = vec![];
+    let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
+    let mut chart_config: Vec<LayerChartConfigItem> = Vec::new();
+    let mut counter = 1; // Start with 1 because the CSS starts with 1
+
+    for disk_name in distinct_disks {
+        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
+        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: Vec<String> = distinct_days.into_iter().collect();
+        let disk_general_info: Option<&DiskInfo> = state.disks.iter().find(|info| disk_name.starts_with(&info.name));
+
+        for day in distinct_days {
+            if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(info) = disk_general_info {
+                        current_agg.values.insert(id_disk_name.clone(), ((info.total_space - history.available_space) as f64) / (info.total_space as f64) * 100f64);
+                    }
+                }
+            } else {
+                let mut new_entry = LayerChartReportData::empty(day.clone());
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(info) = disk_general_info {
+                        new_entry.values.insert(id_disk_name.clone(), ((info.total_space - history.available_space) as f64) / (info.total_space as f64) * 100f64);
+                    }
+                }
+                aggregated_data.push(new_entry)
+            }
+        }
+
+        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
+            label: disk_name.clone(),
+            color: format!("var(--chart-{})", counter),
+        });
+
+        chart_config.push(LayerChartConfigItem {
+            key: id_disk_name,
+            label: disk_name,
+            color: format!("var(--chart-{})", counter),
+        });
+
+        counter += 1;
+    }
+
+    Report::<f64> {
+        report_type: ReportType::UsedSpacePct,
         data: aggregated_data,
         container_config,
         chart_config,
@@ -373,9 +490,16 @@ pub fn run() {
             increment_counter,
             get_counter,
             aggregate_disk_available_space_history,
+            aggregate_disk_usage_history,
+            aggregate_disk_usage_pct_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn to_percentage<T>(amount: T, total: T) -> f64
+where T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64> {
+    amount.clone().into() / total.clone().into() * 100f64
 }
 
 mod tests {
@@ -389,5 +513,12 @@ mod tests {
     fn test_hostname() {
         let name = super::hostname();
         assert!(!name.is_empty());
+    }
+
+    #[test]
+    fn test_to_percentage() {
+        let actual = super::to_percentage(45, 73);
+        let expected = 61.64383561643836f64;
+        assert_eq!(actual, expected);
     }
 }
