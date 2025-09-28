@@ -13,4 +13,7 @@ Analyzes disk usages over time.
 
 - [svelte-shadcn](https://shadcn-svelte.com/docs)
 - [Rust Book](https://doc.rust-lang.org/book/)
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/index.html)
 - [Svelte](https://svelte.dev/)
+- [Lucide](https://lucide.dev/)
+- [Tauri](https://v2.tauri.app/)

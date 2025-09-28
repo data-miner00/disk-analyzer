@@ -2,10 +2,10 @@
 
 ## Core Features
 
-- [ ] List disk volumes and total space
-- [ ] Collect and store daily disk usage snapshots
-- [ ] Visualize disk usage trends over time (charts/graphs)
-- [ ] Show usage by file type (e.g., images, videos, documents)
+- [x] List disk volumes and total space
+- [x] Collect and store daily disk usage snapshots
+- [x] Visualize disk usage trends over time (charts/graphs)
+- [x] Show usage by file type (e.g., images, videos, documents)
 - [ ] Identify and list largest files/folders
 - [ ] Find duplicate files
 - [ ] Background process
@@ -13,7 +13,7 @@
 ## Reporting & Export
 
 - [ ] Export reports (CSV, PDF, images)
-- [ ] Generate historical usage reports
+- [x] Generate historical usage reports
 
 ## User Experience
 
