@@ -468,6 +468,33 @@ fn get_counter(state: State<'_, Mutex<AppState>>) -> u32 {
     state.counter
 }
 
+#[tauri::command]
+fn calculate_size_by_file_type(folder_path: String) -> HashMap<String, u64> {
+    let mut store = HashMap::<String, u64>::new();
+    let read_dir = std::fs::read_dir(folder_path);
+
+    if let Ok(entries) = read_dir {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                let size = match fs::metadata(&path) {
+                    Ok(metadata) => metadata.len(),
+                    Err(_) => continue,
+                };
+
+                let ext = path.extension()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("others")
+                    .to_string();
+
+                *store.entry(ext).or_insert(0) += size;
+            }
+        }
+    }
+
+    store
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
@@ -492,6 +519,7 @@ pub fn run() {
             aggregate_disk_available_space_history,
             aggregate_disk_usage_history,
             aggregate_disk_usage_pct_history,
+            calculate_size_by_file_type,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
