@@ -530,6 +530,32 @@ where T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64> {
     amount.clone().into() / total.clone().into() * 100f64
 }
 
+fn read_msg() {
+    let mut message: String = String::new();
+    println!("Enter message: ");
+
+    std::io::stdin().read_line(&mut message).unwrap();
+
+    println!("Your message is: {message}");
+}
+
+/// Adds two numbers
+/// 
+/// # Arguments
+/// 
+/// * `a` - A 32 bit integer
+/// * `b` - A 32 bit integer
+/// 
+/// Examples
+/// ```
+/// use disk_analyzer_lib::add;
+/// let ans = add(1, 2);
+/// assert_eq!(ans, 3);
+/// ```
+pub fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
 mod tests {
     #[test]
     fn test_greet() {
