@@ -8,6 +8,10 @@ use std::convert::Into;
 use std::collections::{HashMap, HashSet};
 use serde_json::json;
 use tauri::{Builder, Manager, State};
+use tauri::{
+  menu::{Menu, MenuItem},
+  tray::TrayIconBuilder,
+};
 
 #[derive(Default)]
 struct AppState {
@@ -500,6 +504,25 @@ pub fn run() {
     Builder::default()
         .setup(|app| {
             app.manage(Mutex::new(AppState::new(0, get_disks())));
+
+            let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i])?;
+
+            let tray = TrayIconBuilder::new()
+                .menu(&menu)
+                .menu_on_left_click(false)
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "quit" => {
+                        println!("quit menu item was clicked");
+                        app.exit(0);
+                    }
+                    _ => {
+                        println!("menu item {:?} not handled", event.id);
+                    }
+                })
+                .build(app)?;
+
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
@@ -533,6 +556,8 @@ where T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64> {
 fn read_msg() {
     let mut message: String = String::new();
     println!("Enter message: ");
+
+    let _ = std::fs::OpenOptions::new().read(true).open(message.clone());
 
     std::io::stdin().read_line(&mut message).unwrap();
 
