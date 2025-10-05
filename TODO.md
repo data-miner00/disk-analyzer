@@ -38,3 +38,31 @@
 - [ ] Integration with OS notifications
 
 ---
+
+## Fine tune
+
+- [ ] Fonts
+- [ ] New color palette
+
+## Settings
+
+Presentation
+
+- [ ] Dark Mode - on or off
+- [ ] Search bar - on or off - defaults to on
+- [ ] Language - dropdown selection
+- [ ] Prefetch count - input number - defaults to 20
+- [ ] Byte Presentation - dropdown selection - B, KB, MB, GB, TB
+
+Service
+
+- [ ] Notification desktop - on or off
+- [ ] On close minimize - on or off - defaults to on
+- [ ] Start on logon - on or off - defaults to on
+
+Data persistence
+
+- [ ] Logging path
+- [ ] Backup data
+- [ ] Backup path
+- [ ] Backup frequency
