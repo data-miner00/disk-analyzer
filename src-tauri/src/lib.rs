@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sysinfo::{Disks, System};
+use tauri::tray::MouseButton;
 use std::sync::Mutex;
 use std::{error::Error, io};
 use std::fs;
@@ -10,7 +11,7 @@ use serde_json::json;
 use tauri::{Builder, Manager, State};
 use tauri::{
   menu::{Menu, MenuItem},
-  tray::TrayIconBuilder,
+  tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
 };
 
 #[derive(Default)]
@@ -499,6 +500,14 @@ fn calculate_size_by_file_type(folder_path: String) -> HashMap<String, u64> {
     store
 }
 
+fn maximize_app_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
@@ -506,16 +515,32 @@ pub fn run() {
             app.manage(Mutex::new(AppState::new(0, get_disks())));
 
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&quit_i])?;
+            let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i, &show_i])?;
 
-            let tray = TrayIconBuilder::new()
+            TrayIconBuilder::new()
                 .menu(&menu)
-                .menu_on_left_click(false)
+                .show_menu_on_left_click(false)
                 .icon(app.default_window_icon().unwrap().clone())
+                .on_tray_icon_event(|tray, event| match event {
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } => {
+                        println!("left click pressed and released");
+                        let app = tray.app_handle();
+                        maximize_app_window(app);
+                    }
+                    _ => {}
+                })
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
                         println!("quit menu item was clicked");
                         app.exit(0);
+                    }
+                    "show" => {
+                        maximize_app_window(app);
                     }
                     _ => {
                         println!("menu item {:?} not handled", event.id);
