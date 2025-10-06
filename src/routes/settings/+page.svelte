@@ -2,6 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import SettingSwitch from "$lib/components/custom/setting-switch.svelte";
   import SettingSelect from "$lib/components/custom/setting-select.svelte";
+  import SettingNumberInput from "$lib/components/custom/setting-number-input.svelte";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -14,6 +15,7 @@
     searchBar: boolean;
     language: string;
     byteFormat: string;
+    prefetchCount: number;
   };
 
   const settings: Settings = $state({
@@ -21,6 +23,7 @@
     searchBar: false,
     language: "en",
     byteFormat: "gb",
+    prefetchCount: 20,
   });
 
   function updateDarkMode(newValue: boolean): void {
@@ -37,6 +40,10 @@
 
   function updateByteFormat(newValue: string): void {
     settings.byteFormat = newValue;
+  }
+
+  function updatePrefetchCount(newValue: number): void {
+    settings.prefetchCount = newValue;
   }
 
   type Language = {
@@ -90,6 +97,18 @@
       options={availableLanguages}
       initialValue={settings.language}
       onChange={updateLanguage}
+    />
+  </div>
+
+  <div class="my-4">
+    <SettingNumberInput
+      title="Prefetch Count"
+      description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
+      placeholder="Count"
+      initialValue={settings.prefetchCount}
+      onChange={updatePrefetchCount}
+      min={0}
+      max={30}
     />
   </div>
 
