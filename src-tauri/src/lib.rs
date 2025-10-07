@@ -594,14 +594,6 @@ pub fn run() {
         .setup(|app| {
             app.manage(Mutex::new(AppState::new(0, get_disks())));
 
-            // testing
-            let setting_repo = CsvSettingsRepository::new("settings.csv".to_string());
-            setting_repo.init()?;
-            let mut setting = setting_repo.get()?;
-            setting.dark_mode = true;
-            setting.desktop_noti = true;
-            setting_repo.upsert(setting)?;
-
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i, &show_i])?;

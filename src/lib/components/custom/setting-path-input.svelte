@@ -7,14 +7,18 @@
   type Props = {
     title: string;
     description: string;
-    initialValue: string;
+    value: string;
     placeholder: string;
     onChange: (newValue: string) => void;
   };
 
-  const props: Props = $props();
-
-  let value = $state(props.initialValue);
+  let {
+    title,
+    description,
+    value = $bindable(),
+    placeholder,
+    onChange,
+  }: Props = $props();
 
   function openFileExplorer() {
     invoke("open_file_explorer", { path: value });
@@ -33,12 +37,12 @@
     );
     selectedFiles.forEach((file) => {
       value = file.name;
-      props.onChange(file.name);
+      onChange(file.name);
     });
   }
 
   $effect(() => {
-    props.onChange(value);
+    onChange(value);
   });
 </script>
 
@@ -46,12 +50,12 @@
   class="flex flex-col py-4 justify-between px-6 rounded-lg border border-solid border-gray-200"
 >
   <div class="mb-4">
-    <p class="font-semibold">{props.title}</p>
-    <p>{props.description}</p>
+    <p class="font-semibold">{title}</p>
+    <p>{description}</p>
   </div>
   <div class="flex items-center gap-2">
     <div>
-      <Input type="text" placeholder={props.placeholder} bind:value />
+      <Input type="text" {placeholder} bind:value />
     </div>
     <Button
       variant="outline"

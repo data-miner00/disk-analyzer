@@ -79,7 +79,7 @@
   }
 
   function updateLogPath(newValue: string): void {
-    settings.logPath = newValue;
+    console.log(newValue);
   }
 
   function updateEnableLog(newValue: boolean): void {
@@ -91,7 +91,8 @@
   }
 
   function updateBackupPath(newValue: string): void {
-    settings.backupPath = newValue;
+    // settings.backupPath = newValue;
+    console.log(newValue);
   }
 
   function updateBackupFrequency(newValue: number): void {
@@ -256,7 +257,7 @@
       <SettingPathInput
         title="Log Path"
         description="The folder or directory to keep track of the generated logs. Defaults to the application log path."
-        initialValue={settings.logPath}
+        bind:value={settings.logPath}
         placeholder="Select a logging directory"
         onChange={updateLogPath}
       />
@@ -279,7 +280,7 @@
       <SettingPathInput
         title="Backup Path"
         description="The folder or directory to keep the backup for the application data. Defaults to the application data path."
-        initialValue={settings.backupPath}
+        bind:value={settings.backupPath}
         placeholder="Select a backup directory"
         onChange={updateBackupPath}
       />
