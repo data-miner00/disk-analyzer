@@ -87,6 +87,28 @@ trait DiskInfoRepository {
     fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
 }
 
+#[derive(Default, Debug, Serialize, Deserialize)]
+struct Settings {
+    dark_mode: bool,
+    search_bar: bool,
+    language: String,
+    byte_format: String,
+    prefetch_count: i32,
+    desktop_noti: bool,
+    minimize_close: bool,
+    start_logon: bool,
+    enable_logging: bool,
+    log_path: String,
+    enable_backup: bool,
+    backup_path: String,
+    backup_frequency_days: i32,
+}
+
+trait SettingsRepository {
+    fn get(&self) -> Result<Settings, Box<dyn Error>>;
+    fn upsert(&self, settings: Settings) -> Result<(), Box<dyn Error>>;
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct DiskInfo {
     name: String,
@@ -104,6 +126,50 @@ struct DiskDto {
     name: String,
     available_space: u64,
     date: String,
+}
+
+struct CsvSettingsRepository {
+    settings: Settings,
+    file_path: String,
+}
+
+impl CsvSettingsRepository {
+    fn new(file_path: String) -> Self {
+        Self {
+            settings: Settings::default(),
+            file_path,
+        }
+    }
+
+    fn init(&self) -> Result<(), io::Error> {
+        if !std::path::Path::new(&self.file_path).exists() {
+            fs::File::create(&self.file_path)?;
+        }
+        Ok(())
+    }
+}
+
+impl SettingsRepository for CsvSettingsRepository {
+    fn get(&self) -> Result<Settings, Box<dyn Error>> {
+        let mut rdr = csv::Reader::from_reader(fs::File::open(&self.file_path)?);
+        if let Some(result) = rdr.deserialize().next() {
+            let record: Settings = result?;
+            return Ok(record);
+        }
+
+        Ok(Settings::default())
+    }
+
+    fn upsert(&self, settings: Settings) -> Result<(), Box<dyn Error>> {
+        let list: Vec<Settings> = vec![settings];
+
+        let mut wtr = csv::Writer::from_writer(fs::File::create(&self.file_path)?);
+        for setting in list {
+            wtr.serialize(setting)?;
+        }
+        wtr.flush()?;
+        Ok(())
+    }
 }
 
 struct CsvDiskInfoRepository {
@@ -514,6 +580,13 @@ pub fn run() {
         .setup(|app| {
             app.manage(Mutex::new(AppState::new(0, get_disks())));
 
+            // testing
+            let setting_repo = CsvSettingsRepository::new("settings.csv".to_string());
+            setting_repo.init()?;
+            let mut setting = setting_repo.get()?;
+            setting.dark_mode = true;
+            setting_repo.upsert(setting)?;
+
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&quit_i, &show_i])?;
@@ -591,7 +664,7 @@ fn read_msg() {
 
 /// Adds two numbers
 /// 
-/// # Arguments
+/// ### Arguments
 /// 
 /// * `a` - A 32 bit integer
 /// * `b` - A 32 bit integer
