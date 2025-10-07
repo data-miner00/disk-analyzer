@@ -55,15 +55,15 @@
   }
 
   function updateLanguage(newValue: string): void {
-    settings.language = newValue;
+    // settings.language = newValue;
   }
 
   function updateByteFormat(newValue: string): void {
-    settings.byteFormat = newValue;
+    // settings.byteFormat = newValue;
   }
 
   function updatePrefetchCount(newValue: number): void {
-    settings.prefetchCount = newValue;
+    // settings.prefetchCount = newValue;
   }
 
   function updateDesktopNotification(newValue: boolean): void {
@@ -96,7 +96,7 @@
   }
 
   function updateBackupFrequency(newValue: number): void {
-    settings.backupFrequencyDays = newValue;
+    // settings.backupFrequencyDays = newValue;
   }
 
   async function getSettings() {
@@ -185,7 +185,7 @@
         description="The language used for the user interface from a limited preset."
         defaultLabel="Select language"
         options={availableLanguages}
-        initialValue={settings.language}
+        bind:value={settings.language}
         onChange={updateLanguage}
       />
     </div>
@@ -195,7 +195,7 @@
         title="Prefetch Count"
         description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
         placeholder="Count"
-        initialValue={settings.prefetchCount}
+        bind:value={settings.prefetchCount}
         onChange={updatePrefetchCount}
         min={0}
         max={30}
@@ -208,7 +208,7 @@
         description="The format for which the bytes will be displayed by default."
         defaultLabel="Select byte format"
         options={availableByteFormats}
-        initialValue={settings.byteFormat}
+        bind:value={settings.byteFormat}
         onChange={updateByteFormat}
       />
     </div>
@@ -290,7 +290,7 @@
       <SettingSlider
         title="Frequency"
         description="The interval of which the data will be backed-up to create restorable snapshots. Defaults to 7 days."
-        initialValue={settings.backupFrequencyDays}
+        bind:value={settings.backupFrequencyDays}
         min={1}
         max={30}
         onChange={updateBackupFrequency}

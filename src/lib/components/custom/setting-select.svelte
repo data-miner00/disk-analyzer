@@ -11,15 +11,21 @@
     description: string;
     defaultLabel: string;
     options: Selectable[];
-    initialValue: string;
+    value: string;
     onChange: (newValue: string) => void;
     // Add icon
   };
 
-  let props: Props = $props();
-  let value = $state(props.initialValue);
+  let {
+    title,
+    description,
+    defaultLabel,
+    options,
+    value = $bindable(),
+    onChange,
+  }: Props = $props();
   const triggerContent = $derived(
-    props.options.find((f) => f.value === value)?.label ?? props.defaultLabel
+    options.find((f) => f.value === value)?.label ?? defaultLabel
   );
 </script>
 
@@ -27,15 +33,15 @@
   class="flex items-center py-4 justify-between px-6 rounded-lg border border-solid border-gray-200"
 >
   <div>
-    <p class="font-semibold">{props.title}</p>
-    <p>{props.description}</p>
+    <p class="font-semibold">{title}</p>
+    <p>{description}</p>
   </div>
   <div>
     <Select.Root
       type="single"
       name="favoriteFruit"
       bind:value
-      onValueChange={props.onChange}
+      onValueChange={onChange}
     >
       <Select.Trigger class="w-[180px]">
         {triggerContent}
@@ -43,7 +49,7 @@
       <Select.Content>
         <Select.Group>
           <!-- <Select.Label>Fruits</Select.Label> -->
-          {#each props.options as option (option.value)}
+          {#each options as option (option.value)}
             <Select.Item
               value={option.value}
               label={option.label}
