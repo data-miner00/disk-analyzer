@@ -4,24 +4,33 @@
   type Props = {
     title: string;
     description: string;
-    initialValue: boolean;
+    value: boolean;
     onChange: (newValue: boolean) => void;
     // Add icon
   };
 
-  let props: Props = $props();
+  let {
+    value: initialValue = $bindable(),
+    title,
+    description,
+    onChange,
+  }: Props = $props();
+
+  $effect(() => {
+    onChange(initialValue);
+  });
+
   let uid = $props.id();
-  let isChecked = $state(props.initialValue);
 </script>
 
 <div
   class="flex items-center py-4 justify-between px-6 rounded-lg border border-solid border-gray-200"
 >
   <div>
-    <p class="font-semibold">{props.title}</p>
-    <p>{props.description}</p>
+    <p class="font-semibold">{title}</p>
+    <p>{description}</p>
   </div>
   <div>
-    <Switch bind:checked={isChecked} />
+    <Switch bind:checked={initialValue} />
   </div>
 </div>

@@ -566,6 +566,20 @@ fn calculate_size_by_file_type(folder_path: String) -> HashMap<String, u64> {
     store
 }
 
+#[tauri::command]
+fn get_settings() -> Settings {
+    let setting_repo = CsvSettingsRepository::new("settings.csv".to_string());
+    if let Err(_) = setting_repo.init() {
+        return Settings::default();
+    }
+
+    if let Ok(setting) = setting_repo.get() {
+        return setting;
+    }
+
+    Settings::default()
+}
+
 fn maximize_app_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -585,6 +599,7 @@ pub fn run() {
             setting_repo.init()?;
             let mut setting = setting_repo.get()?;
             setting.dark_mode = true;
+            setting.desktop_noti = true;
             setting_repo.upsert(setting)?;
 
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
@@ -641,6 +656,7 @@ pub fn run() {
             aggregate_disk_usage_history,
             aggregate_disk_usage_pct_history,
             calculate_size_by_file_type,
+            get_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
