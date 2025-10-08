@@ -6,6 +6,7 @@
   import SettingPathInput from "$lib/components/custom/setting-path-input.svelte";
   import SettingSlider from "$lib/components/custom/setting-slider.svelte";
   import { onMount } from "svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -46,7 +47,6 @@
   });
 
   function updateDarkMode(newValue: boolean): void {
-    // settings.darkMode = newValue;
     console.log(newValue);
   }
 
@@ -102,6 +102,26 @@
   async function getSettings() {
     const setting = await invoke("get_settings");
     settings = convertObjectKeysToCamelCase(setting) as Settings;
+  }
+
+  async function setSettings() {
+    await invoke("set_settings", {
+      settings: {
+        dark_mode: settings.darkMode,
+        search_bar: settings.searchBar,
+        language: settings.language,
+        byte_format: settings.byteFormat,
+        prefetch_count: settings.prefetchCount,
+        desktop_noti: settings.desktopNoti,
+        minimize_close: settings.minimizeClose,
+        start_logon: settings.startLogon,
+        enable_logging: settings.enableLogging,
+        log_path: settings.logPath,
+        enable_backup: settings.enableBackup,
+        backup_path: settings.backupPath,
+        backup_frequency_days: settings.backupFrequencyDays,
+      },
+    });
   }
 
   type Language = {
@@ -298,4 +318,6 @@
       />
     </div>
   </section>
+
+  <Button onclick={setSettings}>Save Changes</Button>
 </main>

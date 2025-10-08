@@ -580,6 +580,19 @@ fn get_settings() -> Settings {
     Settings::default()
 }
 
+#[tauri::command]
+fn set_settings(settings: Settings) {
+    let setting_repo = CsvSettingsRepository::new("settings.csv".to_string());
+
+    if let Err(_) = setting_repo.init() {
+        return;
+    }
+
+    if let Err(_) = setting_repo.upsert(settings) {
+        return;
+    }
+}
+
 fn maximize_app_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -649,6 +662,7 @@ pub fn run() {
             aggregate_disk_usage_pct_history,
             calculate_size_by_file_type,
             get_settings,
+            set_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
