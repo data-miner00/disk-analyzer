@@ -1,43 +1,44 @@
 <script lang="ts">
-import { invoke } from "@tauri-apps/api/core";
-import Button from "$lib/components/ui/button/button.svelte";
-import Input from "$lib/components/ui/input/input.svelte";
-import * as Table from "$lib/components/ui/table";
+  import { invoke } from "@tauri-apps/api/core";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import * as Table from "$lib/components/ui/table";
 
-let { data } = $props();
+  let { data } = $props();
 
-let currentCount = $state(0);
-let path = $state("");
-let sizeByExtension = $state<SizeByExtension>();
-let isValid = $state(true);
-let testCounter = $state(false);
+  let currentCount = $state(0);
+  let path = $state("");
+  let sizeByExtension = $state<SizeByExtension>();
+  let isValid = $state(true);
+  let testCounter = $state(false);
 
-async function get_folder_size(event: Event) {
-  event.preventDefault();
-  const size = await invoke("folder_size", { path });
-  window.alert(`Folder size: ${size} bytes`);
-}
-
-type SizeByExtension = {
-  [ext: string]: number;
-};
-
-async function getFolderSizeByExtension() {
-  if (!path) {
-    isValid = false;
-    return;
+  async function get_folder_size(event: Event) {
+    event.preventDefault();
+    const size = await invoke("folder_size", { path });
+    window.alert(`Folder size: ${size} bytes`);
   }
-  isValid = true;
-  const result: SizeByExtension = await invoke("calculate_size_by_file_type", {
-    folderPath: path,
-  });
-  sizeByExtension = result;
-}
 
-async function increment() {
-  const newCount = await invoke("increment_counter");
-  currentCount = newCount as number;
-}
+  type SizeByExtension = {
+    [ext: string]: number;
+  };
+
+  async function getFolderSizeByExtension() {
+    if (!path) {
+      isValid = false;
+      return;
+    }
+    isValid = true;
+    const result: SizeByExtension = await invoke(
+      "calculate_size_by_file_type",
+      { folderPath: path }
+    );
+    sizeByExtension = result;
+  }
+
+  async function increment() {
+    const newCount = await invoke("increment_counter");
+    currentCount = newCount as number;
+  }
 </script>
 
 <svelte:head>

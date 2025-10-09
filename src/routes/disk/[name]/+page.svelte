@@ -1,7 +1,7 @@
 <script lang="ts">
-import { HardDrive, Info } from "@lucide/svelte";
+  import { HardDrive, Info } from "@lucide/svelte";
 
-const { data } = $props();
+  const { data } = $props();
 </script>
 
 {#if data && data.disk}

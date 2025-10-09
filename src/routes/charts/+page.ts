@@ -55,7 +55,7 @@ export async function load({ params }) {
 
 async function loadAvailableSpaceReport(): Promise<ConsolidatedReport> {
   const available_space_raw_report: RawReport = await invoke(
-    "aggregate_disk_available_space_history",
+    "aggregate_disk_available_space_history"
   );
 
   const mappedData = available_space_raw_report.data
@@ -63,10 +63,7 @@ async function loadAvailableSpaceReport(): Promise<ConsolidatedReport> {
     .map((x) => ({
       date: new Date(x.date),
       ...Object.fromEntries(
-        Object.entries(x.values).map(([key, value]) => [
-          key,
-          toGBNumber(value),
-        ]),
+        Object.entries(x.values).map(([key, value]) => [key, toGBNumber(value)])
       ),
     }));
 
@@ -86,10 +83,7 @@ async function loadUsedSpaceReport(): Promise<ConsolidatedReport> {
     .map((x) => ({
       date: new Date(x.date),
       ...Object.fromEntries(
-        Object.entries(x.values).map(([key, value]) => [
-          key,
-          toGBNumber(value),
-        ]),
+        Object.entries(x.values).map(([key, value]) => [key, toGBNumber(value)])
       ),
     }));
 
@@ -103,7 +97,7 @@ async function loadUsedSpaceReport(): Promise<ConsolidatedReport> {
 
 async function loadUsedSpacePctReport(): Promise<ConsolidatedReport> {
   const raw_report: RawReport = await invoke(
-    "aggregate_disk_usage_pct_history",
+    "aggregate_disk_usage_pct_history"
   );
 
   const mappedData = raw_report.data
@@ -111,7 +105,7 @@ async function loadUsedSpacePctReport(): Promise<ConsolidatedReport> {
     .map((x) => ({
       date: new Date(x.date),
       ...Object.fromEntries(
-        Object.entries(x.values).map(([key, value]) => [key, value]),
+        Object.entries(x.values).map(([key, value]) => [key, value])
       ),
     }));
 

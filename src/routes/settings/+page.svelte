@@ -1,182 +1,182 @@
 <script lang="ts">
-import { invoke } from "@tauri-apps/api/core";
-import SettingSwitch from "$lib/components/custom/setting-switch.svelte";
-import SettingSelect from "$lib/components/custom/setting-select.svelte";
-import SettingNumberInput from "$lib/components/custom/setting-number-input.svelte";
-import SettingPathInput from "$lib/components/custom/setting-path-input.svelte";
-import SettingSlider from "$lib/components/custom/setting-slider.svelte";
-import { onMount } from "svelte";
-import Button from "$lib/components/ui/button/button.svelte";
-import { Spinner } from "$lib/components/ui/spinner";
+  import { invoke } from "@tauri-apps/api/core";
+  import SettingSwitch from "$lib/components/custom/setting-switch.svelte";
+  import SettingSelect from "$lib/components/custom/setting-select.svelte";
+  import SettingNumberInput from "$lib/components/custom/setting-number-input.svelte";
+  import SettingPathInput from "$lib/components/custom/setting-path-input.svelte";
+  import SettingSlider from "$lib/components/custom/setting-slider.svelte";
+  import { onMount } from "svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import { Spinner } from "$lib/components/ui/spinner";
 
-type ByteFormat = {
-  value: "b" | "kb" | "mb" | "gb" | "tb";
-  label: string;
-  description: string;
-};
+  type ByteFormat = {
+    value: "b" | "kb" | "mb" | "gb" | "tb";
+    label: string;
+    description: string;
+  };
 
-type Settings = {
-  darkMode: boolean;
-  searchBar: boolean;
-  language: string;
-  byteFormat: string;
-  prefetchCount: number;
-  desktopNoti: boolean;
-  minimizeClose: boolean;
-  startLogon: boolean;
-  enableLogging: boolean;
-  logPath: string;
-  enableBackup: boolean;
-  backupPath: string;
-  backupFrequencyDays: number;
-};
+  type Settings = {
+    darkMode: boolean;
+    searchBar: boolean;
+    language: string;
+    byteFormat: string;
+    prefetchCount: number;
+    desktopNoti: boolean;
+    minimizeClose: boolean;
+    startLogon: boolean;
+    enableLogging: boolean;
+    logPath: string;
+    enableBackup: boolean;
+    backupPath: string;
+    backupFrequencyDays: number;
+  };
 
-let settings: Settings = $state({
-  darkMode: false,
-  searchBar: false,
-  language: "en",
-  byteFormat: "gb",
-  prefetchCount: 20,
-  desktopNoti: true,
-  minimizeClose: false,
-  startLogon: true,
-  enableLogging: true,
-  logPath: "logs",
-  enableBackup: true,
-  backupPath: "backup",
-  backupFrequencyDays: 7,
-});
-
-let isLoading = $state(true);
-
-function updateDarkMode(newValue: boolean): void {
-  console.log(newValue);
-}
-
-function updateSearchBar(newValue: boolean): void {
-  // settings.searchBar = newValue;
-}
-
-function updateLanguage(newValue: string): void {
-  // settings.language = newValue;
-}
-
-function updateByteFormat(newValue: string): void {
-  // settings.byteFormat = newValue;
-}
-
-function updatePrefetchCount(newValue: number): void {
-  // settings.prefetchCount = newValue;
-}
-
-function updateDesktopNotification(newValue: boolean): void {
-  // settings.desktopNoti = newValue;
-}
-
-function updateCloseMinimize(newValue: boolean): void {
-  // settings.minimizeClose = newValue;
-}
-
-function updateStartLogon(newValue: boolean): void {
-  // settings.startLogon = newValue;
-}
-
-function updateLogPath(newValue: string): void {
-  console.log(newValue);
-}
-
-function updateEnableLog(newValue: boolean): void {
-  // settings.enableLogging = newValue;
-}
-
-function updateEnableBackup(newValue: boolean): void {
-  // settings.enableBackup = newValue;
-}
-
-function updateBackupPath(newValue: string): void {
-  // settings.backupPath = newValue;
-  console.log(newValue);
-}
-
-function updateBackupFrequency(newValue: number): void {
-  // settings.backupFrequencyDays = newValue;
-}
-
-async function getSettings() {
-  const setting = await invoke("get_settings");
-  settings = convertObjectKeysToCamelCase(setting) as Settings;
-}
-
-async function setSettings() {
-  await invoke("set_settings", {
-    settings: {
-      dark_mode: settings.darkMode,
-      search_bar: settings.searchBar,
-      language: settings.language,
-      byte_format: settings.byteFormat,
-      prefetch_count: settings.prefetchCount,
-      desktop_noti: settings.desktopNoti,
-      minimize_close: settings.minimizeClose,
-      start_logon: settings.startLogon,
-      enable_logging: settings.enableLogging,
-      log_path: settings.logPath,
-      enable_backup: settings.enableBackup,
-      backup_path: settings.backupPath,
-      backup_frequency_days: settings.backupFrequencyDays,
-    },
+  let settings: Settings = $state({
+    darkMode: false,
+    searchBar: false,
+    language: "en",
+    byteFormat: "gb",
+    prefetchCount: 20,
+    desktopNoti: true,
+    minimizeClose: false,
+    startLogon: true,
+    enableLogging: true,
+    logPath: "logs",
+    enableBackup: true,
+    backupPath: "backup",
+    backupFrequencyDays: 7,
   });
-}
 
-type Language = {
-  value: string;
-  label: string;
-};
+  let isLoading = $state(true);
 
-const availableLanguages: Language[] = [
-  { value: "en", label: "English" },
-  { value: "ko", label: "한국어" },
-  { value: "ja", label: "日本語" },
-  { value: "ms", label: "Bahasa Melayu" },
-  { value: "pt", label: "Português" },
-];
-
-const availableByteFormats: ByteFormat[] = [
-  { value: "b", label: "B", description: "Bytes" },
-  { value: "kb", label: "KB", description: "Kilobytes" },
-  { value: "mb", label: "MB", description: "Megabytes" },
-  { value: "gb", label: "GB", description: "Gigabytes" },
-  { value: "tb", label: "TB", description: "Terabytes" },
-];
-
-onMount(async () => {
-  await getSettings();
-  isLoading = false;
-});
-
-function snakeToCamelCase(str: string): string {
-  return str.replace(/([-_][a-z])/g, (group) =>
-    group.toUpperCase().replace("-", "").replace("_", ""),
-  );
-}
-
-function convertObjectKeysToCamelCase<T>(obj: T): T {
-  if (typeof obj !== "object" || obj === null) {
-    return obj; // Return non-objects and null directly
+  function updateDarkMode(newValue: boolean): void {
+    console.log(newValue);
   }
 
-  if (Array.isArray(obj)) {
-    return obj.map((item) => convertObjectKeysToCamelCase(item)) as T; // Recursively convert array elements
+  function updateSearchBar(newValue: boolean): void {
+    // settings.searchBar = newValue;
   }
 
-  const newObj: { [key: string]: any } = {};
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      const camelKey = snakeToCamelCase(key);
-      newObj[camelKey] = convertObjectKeysToCamelCase((obj as any)[key]); // Recursively convert nested objects
+  function updateLanguage(newValue: string): void {
+    // settings.language = newValue;
+  }
+
+  function updateByteFormat(newValue: string): void {
+    // settings.byteFormat = newValue;
+  }
+
+  function updatePrefetchCount(newValue: number): void {
+    // settings.prefetchCount = newValue;
+  }
+
+  function updateDesktopNotification(newValue: boolean): void {
+    // settings.desktopNoti = newValue;
+  }
+
+  function updateCloseMinimize(newValue: boolean): void {
+    // settings.minimizeClose = newValue;
+  }
+
+  function updateStartLogon(newValue: boolean): void {
+    // settings.startLogon = newValue;
+  }
+
+  function updateLogPath(newValue: string): void {
+    console.log(newValue);
+  }
+
+  function updateEnableLog(newValue: boolean): void {
+    // settings.enableLogging = newValue;
+  }
+
+  function updateEnableBackup(newValue: boolean): void {
+    // settings.enableBackup = newValue;
+  }
+
+  function updateBackupPath(newValue: string): void {
+    // settings.backupPath = newValue;
+    console.log(newValue);
+  }
+
+  function updateBackupFrequency(newValue: number): void {
+    // settings.backupFrequencyDays = newValue;
+  }
+
+  async function getSettings() {
+    const setting = await invoke("get_settings");
+    settings = convertObjectKeysToCamelCase(setting) as Settings;
+  }
+
+  async function setSettings() {
+    await invoke("set_settings", {
+      settings: {
+        dark_mode: settings.darkMode,
+        search_bar: settings.searchBar,
+        language: settings.language,
+        byte_format: settings.byteFormat,
+        prefetch_count: settings.prefetchCount,
+        desktop_noti: settings.desktopNoti,
+        minimize_close: settings.minimizeClose,
+        start_logon: settings.startLogon,
+        enable_logging: settings.enableLogging,
+        log_path: settings.logPath,
+        enable_backup: settings.enableBackup,
+        backup_path: settings.backupPath,
+        backup_frequency_days: settings.backupFrequencyDays,
+      },
+    });
+  }
+
+  type Language = {
+    value: string;
+    label: string;
+  };
+
+  const availableLanguages: Language[] = [
+    { value: "en", label: "English" },
+    { value: "ko", label: "한국어" },
+    { value: "ja", label: "日本語" },
+    { value: "ms", label: "Bahasa Melayu" },
+    { value: "pt", label: "Português" },
+  ];
+
+  const availableByteFormats: ByteFormat[] = [
+    { value: "b", label: "B", description: "Bytes" },
+    { value: "kb", label: "KB", description: "Kilobytes" },
+    { value: "mb", label: "MB", description: "Megabytes" },
+    { value: "gb", label: "GB", description: "Gigabytes" },
+    { value: "tb", label: "TB", description: "Terabytes" },
+  ];
+
+  onMount(async () => {
+    await getSettings();
+    isLoading = false;
+  });
+
+  function snakeToCamelCase(str: string): string {
+    return str.replace(/([-_][a-z])/g, (group) =>
+      group.toUpperCase().replace("-", "").replace("_", "")
+    );
+  }
+
+  function convertObjectKeysToCamelCase<T>(obj: T): T {
+    if (typeof obj !== "object" || obj === null) {
+      return obj; // Return non-objects and null directly
     }
+
+    if (Array.isArray(obj)) {
+      return obj.map((item) => convertObjectKeysToCamelCase(item)) as T; // Recursively convert array elements
+    }
+
+    const newObj: { [key: string]: any } = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const camelKey = snakeToCamelCase(key);
+        newObj[camelKey] = convertObjectKeysToCamelCase((obj as any)[key]); // Recursively convert nested objects
+      }
+    }
+    return newObj as T;
   }
-  return newObj as T;
-}
 </script>
 
 <main>
