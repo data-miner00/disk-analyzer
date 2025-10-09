@@ -19,6 +19,7 @@
     "d3-shape": "^3.2.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.5",
     "@internationalized/date": "^3.9.0",
     "@lucide/svelte": "^0.544.0",
     "@sveltejs/adapter-static": "^3.0.6",
