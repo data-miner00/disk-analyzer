@@ -1,27 +1,27 @@
 <script lang="ts">
-  import Slider from "../ui/slider/slider.svelte";
+import Slider from "../ui/slider/slider.svelte";
 
-  type Props = {
-    title: string;
-    description: string;
-    value: number;
-    min: number;
-    max: number;
-    step?: number;
-    unit: string;
-    onChange: (newValue: number) => void;
-  };
+type Props = {
+  title: string;
+  description: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  unit: string;
+  onChange: (newValue: number) => void;
+};
 
-  let {
-    title,
-    description,
-    value = $bindable(),
-    min,
-    max,
-    step,
-    unit,
-    onChange,
-  }: Props = $props();
+let {
+  title,
+  description,
+  value = $bindable(),
+  min,
+  max,
+  step,
+  unit,
+  onChange,
+}: Props = $props();
 </script>
 
 <div

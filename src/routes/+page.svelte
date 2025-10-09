@@ -1,69 +1,68 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
-  import { HardDrive } from "@lucide/svelte";
-  import { onMount } from "svelte";
-  import { type Disk } from "$lib/types";
+import { invoke } from "@tauri-apps/api/core";
+import { HardDrive } from "@lucide/svelte";
+import { onMount } from "svelte";
+import { type Disk } from "$lib/types";
 
-  let diskInfo = $state<Disk[]>([]);
-  let isLoading = $state(true);
+let diskInfo = $state<Disk[]>([]);
+let isLoading = $state(true);
 
-  type DiskDto = {
-    id: number;
-    name: string;
-    available_space: number;
-    date: string;
-  };
+type DiskDto = {
+  id: number;
+  name: string;
+  available_space: number;
+  date: string;
+};
 
-  async function get_disks() {
-    const disks = await invoke("get_disks_rust");
-    diskInfo = disks as Disk[];
+async function get_disks() {
+  const disks = await invoke("get_disks_rust");
+  diskInfo = disks as Disk[];
+}
+
+async function process_daily_disk_info() {
+  const disksHistory = (await invoke("read_disk_dtos", {
+    count: 20,
+  })) as DiskDto[];
+  const lastEntry = disksHistory[disksHistory.length - 1];
+  let newIndex = lastEntry ? lastEntry.id + 1 : 1;
+  const lastRecordedDate = lastEntry ? new Date(lastEntry.date) : null;
+  const today = new Date();
+
+  if (
+    lastRecordedDate &&
+    lastRecordedDate.toDateString() === today.toDateString()
+  ) {
+    console.log("Today's disk info has already been recorded.");
+    return;
   }
 
-  async function process_daily_disk_info() {
-    const disksHistory = (await invoke("read_disk_dtos", {
-      count: 20,
-    })) as DiskDto[];
-    const lastEntry = disksHistory[disksHistory.length - 1];
-    let newIndex = lastEntry ? lastEntry.id + 1 : 1;
-    const lastRecordedDate = lastEntry ? new Date(lastEntry.date) : null;
-    const today = new Date();
+  const newDiskDtos: DiskDto[] = [];
 
-    if (
-      lastRecordedDate &&
-      lastRecordedDate.toDateString() === today.toDateString()
-    ) {
-      console.log("Today's disk info has already been recorded.");
-      return;
-    }
-
-    const newDiskDtos: DiskDto[] = [];
-
-    for (let disk of diskInfo) {
-      newDiskDtos.push({
-        id: newIndex++,
-        name:
-          disk.name === "Unnamed" ? `Unnamed_${disk.total_space}` : disk.name,
-        available_space: disk.available_space,
-        date: today.toISOString().split("T")[0],
-      });
-    }
-
-    await invoke("add_disk_dtos", { disks: newDiskDtos });
+  for (let disk of diskInfo) {
+    newDiskDtos.push({
+      id: newIndex++,
+      name: disk.name === "Unnamed" ? `Unnamed_${disk.total_space}` : disk.name,
+      available_space: disk.available_space,
+      date: today.toISOString().split("T")[0],
+    });
   }
 
-  onMount(async () => {
-    await get_disks();
-    await process_daily_disk_info();
-    isLoading = false;
-  });
+  await invoke("add_disk_dtos", { disks: newDiskDtos });
+}
 
-  function toGB(bytes: number): string {
-    return (bytes / 1024 ** 3).toFixed(2) + " GB";
-  }
+onMount(async () => {
+  await get_disks();
+  await process_daily_disk_info();
+  isLoading = false;
+});
 
-  function toPercentage(used: number, total: number): number {
-    return (used / total) * 100;
-  }
+function toGB(bytes: number): string {
+  return (bytes / 1024 ** 3).toFixed(2) + " GB";
+}
+
+function toPercentage(used: number, total: number): number {
+  return (used / total) * 100;
+}
 </script>
 
 <main class="container my-6">

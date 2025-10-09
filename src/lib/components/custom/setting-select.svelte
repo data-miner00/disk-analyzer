@@ -1,32 +1,32 @@
 <script lang="ts">
-  import * as Select from "$lib/components/ui/select/index.js";
+import * as Select from "$lib/components/ui/select/index.js";
 
-  type Selectable = {
-    value: string;
-    label: string;
-  };
+type Selectable = {
+  value: string;
+  label: string;
+};
 
-  type Props = {
-    title: string;
-    description: string;
-    defaultLabel: string;
-    options: Selectable[];
-    value: string;
-    onChange: (newValue: string) => void;
-    // Add icon
-  };
+type Props = {
+  title: string;
+  description: string;
+  defaultLabel: string;
+  options: Selectable[];
+  value: string;
+  onChange: (newValue: string) => void;
+  // Add icon
+};
 
-  let {
-    title,
-    description,
-    defaultLabel,
-    options,
-    value = $bindable(),
-    onChange,
-  }: Props = $props();
-  const triggerContent = $derived(
-    options.find((f) => f.value === value)?.label ?? defaultLabel
-  );
+let {
+  title,
+  description,
+  defaultLabel,
+  options,
+  value = $bindable(),
+  onChange,
+}: Props = $props();
+const triggerContent = $derived(
+  options.find((f) => f.value === value)?.label ?? defaultLabel,
+);
 </script>
 
 <div

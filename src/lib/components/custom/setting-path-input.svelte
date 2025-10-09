@@ -1,49 +1,49 @@
 <script lang="ts">
-  import { ExternalLink, FolderOpen, Icon } from "@lucide/svelte";
-  import { Button } from "../ui/button";
-  import { Input } from "../ui/input";
-  import { invoke } from "@tauri-apps/api/core";
+import { ExternalLink, FolderOpen, Icon } from "@lucide/svelte";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { invoke } from "@tauri-apps/api/core";
 
-  type Props = {
-    title: string;
-    description: string;
-    value: string;
-    placeholder: string;
-    onChange: (newValue: string) => void;
-  };
+type Props = {
+  title: string;
+  description: string;
+  value: string;
+  placeholder: string;
+  onChange: (newValue: string) => void;
+};
 
-  let {
-    title,
-    description,
-    value = $bindable(),
-    placeholder,
-    onChange,
-  }: Props = $props();
+let {
+  title,
+  description,
+  value = $bindable(),
+  placeholder,
+  onChange,
+}: Props = $props();
 
-  function openFileExplorer() {
-    invoke("open_file_explorer", { path: value });
-  }
+function openFileExplorer() {
+  invoke("open_file_explorer", { path: value });
+}
 
-  let selectedFiles = $state<File[]>([]);
+let selectedFiles = $state<File[]>([]);
 
-  function handleFileChange(event: Event) {
-    let elem = <HTMLInputElement>event.target;
+function handleFileChange(event: Event) {
+  let elem = <HTMLInputElement>event.target;
 
-    selectedFiles = Array.from(elem.files ?? []);
+  selectedFiles = Array.from(elem.files ?? []);
 
-    console.log(
-      "Selected files:",
-      selectedFiles.map((file) => file.name)
-    );
-    selectedFiles.forEach((file) => {
-      value = file.name;
-      onChange(file.name);
-    });
-  }
-
-  $effect(() => {
-    onChange(value);
+  console.log(
+    "Selected files:",
+    selectedFiles.map((file) => file.name),
+  );
+  selectedFiles.forEach((file) => {
+    value = file.name;
+    onChange(file.name);
   });
+}
+
+$effect(() => {
+  onChange(value);
+});
 </script>
 
 <div

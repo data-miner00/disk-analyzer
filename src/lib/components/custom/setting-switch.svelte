@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { Switch } from "$lib/components/ui/switch";
+import { Switch } from "$lib/components/ui/switch";
 
-  type Props = {
-    title: string;
-    description: string;
-    value: boolean;
-    onChange: (newValue: boolean) => void;
-    // Add icon
-  };
+type Props = {
+  title: string;
+  description: string;
+  value: boolean;
+  onChange: (newValue: boolean) => void;
+  // Add icon
+};
 
-  let {
-    value: initialValue = $bindable(),
-    title,
-    description,
-    onChange,
-  }: Props = $props();
+let {
+  value: initialValue = $bindable(),
+  title,
+  description,
+  onChange,
+}: Props = $props();
 
-  $effect(() => {
-    onChange(initialValue);
-  });
+$effect(() => {
+  onChange(initialValue);
+});
 
-  let uid = $props.id();
+let uid = $props.id();
 </script>
 
 <div

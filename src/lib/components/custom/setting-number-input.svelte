@@ -1,42 +1,42 @@
 <script lang="ts">
-  import { Button } from "../ui/button";
-  import { Input } from "../ui/input";
-  type Props = {
-    title: string;
-    description: string;
-    placeholder: string;
-    value: number;
-    min: number;
-    max: number;
-    onChange: (newValue: number) => void;
-    // Add icon
-  };
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+type Props = {
+  title: string;
+  description: string;
+  placeholder: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (newValue: number) => void;
+  // Add icon
+};
 
-  let {
-    title,
-    description,
-    placeholder,
-    value = $bindable(),
-    min,
-    max,
-    onChange,
-  }: Props = $props();
+let {
+  title,
+  description,
+  placeholder,
+  value = $bindable(),
+  min,
+  max,
+  onChange,
+}: Props = $props();
 
-  $effect(() => {
-    onChange(value);
-  });
+$effect(() => {
+  onChange(value);
+});
 
-  function decrement() {
-    if (value > min) {
-      value--;
-    }
+function decrement() {
+  if (value > min) {
+    value--;
   }
+}
 
-  function increment() {
-    if (value < max) {
-      value++;
-    }
+function increment() {
+  if (value < max) {
+    value++;
   }
+}
 </script>
 
 <div
