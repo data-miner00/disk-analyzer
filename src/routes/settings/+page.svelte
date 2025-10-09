@@ -7,6 +7,7 @@
   import SettingSlider from "$lib/components/custom/setting-slider.svelte";
   import { onMount } from "svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { Spinner } from "$lib/components/ui/spinner";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -45,6 +46,8 @@
     backupPath: "backup",
     backupFrequencyDays: 7,
   });
+
+  let isLoading = $state(true);
 
   function updateDarkMode(newValue: boolean): void {
     console.log(newValue);
@@ -147,6 +150,7 @@
 
   onMount(async () => {
     await getSettings();
+    isLoading = false;
   });
 
   function snakeToCamelCase(str: string): string {
@@ -178,146 +182,154 @@
 <main>
   <h1 class="text-xl font-semibold mb-6">Settings</h1>
 
-  <section class="my-2">
-    <h2 class="text-lg mb-4">Presentation</h2>
-
-    <div class="my-4">
-      <SettingSwitch
-        title="Dark Mode"
-        description="The themes available currently are light and dark. Dark mode eases the eyes drastically."
-        bind:value={settings.darkMode}
-        onChange={updateDarkMode}
-      />
+  {#if isLoading}
+    <div
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+    >
+      <Spinner class="size-6" />
     </div>
+  {:else}
+    <section class="my-2">
+      <h2 class="text-lg mb-4">Presentation</h2>
 
-    <div class="my-4">
-      <SettingSwitch
-        title="Search bar"
-        description="Whether to enable the search bar functionality for applicable pages."
-        bind:value={settings.searchBar}
-        onChange={updateSearchBar}
-      />
-    </div>
+      <div class="my-4">
+        <SettingSwitch
+          title="Dark Mode"
+          description="The themes available currently are light and dark. Dark mode eases the eyes drastically."
+          bind:value={settings.darkMode}
+          onChange={updateDarkMode}
+        />
+      </div>
 
-    <div class="my-4">
-      <SettingSelect
-        title="Language"
-        description="The language used for the user interface from a limited preset."
-        defaultLabel="Select language"
-        options={availableLanguages}
-        bind:value={settings.language}
-        onChange={updateLanguage}
-      />
-    </div>
+      <div class="my-4">
+        <SettingSwitch
+          title="Search bar"
+          description="Whether to enable the search bar functionality for applicable pages."
+          bind:value={settings.searchBar}
+          onChange={updateSearchBar}
+        />
+      </div>
 
-    <div class="my-4">
-      <SettingNumberInput
-        title="Prefetch Count"
-        description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
-        placeholder="Count"
-        bind:value={settings.prefetchCount}
-        onChange={updatePrefetchCount}
-        min={0}
-        max={30}
-      />
-    </div>
+      <div class="my-4">
+        <SettingSelect
+          title="Language"
+          description="The language used for the user interface from a limited preset."
+          defaultLabel="Select language"
+          options={availableLanguages}
+          bind:value={settings.language}
+          onChange={updateLanguage}
+        />
+      </div>
 
-    <div class="my-4">
-      <SettingSelect
-        title="Byte Display"
-        description="The format for which the bytes will be displayed by default."
-        defaultLabel="Select byte format"
-        options={availableByteFormats}
-        bind:value={settings.byteFormat}
-        onChange={updateByteFormat}
-      />
-    </div>
-  </section>
-  <section>
-    <h2 class="text-lg mb-4">Service</h2>
-    <div class="my-4">
-      <SettingSwitch
-        title="Desktop Notification"
-        description="Notify through the desktop notification when the alert configured has reached its threshold."
-        bind:value={settings.desktopNoti}
-        onChange={updateDesktopNotification}
-      />
-    </div>
-    <div class="my-4">
-      <SettingSwitch
-        title="Minimize On Close"
-        description="Upon clicking the exit button, instead of exiting the program, it minimize to tray instead."
-        bind:value={settings.minimizeClose}
-        onChange={updateCloseMinimize}
-      />
-    </div>
-    <div class="my-4">
-      <SettingSwitch
-        title="Start On Logon"
-        description="Automatically start the program upon logon. Recommended to have consistent logs recorded."
-        bind:value={settings.startLogon}
-        onChange={updateStartLogon}
-      />
-    </div>
-  </section>
+      <div class="my-4">
+        <SettingNumberInput
+          title="Prefetch Count"
+          description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
+          placeholder="Count"
+          bind:value={settings.prefetchCount}
+          onChange={updatePrefetchCount}
+          min={0}
+          max={30}
+        />
+      </div>
 
-  <section>
-    <h2 class="text-lg mb-4">Logging</h2>
+      <div class="my-4">
+        <SettingSelect
+          title="Byte Display"
+          description="The format for which the bytes will be displayed by default."
+          defaultLabel="Select byte format"
+          options={availableByteFormats}
+          bind:value={settings.byteFormat}
+          onChange={updateByteFormat}
+        />
+      </div>
+    </section>
+    <section>
+      <h2 class="text-lg mb-4">Service</h2>
+      <div class="my-4">
+        <SettingSwitch
+          title="Desktop Notification"
+          description="Notify through the desktop notification when the alert configured has reached its threshold."
+          bind:value={settings.desktopNoti}
+          onChange={updateDesktopNotification}
+        />
+      </div>
+      <div class="my-4">
+        <SettingSwitch
+          title="Minimize On Close"
+          description="Upon clicking the exit button, instead of exiting the program, it minimize to tray instead."
+          bind:value={settings.minimizeClose}
+          onChange={updateCloseMinimize}
+        />
+      </div>
+      <div class="my-4">
+        <SettingSwitch
+          title="Start On Logon"
+          description="Automatically start the program upon logon. Recommended to have consistent logs recorded."
+          bind:value={settings.startLogon}
+          onChange={updateStartLogon}
+        />
+      </div>
+    </section>
 
-    <div class="my-4">
-      <SettingSwitch
-        title="Activity Logging"
-        description="Log the activities that is happening when the program is running. Useful to find out bugs."
-        bind:value={settings.enableLogging}
-        onChange={updateEnableLog}
-      />
-    </div>
+    <section>
+      <h2 class="text-lg mb-4">Logging</h2>
 
-    <div class="my-4">
-      <SettingPathInput
-        title="Log Path"
-        description="The folder or directory to keep track of the generated logs. Defaults to the application log path."
-        bind:value={settings.logPath}
-        placeholder="Select a logging directory"
-        onChange={updateLogPath}
-      />
-    </div>
-  </section>
+      <div class="my-4">
+        <SettingSwitch
+          title="Activity Logging"
+          description="Log the activities that is happening when the program is running. Useful to find out bugs."
+          bind:value={settings.enableLogging}
+          onChange={updateEnableLog}
+        />
+      </div>
 
-  <section>
-    <h2 class="text-lg mb-4">Backup</h2>
+      <div class="my-4">
+        <SettingPathInput
+          title="Log Path"
+          description="The folder or directory to keep track of the generated logs. Defaults to the application log path."
+          bind:value={settings.logPath}
+          placeholder="Select a logging directory"
+          onChange={updateLogPath}
+        />
+      </div>
+    </section>
 
-    <div class="my-4">
-      <SettingSwitch
-        title="Data Backup"
-        description="Safely creates a restore point that can be restored from a previous snapshot."
-        bind:value={settings.enableLogging}
-        onChange={updateEnableBackup}
-      />
-    </div>
+    <section>
+      <h2 class="text-lg mb-4">Backup</h2>
 
-    <div class="my-4">
-      <SettingPathInput
-        title="Backup Path"
-        description="The folder or directory to keep the backup for the application data. Defaults to the application data path."
-        bind:value={settings.backupPath}
-        placeholder="Select a backup directory"
-        onChange={updateBackupPath}
-      />
-    </div>
+      <div class="my-4">
+        <SettingSwitch
+          title="Data Backup"
+          description="Safely creates a restore point that can be restored from a previous snapshot."
+          bind:value={settings.enableLogging}
+          onChange={updateEnableBackup}
+        />
+      </div>
 
-    <div class="my-4">
-      <SettingSlider
-        title="Frequency"
-        description="The interval of which the data will be backed-up to create restorable snapshots. Defaults to 7 days."
-        bind:value={settings.backupFrequencyDays}
-        min={1}
-        max={30}
-        onChange={updateBackupFrequency}
-        unit="days"
-      />
-    </div>
-  </section>
+      <div class="my-4">
+        <SettingPathInput
+          title="Backup Path"
+          description="The folder or directory to keep the backup for the application data. Defaults to the application data path."
+          bind:value={settings.backupPath}
+          placeholder="Select a backup directory"
+          onChange={updateBackupPath}
+        />
+      </div>
 
-  <Button onclick={setSettings}>Save Changes</Button>
+      <div class="my-4">
+        <SettingSlider
+          title="Frequency"
+          description="The interval of which the data will be backed-up to create restorable snapshots. Defaults to 7 days."
+          bind:value={settings.backupFrequencyDays}
+          min={1}
+          max={30}
+          onChange={updateBackupFrequency}
+          unit="days"
+        />
+      </div>
+    </section>
+
+    <Button onclick={setSettings}>Save Changes</Button>
+  {/if}
 </main>
