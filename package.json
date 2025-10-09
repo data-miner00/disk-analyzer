@@ -9,9 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "tauri",
-    "format": "biome format",
-    "lint": "biome check"
+    "tauri": "tauri"
   },
   "license": "EUPL-1.2",
   "dependencies": {
