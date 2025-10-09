@@ -33,8 +33,10 @@
   });
 </script>
 
-<div class="p-2">
-  <header class="flex justify-between items-center">
+<div class="px-2 pb-2 min-h-screen">
+  <header
+    class="flex justify-between items-center sticky top-0 bg-white z-10 py-2 w-full"
+  >
     <div class="flex items-center gap-1">
       <div class="shadow-xs h-9 w-9 p-1 rounded-md border">
         <a
