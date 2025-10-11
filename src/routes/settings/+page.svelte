@@ -49,59 +49,6 @@
 
   let isLoading = $state(true);
 
-  function updateDarkMode(newValue: boolean): void {
-    console.log(newValue);
-  }
-
-  function updateSearchBar(newValue: boolean): void {
-    // settings.searchBar = newValue;
-  }
-
-  function updateLanguage(newValue: string): void {
-    // settings.language = newValue;
-  }
-
-  function updateByteFormat(newValue: string): void {
-    // settings.byteFormat = newValue;
-  }
-
-  function updatePrefetchCount(newValue: number): void {
-    // settings.prefetchCount = newValue;
-  }
-
-  function updateDesktopNotification(newValue: boolean): void {
-    // settings.desktopNoti = newValue;
-  }
-
-  function updateCloseMinimize(newValue: boolean): void {
-    // settings.minimizeClose = newValue;
-  }
-
-  function updateStartLogon(newValue: boolean): void {
-    // settings.startLogon = newValue;
-  }
-
-  function updateLogPath(newValue: string): void {
-    console.log(newValue);
-  }
-
-  function updateEnableLog(newValue: boolean): void {
-    // settings.enableLogging = newValue;
-  }
-
-  function updateEnableBackup(newValue: boolean): void {
-    // settings.enableBackup = newValue;
-  }
-
-  function updateBackupPath(newValue: string): void {
-    // settings.backupPath = newValue;
-    console.log(newValue);
-  }
-
-  function updateBackupFrequency(newValue: number): void {
-    // settings.backupFrequencyDays = newValue;
-  }
-
   async function getSettings() {
     const setting = await invoke("get_settings");
     settings = convertObjectKeysToCamelCase(setting) as Settings;
@@ -197,7 +144,6 @@
           title="Dark Mode"
           description="The themes available currently are light and dark. Dark mode eases the eyes drastically."
           bind:value={settings.darkMode}
-          onChange={updateDarkMode}
         />
       </div>
 
@@ -206,7 +152,6 @@
           title="Search bar"
           description="Whether to enable the search bar functionality for applicable pages."
           bind:value={settings.searchBar}
-          onChange={updateSearchBar}
         />
       </div>
 
@@ -217,7 +162,6 @@
           defaultLabel="Select language"
           options={availableLanguages}
           bind:value={settings.language}
-          onChange={updateLanguage}
         />
       </div>
 
@@ -227,7 +171,6 @@
           description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
           placeholder="Count"
           bind:value={settings.prefetchCount}
-          onChange={updatePrefetchCount}
           min={0}
           max={30}
         />
@@ -240,7 +183,6 @@
           defaultLabel="Select byte format"
           options={availableByteFormats}
           bind:value={settings.byteFormat}
-          onChange={updateByteFormat}
         />
       </div>
     </section>
@@ -251,7 +193,6 @@
           title="Desktop Notification"
           description="Notify through the desktop notification when the alert configured has reached its threshold."
           bind:value={settings.desktopNoti}
-          onChange={updateDesktopNotification}
         />
       </div>
       <div class="my-4">
@@ -259,7 +200,6 @@
           title="Minimize On Close"
           description="Upon clicking the exit button, instead of exiting the program, it minimize to tray instead."
           bind:value={settings.minimizeClose}
-          onChange={updateCloseMinimize}
         />
       </div>
       <div class="my-4">
@@ -267,7 +207,6 @@
           title="Start On Logon"
           description="Automatically start the program upon logon. Recommended to have consistent logs recorded."
           bind:value={settings.startLogon}
-          onChange={updateStartLogon}
         />
       </div>
     </section>
@@ -280,7 +219,6 @@
           title="Activity Logging"
           description="Log the activities that is happening when the program is running. Useful to find out bugs."
           bind:value={settings.enableLogging}
-          onChange={updateEnableLog}
         />
       </div>
 
@@ -290,7 +228,6 @@
           description="The folder or directory to keep track of the generated logs. Defaults to the application log path."
           bind:value={settings.logPath}
           placeholder="Select a logging directory"
-          onChange={updateLogPath}
         />
       </div>
     </section>
@@ -303,7 +240,6 @@
           title="Data Backup"
           description="Safely creates a restore point that can be restored from a previous snapshot."
           bind:value={settings.enableLogging}
-          onChange={updateEnableBackup}
         />
       </div>
 
@@ -313,7 +249,6 @@
           description="The folder or directory to keep the backup for the application data. Defaults to the application data path."
           bind:value={settings.backupPath}
           placeholder="Select a backup directory"
-          onChange={updateBackupPath}
         />
       </div>
 
@@ -324,7 +259,6 @@
           bind:value={settings.backupFrequencyDays}
           min={1}
           max={30}
-          onChange={updateBackupFrequency}
           unit="days"
         />
       </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "../ui/button";
   import { Input } from "../ui/input";
+
   type Props = {
     title: string;
     description: string;
@@ -8,7 +9,6 @@
     value: number;
     min: number;
     max: number;
-    onChange: (newValue: number) => void;
     // Add icon
   };
 
@@ -19,12 +19,7 @@
     value = $bindable(),
     min,
     max,
-    onChange,
   }: Props = $props();
-
-  $effect(() => {
-    onChange(value);
-  });
 
   function decrement() {
     if (value > min) {

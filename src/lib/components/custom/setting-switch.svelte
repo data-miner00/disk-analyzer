@@ -5,7 +5,6 @@
     title: string;
     description: string;
     value: boolean;
-    onChange: (newValue: boolean) => void;
     // Add icon
   };
 
@@ -13,12 +12,7 @@
     value: initialValue = $bindable(),
     title,
     description,
-    onChange,
   }: Props = $props();
-
-  $effect(() => {
-    onChange(initialValue);
-  });
 
   let uid = $props.id();
 </script>

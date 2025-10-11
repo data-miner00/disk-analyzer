@@ -9,7 +9,6 @@
     description: string;
     value: string;
     placeholder: string;
-    onChange: (newValue: string) => void;
   };
 
   let {
@@ -17,7 +16,6 @@
     description,
     value = $bindable(),
     placeholder,
-    onChange,
   }: Props = $props();
 
   function openFileExplorer() {
@@ -37,13 +35,8 @@
     );
     selectedFiles.forEach((file) => {
       value = file.name;
-      onChange(file.name);
     });
   }
-
-  $effect(() => {
-    onChange(value);
-  });
 </script>
 
 <div

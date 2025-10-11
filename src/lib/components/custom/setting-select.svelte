@@ -12,7 +12,6 @@
     defaultLabel: string;
     options: Selectable[];
     value: string;
-    onChange: (newValue: string) => void;
     // Add icon
   };
 
@@ -22,7 +21,6 @@
     defaultLabel,
     options,
     value = $bindable(),
-    onChange,
   }: Props = $props();
   const triggerContent = $derived(
     options.find((f) => f.value === value)?.label ?? defaultLabel
@@ -37,12 +35,7 @@
     <p>{description}</p>
   </div>
   <div>
-    <Select.Root
-      type="single"
-      name="favoriteFruit"
-      bind:value
-      onValueChange={onChange}
-    >
+    <Select.Root type="single" name="favoriteFruit" bind:value>
       <Select.Trigger class="w-[180px]">
         {triggerContent}
       </Select.Trigger>

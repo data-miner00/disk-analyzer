@@ -9,7 +9,6 @@
     max: number;
     step?: number;
     unit: string;
-    onChange: (newValue: number) => void;
   };
 
   let {
@@ -20,7 +19,6 @@
     max,
     step,
     unit,
-    onChange,
   }: Props = $props();
 </script>
 
