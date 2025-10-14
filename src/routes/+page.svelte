@@ -3,6 +3,7 @@
   import { HardDrive } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { type Disk } from "$lib/types";
+  import { toGB } from "$lib/utils";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
@@ -56,10 +57,6 @@
     await process_daily_disk_info();
     isLoading = false;
   });
-
-  function toGB(bytes: number): string {
-    return (bytes / 1024 ** 3).toFixed(2) + " GB";
-  }
 
   function toPercentage(used: number, total: number): number {
     return (used / total) * 100;

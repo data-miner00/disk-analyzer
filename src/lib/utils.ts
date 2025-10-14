@@ -16,3 +16,14 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?:
 export function toGBNumber(bytes: number, floatingPoint = 2): number {
 	return parseFloat((bytes / 1024 ** 3).toFixed(floatingPoint));
 }
+export  function toGB(bytes: number): string {
+	return (bytes / 1024 ** 3).toFixed(2) + " GB";
+}
+
+export function toMode(isReadOnly: boolean): string {
+	return isReadOnly ? "Read Only" : "Read & Write";
+}
+
+export function toDetatchable(isRemovable: boolean): string {
+	return isRemovable ? "Portable" : "Systems Drive";
+}
