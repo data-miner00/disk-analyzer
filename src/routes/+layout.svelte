@@ -7,6 +7,7 @@
   let { children } = $props();
   import "../app.css";
   import { onMount } from "svelte";
+  import { Toaster } from "$lib/components/ui/sonner";
 
   let hostname = $state("Unknown");
 
@@ -112,6 +113,8 @@
       </Avatar.Root>
     </button>
   </header>
+
+  <Toaster />
 
   {@render children()}
 </div>

@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { Spinner } from "$lib/components/ui/spinner";
+  import { toast } from "svelte-sonner";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -72,6 +73,8 @@
         backup_frequency_days: settings.backupFrequencyDays,
       },
     });
+
+    toast.success("Settings saved successfully!");
   }
 
   type Language = {
