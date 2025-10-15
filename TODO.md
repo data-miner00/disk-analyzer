@@ -8,7 +8,8 @@
 - [x] Show usage by file type (e.g., images, videos, documents)
 - [ ] Identify and list largest files/folders
 - [ ] Find duplicate files
-- [ ] Background process
+- [x] Background process
+- [ ] Search bar
 
 ## Reporting & Export
 
