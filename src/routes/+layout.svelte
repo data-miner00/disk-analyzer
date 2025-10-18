@@ -82,7 +82,9 @@
               Dashboard
               <Menubar.Shortcut>⌘D</Menubar.Shortcut>
             </Menubar.Item>
-            <Menubar.Item>Alerts</Menubar.Item>
+            <Menubar.Item>
+              <a href="/alerts">Alerts</a>
+            </Menubar.Item>
             <Menubar.Item>
               <a href="/charts">Charts</a>
             </Menubar.Item>

@@ -8,8 +8,32 @@
   import { onMount } from "svelte";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import SearchIcon from "@lucide/svelte/icons/search";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
+  import { Label } from "$lib/components/ui/label";
+  import { Input } from "$lib/components/ui/input";
+  import * as Select from "$lib/components/ui/select/index.js";
 
   let searchQuery = $state("");
+
+  type SelectOption = {
+    label: string;
+    value: string;
+  };
+
+  const alertRuleOptions: SelectOption[] = [
+    {
+      label: "Disk Available Space Below %",
+      value: "DiskAvailableSpaceBelowPct",
+    },
+    {
+      label: "Disk Available Space Below Bytes",
+      value: "DiskAvailableSpaceBelowBytes",
+    },
+    {
+      label: "Disk Available Space Change In %",
+      value: "DiskAvailableSpaceChangeInPct",
+    },
+  ] as const;
 
   type AlertSetting = {
     id: number;
@@ -42,7 +66,36 @@
     | DiskAvailableSpaceBelowBytes
     | DiskAvailableSpaceChangeInPct;
 
-  let alertSettings = $state<AlertSetting[]>([]);
+  const date = new Date().toISOString();
+
+  let alertSettings = $state<AlertSetting[]>([
+    {
+      id: 1,
+      name: "Low Disk Space on C:",
+      last_check: date,
+      frequency_days: 7,
+      enabled: true,
+      created_at: date,
+      updated_at: date,
+      rule: {
+        disk_name: "C:",
+        threshold_pct: 15.0,
+      },
+    },
+    {
+      id: 1,
+      name: "Low Disk Space on C:",
+      last_check: date,
+      frequency_days: 7,
+      enabled: true,
+      created_at: date,
+      updated_at: date,
+      rule: {
+        disk_name: "C:",
+        threshold_pct: 15.0,
+      },
+    },
+  ]);
 
   async function addAlert() {
     await invoke("add_alert", {
@@ -73,6 +126,46 @@
     await addAlert();
     await getAlerts();
   });
+
+  let name = $state("");
+  let frequency_days = $state(7);
+  let selectedRuleOption = $state("");
+  let thresholdValue = $state(10);
+  let diskName = $state("");
+
+  const triggerContent = $derived(
+    alertRuleOptions.find((f) => f.value === selectedRuleOption)?.label ??
+      "Select a rule"
+  );
+
+  async function onCreateAlert() {
+    const rule: AlertRule =
+      selectedRuleOption === "DiskAvailableSpaceBelowPct"
+        ? {
+            disk_name: diskName,
+            threshold_pct: parseFloat(thresholdValue.toString()),
+          }
+        : selectedRuleOption === "DiskAvailableSpaceBelowBytes"
+          ? {
+              disk_name: diskName,
+              threshold_bytes: parseInt(thresholdValue.toString()),
+            }
+          : {
+              disk_name: diskName,
+              change_pct: parseFloat(thresholdValue.toString()),
+            };
+
+    await invoke("add_alert", {
+      alert: {
+        name,
+        frequency_days,
+        enabled: true,
+        rule: {
+          [selectedRuleOption]: rule,
+        },
+      },
+    });
+  }
 </script>
 
 <div class="my-4 flex gap-2 items-center">
@@ -85,10 +178,89 @@
       <InputGroup.Button>Search</InputGroup.Button>
     </InputGroup.Addon>
   </InputGroup.Root>
-  <Button size="sm">
-    <Plus />
-    Create Alert
-  </Button>
+  <Dialog.Root>
+    <Dialog.Trigger
+      ><Button>
+        <Plus />
+        Create Alert
+      </Button></Dialog.Trigger
+    >
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Create New Alert</Dialog.Title>
+        <Dialog.Description>
+          Configure the settings for your new alert below.
+        </Dialog.Description>
+      </Dialog.Header>
+      <div class="grid gap-4 py-4">
+        <div class="grid grid-cols-4 items-center gap-4">
+          <Label for="name" class="text-right">Name</Label>
+          <Input id="name" bind:value={name} class="col-span-3" />
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <Label for="username" class="text-right">Rule</Label>
+          <Select.Root
+            type="single"
+            name="alertRule"
+            bind:value={selectedRuleOption}
+          >
+            <Select.Trigger class="w-[280px]">
+              {triggerContent}
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Group>
+                <Select.Label>Rules</Select.Label>
+                {#each alertRuleOptions as option (option.value)}
+                  <Select.Item value={option.value} label={option.label}>
+                    {option.label}
+                  </Select.Item>
+                {/each}
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <Label for="frequency" class="text-right">Frequency</Label>
+          <Input
+            id="frequency"
+            bind:value={frequency_days}
+            type="number"
+            class="col-span-3"
+          />
+        </div>
+        {#if selectedRuleOption === "DiskAvailableSpaceBelowPct"}
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="threshold" class="text-right">Threshold</Label>
+            <Input
+              id="threshold"
+              bind:value={thresholdValue}
+              class="col-span-3"
+            />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="diskName" class="text-right">Disk Name</Label>
+            <Input id="diskName" bind:value={diskName} class="col-span-3" />
+          </div>
+        {:else if selectedRuleOption === "DiskAvailableSpaceBelowBytes"}
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="threshold" class="text-right">Threshold</Label>
+            <Input
+              id="threshold"
+              bind:value={thresholdValue}
+              class="col-span-3"
+            />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="diskName" class="text-right">Disk Name</Label>
+            <Input id="diskName" bind:value={diskName} class="col-span-3" />
+          </div>
+        {/if}
+      </div>
+      <Dialog.Footer>
+        <Button type="submit" onclick={onCreateAlert}>Create</Button>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
 </div>
 
 {#if alertSettings.length > 0}
