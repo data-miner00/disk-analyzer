@@ -1,20 +1,15 @@
 <script lang="ts">
   import * as Menubar from "$lib/components/ui/menubar";
-  import * as Avatar from "$lib/components/ui/avatar";
-  import { Bell, Home } from "@lucide/svelte";
+  import { Home, Minus, Square, X } from "@lucide/svelte";
   import { invoke } from "@tauri-apps/api/core";
 
   let { children } = $props();
   import "../app.css";
   import { onMount } from "svelte";
   import { Toaster } from "$lib/components/ui/sonner";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
 
   let hostname = $state("Unknown");
-
-  async function greet() {
-    const greetMsg = await invoke("greet", { name: hostname });
-    window.alert(greetMsg);
-  }
 
   async function get_hostname() {
     const retrieved_hostname = await invoke("hostname");
@@ -32,10 +27,19 @@
   onMount(async () => {
     await get_hostname();
   });
+
+  function minimize_window() {
+    getCurrentWindow().minimize();
+  }
+
+  function maximize_window() {
+    getCurrentWindow().toggleMaximize();
+  }
 </script>
 
 <div class="px-2 pb-2 min-h-screen max-w-3xl mx-auto">
   <header
+    data-tauri-drag-region
     class="flex justify-between items-center sticky top-0 bg-white z-10 py-2 w-full"
   >
     <div class="flex items-center gap-1">
@@ -100,20 +104,20 @@
         </Menubar.Menu>
       </Menubar.Root>
     </div>
-
-    <button class="flex items-center gap-4" onclick={greet}>
-      <div>
-        <Bell color="#999" strokeWidth={2} size={20} />
+    <div class="flex items-center gap-4">
+      <div>{hostname}</div>
+      <div class="flex items-center gap-4">
+        <button class="block p-2">
+          <Minus size={16} onclick={minimize_window} />
+        </button>
+        <button class="block p-2">
+          <Square size={16} onclick={maximize_window} />
+        </button>
+        <button class="block p-2">
+          <X size={16} onclick={exit_app} />
+        </button>
       </div>
-      <div class="text-end leading-4">
-        <span class="block">{hostname}</span>
-        <span class="block text-sm text-gray-400">hostname</span>
-      </div>
-      <Avatar.Root>
-        <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
-        <Avatar.Fallback>CN</Avatar.Fallback>
-      </Avatar.Root>
-    </button>
+    </div>
   </header>
 
   <Toaster />

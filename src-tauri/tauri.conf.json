@@ -14,7 +14,8 @@
       {
         "title": "Disk Analyzer",
         "minWidth": 800,
-        "minHeight": 600
+        "minHeight": 600,
+        "decorations": false
       }
     ],
     "security": {
