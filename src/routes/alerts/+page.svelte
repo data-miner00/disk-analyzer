@@ -1,4 +1,18 @@
+<script lang="ts" module>
+  import { z } from "zod/v4";
+
+  const formSchema = z.object({
+    name: z.string().min(2).max(50),
+    frequency_days: z.number().min(1).max(365),
+    threshold: z.number().min(1),
+    alertRule: z.string(),
+    diskName: z.string().min(1),
+  });
+</script>
+
 <script lang="ts">
+  import { defaults, superForm } from "sveltekit-superforms";
+  import { zod4 } from "sveltekit-superforms/adapters";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Bell, Plus } from "@lucide/svelte";
@@ -12,6 +26,8 @@
   import { Label } from "$lib/components/ui/label";
   import { Input } from "$lib/components/ui/input";
   import * as Select from "$lib/components/ui/select/index.js";
+  import { toast } from "svelte-sonner";
+  import * as Form from "$lib/components/ui/form/index.js";
 
   let searchQuery = $state("");
 
@@ -82,40 +98,7 @@
         threshold_pct: 15.0,
       },
     },
-    {
-      id: 1,
-      name: "Low Disk Space on C:",
-      last_check: date,
-      frequency_days: 7,
-      enabled: true,
-      created_at: date,
-      updated_at: date,
-      rule: {
-        disk_name: "C:",
-        threshold_pct: 15.0,
-      },
-    },
   ]);
-
-  async function addAlert() {
-    await invoke("add_alert", {
-      alert: {
-        name: "New Alert",
-        frequency_days: 7,
-        enabled: true,
-        rule: {
-          DiskAvailableSpaceBelowPct: {
-            disk_name: "C:",
-            threshold_pct: 10.0,
-          },
-        },
-        id: 0,
-        last_check: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    });
-  }
 
   async function getAlerts() {
     const alerts = await invoke("get_alerts");
@@ -123,48 +106,60 @@
   }
 
   onMount(async () => {
-    await addAlert();
     await getAlerts();
   });
 
-  let name = $state("");
-  let frequency_days = $state(7);
-  let selectedRuleOption = $state("");
-  let thresholdValue = $state(10);
-  let diskName = $state("");
-
   const triggerContent = $derived(
-    alertRuleOptions.find((f) => f.value === selectedRuleOption)?.label ??
+    alertRuleOptions.find((f) => f.value === $formData.alertRule)?.label ??
       "Select a rule"
   );
 
   async function onCreateAlert() {
+    const selectedRuleOption = $formData.alertRule;
     const rule: AlertRule =
       selectedRuleOption === "DiskAvailableSpaceBelowPct"
         ? {
-            disk_name: diskName,
-            threshold_pct: parseFloat(thresholdValue.toString()),
+            disk_name: $formData.diskName,
+            threshold_pct: parseFloat($formData.threshold.toString()),
           }
         : selectedRuleOption === "DiskAvailableSpaceBelowBytes"
           ? {
-              disk_name: diskName,
-              threshold_bytes: parseInt(thresholdValue.toString()),
+              disk_name: $formData.diskName,
+              threshold_bytes: parseInt($formData.threshold.toString()),
             }
           : {
-              disk_name: diskName,
-              change_pct: parseFloat(thresholdValue.toString()),
+              disk_name: $formData.diskName,
+              change_pct: parseFloat($formData.threshold.toString()),
             };
 
-    await invoke("add_alert", {
+    await invoke("add_alert_simplify", {
       alert: {
-        name,
-        frequency_days,
-        enabled: true,
+        name: $formData.name,
+        frequency_days: $formData.frequency_days,
         rule: {
           [selectedRuleOption]: rule,
         },
       },
     });
+  }
+
+  const form = superForm(defaults(zod4(formSchema)), {
+    validators: zod4(formSchema),
+    SPA: true,
+    onUpdate: ({ form: f }) => {
+      if (f.valid) {
+        onCreateAlert();
+        toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+      } else {
+        toast.error("Please fix the errors in the form.");
+      }
+    },
+  });
+
+  const { form: formData, enhance } = form;
+
+  function submitForm() {
+    form.submit();
   }
 </script>
 
@@ -192,72 +187,95 @@
           Configure the settings for your new alert below.
         </Dialog.Description>
       </Dialog.Header>
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="name" class="text-right">Name</Label>
-          <Input id="name" bind:value={name} class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="username" class="text-right">Rule</Label>
-          <Select.Root
-            type="single"
-            name="alertRule"
-            bind:value={selectedRuleOption}
+      <form method="POST" class="space-y-6 h-72 overflow-y-auto" use:enhance>
+        <Form.Field {form} name="name">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Name</Form.Label>
+              <Input {...props} bind:value={$formData.name} />
+            {/snippet}
+          </Form.Control>
+          <Form.Description>The name of the alert setting.</Form.Description>
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field {form} name="frequency_days">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Frequency</Form.Label>
+              <Input
+                type="number"
+                {...props}
+                bind:value={$formData.frequency_days}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The frequency of the alert setting checking.</Form.Description
           >
-            <Select.Trigger class="w-[280px]">
-              {triggerContent}
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Group>
-                <Select.Label>Rules</Select.Label>
-                {#each alertRuleOptions as option (option.value)}
-                  <Select.Item value={option.value} label={option.label}>
-                    {option.label}
-                  </Select.Item>
-                {/each}
-              </Select.Group>
-            </Select.Content>
-          </Select.Root>
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="frequency" class="text-right">Frequency</Label>
-          <Input
-            id="frequency"
-            bind:value={frequency_days}
-            type="number"
-            class="col-span-3"
-          />
-        </div>
-        {#if selectedRuleOption === "DiskAvailableSpaceBelowPct"}
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="threshold" class="text-right">Threshold</Label>
-            <Input
-              id="threshold"
-              bind:value={thresholdValue}
-              class="col-span-3"
-            />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="diskName" class="text-right">Disk Name</Label>
-            <Input id="diskName" bind:value={diskName} class="col-span-3" />
-          </div>
-        {:else if selectedRuleOption === "DiskAvailableSpaceBelowBytes"}
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="threshold" class="text-right">Threshold</Label>
-            <Input
-              id="threshold"
-              bind:value={thresholdValue}
-              class="col-span-3"
-            />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="diskName" class="text-right">Disk Name</Label>
-            <Input id="diskName" bind:value={diskName} class="col-span-3" />
-          </div>
-        {/if}
-      </div>
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field {form} name="threshold">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Threshold</Form.Label>
+              <Input
+                type="number"
+                {...props}
+                bind:value={$formData.threshold}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The threshold value to be hit for triggering an alert.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field {form} name="alertRule">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Alert Rule</Form.Label>
+
+              <Select.Root
+                type="single"
+                name="alertRule"
+                bind:value={$formData.alertRule}
+              >
+                <Select.Trigger class="w-[280px]">
+                  {triggerContent}
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    <Select.Label>Rules</Select.Label>
+                    {#each alertRuleOptions as option (option.value)}
+                      <Select.Item value={option.value} label={option.label}>
+                        {option.label}
+                      </Select.Item>
+                    {/each}
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The rule for the alert setting checking.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field {form} name="diskName">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Disk Name</Form.Label>
+              <Input {...props} bind:value={$formData.diskName} />
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The name of the disk to be alerted.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+      </form>
       <Dialog.Footer>
-        <Button type="submit" onclick={onCreateAlert}>Create</Button>
+        <Button type="submit" onclick={submitForm}>Create</Button>
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>

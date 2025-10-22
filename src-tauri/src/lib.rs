@@ -13,18 +13,25 @@ use tauri::{
   menu::{Menu, MenuItem},
   tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
 };
+use rusqlite::Connection;
 
-#[derive(Default)]
+#[derive(Debug)]
 struct AppState {
     counter: u32,
     disks: Vec<DiskInfo>,
+    connection: Connection,
 }
 
 impl AppState {
-    fn new(counter: u32, disks: Vec<DiskInfo>) -> Self {
+    fn new(
+        counter: u32,
+        disks: Vec<DiskInfo>,
+        connection: Connection,
+    ) -> Self {
         Self {
             counter,
             disks,
+            connection,
         }
     }
 }
@@ -480,12 +487,6 @@ fn get_disks_rust(state: State<'_, Mutex<AppState>>) -> Vec<DiskInfo> {
     state.disks.clone()
 }
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 fn hostname() -> String {
     match System::host_name() {
@@ -593,6 +594,195 @@ fn set_settings(settings: Settings) {
     }
 }
 
+trait AlertSettingRepository {
+    fn get_all_alerts(&self) -> Result<Vec<AlertSetting>, Box<dyn Error>>;
+    fn add_alert(&mut self, alert: AlertSetting) -> Result<(), Box<dyn Error>>;
+    fn update_alert(&mut self, alert: AlertSetting) -> Result<(), Box<dyn Error>>;
+    fn delete_alert(&mut self, alert_id: u32) -> Result<(), Box<dyn Error>>;
+}
+
+#[derive(Debug)]
+struct SqliteAlertSettingRepository<'a> {
+    connection: &'a Connection
+}
+
+impl AlertSettingRepository for SqliteAlertSettingRepository<'_> {
+    fn get_all_alerts(&self) -> Result<Vec<AlertSetting>, Box<dyn Error>> {
+        let mut stmt = self.connection.prepare(
+            "SELECT id, name, last_check, frequency_days, enabled, created_at, updated_at, rule FROM alert_settings",
+        )?;
+        let mut rows = stmt.query([])?;
+
+        let mut results: Vec<AlertSetting> = Vec::new();
+
+        while let Some(row) = rows.next()? {
+            let id_i64: i64 = row.get(0)?;
+            let id = id_i64 as u32;
+            let name: String = row.get(1)?;
+            let last_check: String = row.get(2)?;
+            let frequency_days: i32 = row.get(3)?;
+            // enabled stored as INTEGER (0/1)
+            let enabled_i: i32 = row.get(4)?;
+            let enabled = enabled_i != 0;
+            let created_at: String = row.get(5)?;
+            let updated_at: String = row.get(6)?;
+            let rule_str: String = row.get(7)?;
+
+            let rule: AlertRule = serde_json::from_str(&rule_str)?;
+
+            results.push(AlertSetting {
+                id,
+                name,
+                last_check,
+                frequency_days,
+                enabled,
+                created_at,
+                updated_at,
+                rule,
+            });
+        }
+
+        Ok(results)
+    }
+
+    fn add_alert(&mut self, alert: AlertSetting) -> Result<(), Box<dyn Error>> {
+        self.connection.execute(
+            "INSERT INTO alert_settings (name, last_check, frequency_days, enabled, created_at, updated_at, rule) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            (&alert.name, &alert.last_check, &alert.frequency_days, &alert.enabled, &alert.created_at, &alert.updated_at, &serde_json::to_string(&alert.rule)?),
+        )?;
+
+        Ok(())
+    }
+
+    fn update_alert(&mut self, alert: AlertSetting) -> Result<(), Box<dyn Error>> {
+        let sql = "UPDATE alert_settings SET name = ?1, last_check = ?2, frequency_days = ?3, enabled = ?4, updated_at = ?5, rule = ?6 WHERE id = ?7";
+        let mut stmt = self.connection.prepare(sql)?;
+        stmt.execute((&alert.name, &alert.last_check, &alert.frequency_days, &alert.enabled, &alert.updated_at, &serde_json::to_string(&alert.rule)?, &alert.id))?;
+    
+        Ok(())
+    }
+
+    fn delete_alert(&mut self, alert_id: u32) -> Result<(), Box<dyn Error>> {
+        todo!()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct AlertSetting {
+    id: u32,
+    name: String,
+    last_check: String,
+    frequency_days: i32,
+    enabled: bool,
+    created_at: String,
+    updated_at: String,
+    rule: AlertRule,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct AlertSettingCreateDto {
+    name: String,
+    frequency_days: i32,
+    rule: AlertRule,
+}
+
+struct AlertSettingDbDto {
+    id: u32,
+    name: String,
+    last_check: String,
+    frequency_days: i32,
+    enabled: bool,
+    created_at: String,
+    updated_at: String,
+    rule: String, // JSON serialized AlertRule
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+enum AlertRule {
+    DiskAvailableSpaceBelowPct { disk_name: String, threshold_pct: f64 },
+    DiskAvailableSpaceBelowBytes { disk_name: String, threshold_bytes: u64 },
+    DiskAvailableSpaceChangeInPct { disk_name: String, change_pct: f64 },
+    FolderSizeAboveBytes { folder_path: String, threshold_bytes: u64 },
+}
+
+#[tauri::command]
+fn add_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
+    let state = state.lock().unwrap();
+    let mut repo = SqliteAlertSettingRepository {
+        connection: &state.connection
+    };
+
+    if let Err(e) = repo.add_alert(alert.clone()) {
+        eprintln!("Failed to add alert: {}", e);
+        return;
+    }
+    
+    println!("{:?}", alert);
+}
+
+#[tauri::command]
+fn add_alert_simplify(alert: AlertSettingCreateDto, state: State<'_, Mutex<AppState>>) {
+    let state = state.lock().unwrap();
+    let mut repo = SqliteAlertSettingRepository {
+        connection: &state.connection
+    };
+
+    let new_alert = AlertSetting {
+        id: 0, // Will be set by the database
+        name: alert.name,
+        last_check: "".to_string(),
+        frequency_days: alert.frequency_days,
+        enabled: true,
+        created_at: chrono::Utc::now().to_rfc3339(),
+        updated_at: chrono::Utc::now().to_rfc3339(),
+        rule: alert.rule,
+    };
+
+    if let Err(e) = repo.add_alert(new_alert.clone()) {
+        eprintln!("Failed to add alert: {}", e);
+        return;
+    }
+    
+    println!("{:?}", new_alert);
+}
+
+#[tauri::command]
+fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
+    let state = state.lock().unwrap();
+    let repo = SqliteAlertSettingRepository {
+        connection: &state.connection
+    };
+
+
+    if let Ok(alerts) = repo.get_all_alerts() {
+        return alerts;
+    }
+
+    vec![]
+}
+
+fn process_alerts(connection: &Connection) {
+    todo!()
+}
+
+fn init_db(connection: &Connection) -> Result<(), Box<dyn Error>> {
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS alert_settings (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            last_check TEXT,
+            frequency_days INTEGER,
+            enabled INTEGER,
+            created_at TEXT,
+            updated_at TEXT,
+            rule TEXT
+        ) STRICT",
+     ()
+    )?;
+
+    Ok(())
+}
+
 fn maximize_app_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -605,7 +795,10 @@ fn maximize_app_window(app: &tauri::AppHandle) {
 pub fn run() {
     Builder::default()
         .setup(|app| {
-            app.manage(Mutex::new(AppState::new(0, get_disks())));
+            let connection = Connection::open_in_memory().unwrap();
+            init_db(&connection).unwrap();
+
+            app.manage(Mutex::new(AppState::new(0, get_disks(), connection)));
 
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
@@ -654,7 +847,6 @@ pub fn run() {
             }
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
             get_disks,
             get_disks_rust,
             hostname,
@@ -672,6 +864,9 @@ pub fn run() {
             calculate_size_by_file_type,
             get_settings,
             set_settings,
+            add_alert,
+            add_alert_simplify,
+            get_alerts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -693,6 +888,42 @@ fn read_msg() {
     println!("Your message is: {message}");
 }
 
+fn sqlite_example() -> Result<(), Box<dyn Error>> {
+    let conn = Connection::open_in_memory()?;
+
+    conn.execute(
+        "CREATE TABLE person (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            yob INTEGER,
+            data BLOB
+    ) STRICT",
+     ()
+    )?;
+
+    // Insert
+    conn.execute(
+        "INSERT INTO person (name, yob, data) VALUES (?1, ?2, ?3)",
+        (&"Steven", &1985, &None::<Vec<u8>>),
+    )?;
+
+    // Query
+    let sql = "SELECT id, name, yob, data FROM person WHERE yob > :yob";
+    let mut stmt = conn.prepare(sql)?;
+    let mut rows = stmt.query(&[(":yob", &1990)])?;
+
+    while let Some(row) = rows.next()? {
+        let id: i32 = row.get(0)?;
+        let name: String = row.get(1)?;
+        let yob: i32 = row.get(2)?;
+        let data: Option<Vec<u8>> = row.get(3)?;
+
+        println!("Found person: {} {} {} {:?}", id, name, yob, data);
+    }
+
+    Ok(())
+}
+
 /// Adds two numbers
 /// 
 /// ### Arguments
@@ -711,12 +942,6 @@ pub fn add(a: i32, b: i32) -> i32 {
 }
 
 mod tests {
-    #[test]
-    fn test_greet() {
-        let greeting = super::greet("World");
-        assert_eq!(greeting, "Hello, World! You've been greeted from Rust!");
-    }
-
     #[test]
     fn test_hostname() {
         let name = super::hostname();
