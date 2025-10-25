@@ -28,6 +28,7 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import { toast } from "svelte-sonner";
   import * as Form from "$lib/components/ui/form/index.js";
+  import { type Disk } from "$lib/types";
 
   let searchQuery = $state("");
 
@@ -50,6 +51,8 @@
       value: "DiskAvailableSpaceChangeInPct",
     },
   ] as const;
+
+  let availableDisks = $state<string[]>([]);
 
   type AlertSetting = {
     id: number;
@@ -82,31 +85,32 @@
     | DiskAvailableSpaceBelowBytes
     | DiskAvailableSpaceChangeInPct;
 
-  const date = new Date().toISOString();
-
   let alertSettings = $state<AlertSetting[]>([
-    {
-      id: 1,
-      name: "Low Disk Space on C:",
-      last_check: date,
-      frequency_days: 7,
-      enabled: true,
-      created_at: date,
-      updated_at: date,
-      rule: {
-        disk_name: "C:",
-        threshold_pct: 15.0,
-      },
-    },
+    // {
+    //   id: 1,
+    //   name: "Low Disk Space on C:",
+    //   last_check: date,
+    //   frequency_days: 7,
+    //   enabled: true,
+    //   created_at: date,
+    //   updated_at: date,
+    //   rule: {
+    //     disk_name: "C:",
+    //     threshold_pct: 15.0,
+    //   },
+    // },
   ]);
 
   async function getAlerts() {
-    const alerts = await invoke("get_alerts");
+    const alerts = await invoke<AlertSetting[]>("get_alerts");
     console.log(alerts);
+    alertSettings = alerts;
   }
 
   onMount(async () => {
     await getAlerts();
+    const disks = await invoke<Disk[]>("get_disks_rust");
+    availableDisks = disks.map((d) => d.name);
   });
 
   const triggerContent = $derived(
@@ -141,14 +145,30 @@
         },
       },
     });
+
+    const date = new Date().toISOString();
+    alertSettings = [
+      ...alertSettings,
+      {
+        id: Date.now(),
+        name: $formData.name,
+        last_check: date,
+        frequency_days: $formData.frequency_days,
+        enabled: true,
+        created_at: date,
+        updated_at: date,
+        rule,
+      },
+    ];
   }
 
   const form = superForm(defaults(zod4(formSchema)), {
     validators: zod4(formSchema),
     SPA: true,
-    onUpdate: ({ form: f }) => {
+    onUpdate: async ({ form: f }) => {
       if (f.valid) {
-        onCreateAlert();
+        await onCreateAlert();
+        // toast.success(`Alert "${f.data.name}" created successfully.`);
         toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
       } else {
         toast.error("Please fix the errors in the form.");
@@ -265,7 +285,26 @@
           <Form.Control>
             {#snippet children({ props })}
               <Form.Label>Disk Name</Form.Label>
-              <Input {...props} bind:value={$formData.diskName} />
+              <Select.Root
+                {...props}
+                type="single"
+                name="diskName"
+                bind:value={$formData.diskName}
+              >
+                <Select.Trigger class="w-[280px]">
+                  {$formData.diskName || "Select a disk"}
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    <Select.Label>Disk</Select.Label>
+                    {#each availableDisks as disk}
+                      <Select.Item value={disk} label={disk}>
+                        {disk}
+                      </Select.Item>
+                    {/each}
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
             {/snippet}
           </Form.Control>
           <Form.Description
