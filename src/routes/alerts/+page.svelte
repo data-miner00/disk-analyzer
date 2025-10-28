@@ -62,7 +62,9 @@
     enabled: boolean;
     created_at: string;
     updated_at: string;
-    rule: AlertRule;
+    rule: {
+      [key: string]: AlertRule;
+    };
   };
 
   type DiskAvailableSpaceBelowPct = {
@@ -163,7 +165,9 @@
         enabled: true,
         created_at: date,
         updated_at: date,
-        rule,
+        rule: {
+          [selectedRuleOption]: rule,
+        },
       },
     ];
 
@@ -331,6 +335,7 @@
 {#if alertSettings.length > 0}
   <div class="space-y-4">
     {#each alertSettings as alert}
+      {@const ruleType = Object.keys(alert.rule)[0]}
       <div class="p-4 border rounded-md">
         <h3 class="text-lg font-semibold">{alert.name}</h3>
         <p class="text-sm text-muted-foreground">
@@ -341,16 +346,15 @@
         </p>
         <p class="text-sm mt-2">
           Rule:
-          {#if "threshold_pct" in alert.rule}
-            Alert when disk "{alert.rule.disk_name}" has available space below {alert
-              .rule.threshold_pct}%.
-          {:else if "threshold_bytes" in alert.rule}
-            Alert when disk "{alert.rule.disk_name}" has available space below {toGB(
-              alert.rule.threshold_bytes
-            )} GB.
-          {:else if "change_pct" in alert.rule}
-            Alert when disk "{alert.rule.disk_name}" changes available space by {alert
-              .rule.change_pct}%.
+          {#if ruleType === "DiskAvailableSpaceBelowPct"}
+            Alert when disk "{alert.rule[ruleType].disk_name}" has available
+            space below {(alert.rule[ruleType] as any).threshold_pct}%.
+          {:else if ruleType === "DiskAvailableSpaceBelowBytes"}
+            Alert when disk "{alert.rule[ruleType].disk_name}" has available
+            space below {toGB((alert.rule[ruleType] as any).threshold_bytes)} GB.
+          {:else if ruleType === "DiskAvailableSpaceChangeInPct"}
+            Alert when disk "{alert.rule[ruleType].disk_name}" changes available
+            space by {(alert.rule[ruleType] as any).change_pct}%.
           {/if}
         </p>
       </div>
