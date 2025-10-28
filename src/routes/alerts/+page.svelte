@@ -101,10 +101,15 @@
     // },
   ]);
 
+  let isDialogOpen = $state(false);
+
   async function getAlerts() {
     const alerts = await invoke<AlertSetting[]>("get_alerts");
     console.log(alerts);
-    alertSettings = alerts;
+    alertSettings = alerts.map((alert) => ({
+      ...alert,
+      last_check: alert.last_check || alert.created_at,
+    }));
   }
 
   onMount(async () => {
@@ -120,6 +125,7 @@
 
   async function onCreateAlert() {
     const selectedRuleOption = $formData.alertRule;
+    console.log(selectedRuleOption);
     const rule: AlertRule =
       selectedRuleOption === "DiskAvailableSpaceBelowPct"
         ? {
@@ -160,6 +166,8 @@
         rule,
       },
     ];
+
+    isDialogOpen = false;
   }
 
   const form = superForm(defaults(zod4(formSchema)), {
@@ -193,7 +201,7 @@
       <InputGroup.Button>Search</InputGroup.Button>
     </InputGroup.Addon>
   </InputGroup.Root>
-  <Dialog.Root>
+  <Dialog.Root bind:open={isDialogOpen}>
     <Dialog.Trigger
       ><Button>
         <Plus />
