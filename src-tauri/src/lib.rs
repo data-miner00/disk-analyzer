@@ -14,6 +14,7 @@ use tauri::{
   tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
 };
 use rusqlite::Connection;
+use chrono::Local;
 
 #[derive(Debug)]
 struct AppState {
@@ -795,6 +796,9 @@ fn maximize_app_window(app: &tauri::AppHandle) {
 pub fn run() {
     Builder::default()
         .setup(|app| {
+            let now = Local::now();
+            println!("Current local time: {}", now);
+
             let connection = Connection::open_in_memory().unwrap();
             init_db(&connection).unwrap();
 
