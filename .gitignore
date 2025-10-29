@@ -13,3 +13,4 @@ vite.config.ts.timestamp-*
 # Data
 disks.csv
 settings.csv
+database.db

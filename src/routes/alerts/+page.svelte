@@ -29,6 +29,7 @@
   import { toast } from "svelte-sonner";
   import * as Form from "$lib/components/ui/form/index.js";
   import { type Disk } from "$lib/types";
+  import { Switch } from "$lib/components/ui/switch";
 
   let searchQuery = $state("");
 
@@ -102,6 +103,10 @@
     //   },
     // },
   ]);
+
+  async function changeAlertStatus(id: number, enabled: boolean) {
+    await invoke("change_alert_status", { alertId: id, enable: enabled });
+  }
 
   let isDialogOpen = $state(false);
 
@@ -336,27 +341,38 @@
   <div class="space-y-4">
     {#each alertSettings as alert}
       {@const ruleType = Object.keys(alert.rule)[0]}
-      <div class="p-4 border rounded-md">
-        <h3 class="text-lg font-semibold">{alert.name}</h3>
-        <p class="text-sm text-muted-foreground">
-          Last Check: {new Date(alert.last_check).toLocaleDateString()}
-        </p>
-        <p class="text-sm text-muted-foreground">
-          Frequency: Every {alert.frequency_days} days
-        </p>
-        <p class="text-sm mt-2">
-          Rule:
-          {#if ruleType === "DiskAvailableSpaceBelowPct"}
-            Alert when disk "{alert.rule[ruleType].disk_name}" has available
-            space below {(alert.rule[ruleType] as any).threshold_pct}%.
-          {:else if ruleType === "DiskAvailableSpaceBelowBytes"}
-            Alert when disk "{alert.rule[ruleType].disk_name}" has available
-            space below {toGB((alert.rule[ruleType] as any).threshold_bytes)} GB.
-          {:else if ruleType === "DiskAvailableSpaceChangeInPct"}
-            Alert when disk "{alert.rule[ruleType].disk_name}" changes available
-            space by {(alert.rule[ruleType] as any).change_pct}%.
-          {/if}
-        </p>
+      <div
+        class="flex gap-2 p-4 border rounded-md justify-between items-center"
+      >
+        <div>
+          <h3 class="text-lg font-semibold">{alert.name}</h3>
+          <p class="text-sm text-muted-foreground">
+            Last Check: {new Date(alert.last_check).toLocaleDateString()}
+          </p>
+          <p class="text-sm text-muted-foreground">
+            Frequency: Every {alert.frequency_days} days
+          </p>
+          <p class="text-sm mt-2">
+            Rule:
+            {#if ruleType === "DiskAvailableSpaceBelowPct"}
+              Alert when disk "{alert.rule[ruleType].disk_name}" has available
+              space below {(alert.rule[ruleType] as any).threshold_pct}%.
+            {:else if ruleType === "DiskAvailableSpaceBelowBytes"}
+              Alert when disk "{alert.rule[ruleType].disk_name}" has available
+              space below {toGB((alert.rule[ruleType] as any).threshold_bytes)}.
+            {:else if ruleType === "DiskAvailableSpaceChangeInPct"}
+              Alert when disk "{alert.rule[ruleType].disk_name}" changes
+              available space by {(alert.rule[ruleType] as any).change_pct}%.
+            {/if}
+          </p>
+        </div>
+        <div>
+          <Switch
+            checked={alert.enabled}
+            onCheckedChange={(newState) =>
+              changeAlertStatus(alert.id, newState)}
+          />
+        </div>
       </div>
     {/each}
   </div>

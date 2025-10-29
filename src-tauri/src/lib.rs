@@ -784,6 +784,26 @@ fn init_db(connection: &Connection) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+#[tauri::command]
+fn change_alert_status(alert_id: u32, enable: bool, state: State<'_, Mutex<AppState>>) {
+    let state = state.lock().unwrap();
+    if let Err(e) = enable_or_disable_alert_setting(&state.connection, alert_id, enable) {
+        eprintln!("Failed to change alert status: {}", e);
+        return;
+    }
+}
+
+fn enable_or_disable_alert_setting(connection: &Connection, alert_id: u32, enable: bool) -> Result<(), Box<dyn Error>> {
+    let sql = "UPDATE alert_settings SET enabled = ?1, updated_at = ?2 WHERE id = ?3";
+    let enabled_i: i32 = if enable { 1 } else { 0 };
+    let mut stmt = connection.prepare(sql)?;
+    stmt.execute((&enabled_i, &chrono::Utc::now().to_rfc3339(), &alert_id))?;
+
+    println!("Alert ID {} has been {}", alert_id, if enable { "enabled" } else { "disabled" });
+
+    Ok(())
+}
+
 fn maximize_app_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -799,7 +819,7 @@ pub fn run() {
             let now = Local::now();
             println!("Current local time: {}", now);
 
-            let connection = Connection::open_in_memory().unwrap();
+            let connection = Connection::open("database.db").unwrap();
             init_db(&connection).unwrap();
 
             app.manage(Mutex::new(AppState::new(0, get_disks(), connection)));
@@ -871,6 +891,7 @@ pub fn run() {
             add_alert,
             add_alert_simplify,
             get_alerts,
+            change_alert_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
