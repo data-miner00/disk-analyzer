@@ -1,9 +1,11 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import { HardDrive } from "@lucide/svelte";
+  import { HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { type Disk } from "$lib/types";
   import { toGB } from "$lib/utils";
+  import * as InputGroup from "$lib/components/ui/input-group/index.js";
+  import { derived } from "svelte/store";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
@@ -61,13 +63,29 @@
   function toPercentage(used: number, total: number): number {
     return (used / total) * 100;
   }
+
+  let filteredDisk = $derived(
+    diskInfo.filter((x) => x.name.includes(searchQuery))
+  );
+
+  let searchQuery = $state("");
 </script>
 
 <main class="container my-6">
   <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
+  <InputGroup.Root class="mb-4">
+    <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
+    <InputGroup.Addon>
+      <SearchIcon />
+    </InputGroup.Addon>
+    <InputGroup.Addon align="inline-end">
+      <InputGroup.Button>Search</InputGroup.Button>
+    </InputGroup.Addon>
+  </InputGroup.Root>
+
   <ul class="flex gap-4 items-center flex-wrap">
-    {#each diskInfo as disk}
+    {#each filteredDisk as disk}
       {@const usedSpacePercentage = toPercentage(
         disk.total_space - disk.available_space,
         disk.total_space
@@ -100,6 +118,12 @@
       </li>
     {/each}
   </ul>
+
+  <section class="my-12">
+    <p>How many files</p>
+    <p>Largest file</p>
+    <p>Largest file extension</p>
+  </section>
 </main>
 
 <style lang="postcss">
