@@ -5,7 +5,6 @@
   import { type Disk } from "$lib/types";
   import { toGB } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
-  import { derived } from "svelte/store";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
@@ -65,7 +64,9 @@
   }
 
   let filteredDisk = $derived(
-    diskInfo.filter((x) => x.name.includes(searchQuery))
+    diskInfo.filter((x) =>
+      x.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
   );
 
   let searchQuery = $state("");
