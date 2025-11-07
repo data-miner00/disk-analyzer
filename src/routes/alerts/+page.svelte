@@ -8,6 +8,16 @@
     alertRule: z.string(),
     diskName: z.string().min(1),
   });
+
+  const updateFormSchema = z.object({
+    id: z.number().min(1),
+    name: z.string().min(2).max(50),
+    frequency_days: z.number().min(1).max(365),
+    threshold: z.number().min(1),
+    alertRule: z.string(),
+    diskName: z.string().min(1),
+    enabled: z.boolean(),
+  });
 </script>
 
 <script lang="ts">
@@ -15,7 +25,7 @@
   import { zod4 } from "sveltekit-superforms/adapters";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { Bell, Plus } from "@lucide/svelte";
+  import { Bell, Pencil, Plus, Trash } from "@lucide/svelte";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { toGB } from "$lib/utils";
   import { invoke } from "@tauri-apps/api/core";
@@ -32,6 +42,7 @@
   import { Switch } from "$lib/components/ui/switch";
 
   let searchQuery = $state("");
+  let currentSelectedAlertForUpdate = $state<AlertSetting>();
 
   type SelectOption = {
     label: string;
@@ -88,27 +99,14 @@
     | DiskAvailableSpaceBelowBytes
     | DiskAvailableSpaceChangeInPct;
 
-  let alertSettings = $state<AlertSetting[]>([
-    // {
-    //   id: 1,
-    //   name: "Low Disk Space on C:",
-    //   last_check: date,
-    //   frequency_days: 7,
-    //   enabled: true,
-    //   created_at: date,
-    //   updated_at: date,
-    //   rule: {
-    //     disk_name: "C:",
-    //     threshold_pct: 15.0,
-    //   },
-    // },
-  ]);
+  let alertSettings = $state<AlertSetting[]>([]);
 
   async function changeAlertStatus(id: number, enabled: boolean) {
     await invoke("change_alert_status", { alertId: id, enable: enabled });
   }
 
-  let isDialogOpen = $state(false);
+  let isCreateDialogOpen = $state(false);
+  let isEditDialogOpen = $state(false);
 
   async function getAlerts() {
     const alerts = await invoke<AlertSetting[]>("get_alerts");
@@ -127,6 +125,11 @@
 
   const triggerContent = $derived(
     alertRuleOptions.find((f) => f.value === $formData.alertRule)?.label ??
+      "Select a rule"
+  );
+
+  const editTriggerContent = $derived(
+    alertRuleOptions.find((f) => f.value === $editFormData.alertRule)?.label ??
       "Select a rule"
   );
 
@@ -176,7 +179,60 @@
       },
     ];
 
-    isDialogOpen = false;
+    isCreateDialogOpen = false;
+  }
+
+  async function onEditAlert() {
+    const selectedRuleOption = $editFormData.alertRule;
+    console.log(selectedRuleOption);
+    const rule: AlertRule =
+      selectedRuleOption === "DiskAvailableSpaceBelowPct"
+        ? {
+            disk_name: $editFormData.diskName,
+            threshold_pct: parseFloat($editFormData.threshold.toString()),
+          }
+        : selectedRuleOption === "DiskAvailableSpaceBelowBytes"
+          ? {
+              disk_name: $editFormData.diskName,
+              threshold_bytes: parseInt($editFormData.threshold.toString()),
+            }
+          : {
+              disk_name: $editFormData.diskName,
+              change_pct: parseFloat($editFormData.threshold.toString()),
+            };
+
+    const date = new Date().toISOString();
+    await invoke("update_alert", {
+      alert: {
+        id: $editFormData.id,
+        name: $editFormData.name,
+        frequency_days: $editFormData.frequency_days,
+        rule: {
+          [selectedRuleOption]: rule,
+        },
+        enabled: $editFormData.enabled, // to enable on UI
+        last_check: date, // Make these unquired by using DTO
+        created_at: date,
+        updated_at: date,
+      },
+    });
+
+    const indexInUI = alertSettings.findIndex((x) => x.id === $editFormData.id);
+
+    alertSettings[indexInUI] = {
+      id: $editFormData.id,
+      name: $editFormData.name,
+      last_check: date,
+      frequency_days: $editFormData.frequency_days,
+      enabled: $editFormData.enabled,
+      created_at: date,
+      updated_at: date,
+      rule: {
+        [selectedRuleOption]: rule,
+      },
+    };
+
+    isEditDialogOpen = false;
   }
 
   const form = superForm(defaults(zod4(formSchema)), {
@@ -195,8 +251,27 @@
 
   const { form: formData, enhance } = form;
 
+  const editForm = superForm(defaults(zod4(updateFormSchema)), {
+    validators: zod4(updateFormSchema),
+    SPA: true,
+    onUpdate: async ({ form: f }) => {
+      if (f.valid) {
+        await onEditAlert();
+        toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+      } else {
+        toast.error("Please fix the errors in the form.");
+      }
+    },
+  });
+
+  const { form: editFormData, enhance: enhance2 } = editForm;
+
   function submitForm() {
     form.submit();
+  }
+
+  function submitEditForm() {
+    editForm.submit();
   }
 </script>
 
@@ -210,7 +285,7 @@
       <InputGroup.Button>Search</InputGroup.Button>
     </InputGroup.Addon>
   </InputGroup.Root>
-  <Dialog.Root bind:open={isDialogOpen}>
+  <Dialog.Root bind:open={isCreateDialogOpen}>
     <Dialog.Trigger
       ><Button>
         <Plus />
@@ -335,6 +410,127 @@
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
+
+  <!-- Edit dialog -->
+  <Dialog.Root bind:open={isEditDialogOpen}>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Edit {currentSelectedAlertForUpdate?.name}</Dialog.Title>
+        <Dialog.Description>
+          Configure the settings for your new alert below.
+        </Dialog.Description>
+      </Dialog.Header>
+      <form method="POST" class="space-y-6 h-72 overflow-y-auto" use:enhance2>
+        <Form.Field form={editForm} name="name">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Name</Form.Label>
+              <Input {...props} bind:value={$editFormData.name} />
+            {/snippet}
+          </Form.Control>
+          <Form.Description>The name of the alert setting.</Form.Description>
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field form={editForm} name="frequency_days">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Frequency</Form.Label>
+              <Input
+                type="number"
+                {...props}
+                bind:value={$editFormData.frequency_days}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The frequency of the alert setting checking.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field form={editForm} name="threshold">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Threshold</Form.Label>
+              <Input
+                type="number"
+                {...props}
+                bind:value={$editFormData.threshold}
+              />
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The threshold value to be hit for triggering an alert.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field form={editForm} name="alertRule">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Alert Rule</Form.Label>
+
+              <Select.Root
+                type="single"
+                name="alertRule"
+                bind:value={$editFormData.alertRule}
+              >
+                <Select.Trigger class="w-[280px]">
+                  {editTriggerContent}
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    <Select.Label>Rules</Select.Label>
+                    {#each alertRuleOptions as option (option.value)}
+                      <Select.Item value={option.value} label={option.label}>
+                        {option.label}
+                      </Select.Item>
+                    {/each}
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The rule for the alert setting checking.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+        <Form.Field form={editForm} name="diskName">
+          <Form.Control>
+            {#snippet children({ props })}
+              <Form.Label>Disk Name</Form.Label>
+              <Select.Root
+                {...props}
+                type="single"
+                name="diskName"
+                bind:value={$editFormData.diskName}
+              >
+                <Select.Trigger class="w-[280px]">
+                  {$editFormData.diskName || "Select a disk"}
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Group>
+                    <Select.Label>Disk</Select.Label>
+                    {#each availableDisks as disk}
+                      <Select.Item value={disk} label={disk}>
+                        {disk}
+                      </Select.Item>
+                    {/each}
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
+            {/snippet}
+          </Form.Control>
+          <Form.Description
+            >The name of the disk to be alerted.</Form.Description
+          >
+          <Form.FieldErrors />
+        </Form.Field>
+      </form>
+      <Dialog.Footer>
+        <Button type="submit" onclick={submitEditForm}>Edit</Button>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
 </div>
 
 {#if alertSettings.length > 0}
@@ -366,7 +562,48 @@
             {/if}
           </p>
         </div>
-        <div>
+        <div class="flex items-center gap-4">
+          <Button variant="outline">
+            <Trash />
+          </Button>
+
+          <Button
+            variant="outline"
+            onclick={() => {
+              const key: string = Object.keys(alert.rule)[0]!;
+
+              const rule = alert.rule[key] as any;
+
+              // Use the rule key (discriminant) to determine shape
+              if (key === "DiskAvailableSpaceBelowPct") {
+                $editFormData.threshold = (
+                  rule as DiskAvailableSpaceBelowPct
+                ).threshold_pct;
+              } else if (key === "DiskAvailableSpaceBelowBytes") {
+                $editFormData.threshold = (
+                  rule as DiskAvailableSpaceBelowBytes
+                ).threshold_bytes;
+              } else if (key === "DiskAvailableSpaceChangeInPct") {
+                $editFormData.threshold = (
+                  rule as DiskAvailableSpaceChangeInPct
+                ).change_pct;
+              } else {
+                $editFormData.threshold = 0;
+              }
+
+              currentSelectedAlertForUpdate = alert;
+              $editFormData.alertRule = key;
+              $editFormData.id = alert.id;
+              $editFormData.diskName = alert.rule[key].disk_name;
+              $editFormData.name = alert.name;
+              $editFormData.enabled = alert.enabled;
+              $editFormData.frequency_days = alert.frequency_days;
+              isEditDialogOpen = true;
+            }}
+          >
+            <Pencil />
+          </Button>
+
           <Switch
             checked={alert.enabled}
             onCheckedChange={(newState) =>

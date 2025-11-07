@@ -664,7 +664,11 @@ impl AlertSettingRepository for SqliteAlertSettingRepository<'_> {
     }
 
     fn delete_alert(&mut self, alert_id: u32) -> Result<(), Box<dyn Error>> {
-        todo!()
+        let sql = "DELETE FROM alert_settings WHERE id = ?1";
+        let mut stmt = self.connection.prepare(sql)?;
+        stmt.execute((&alert_id,))?;
+
+        Ok(())
     }
 }
 
@@ -745,6 +749,32 @@ fn add_alert_simplify(alert: AlertSettingCreateDto, state: State<'_, Mutex<AppSt
     }
     
     println!("{:?}", new_alert);
+}
+
+#[tauri::command]
+fn update_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
+    let state = state.lock().unwrap();
+    let mut repo = SqliteAlertSettingRepository {
+        connection: &state.connection
+    };
+
+    if let Err(e) = repo.update_alert(alert.clone()) {
+        eprintln!("Failed to update alert: {}", e);
+        return;
+    }
+}
+
+#[tauri::command]
+fn delete_alert(alert_id: u32, state: State<'_, Mutex<AppState>>) {
+    let state = state.lock().unwrap();
+    let mut repo = SqliteAlertSettingRepository {
+        connection: &state.connection
+    };
+
+    if let Err(e) = repo.delete_alert(alert_id) {
+        eprintln!("Failed to delete alert: {}", e);
+        return;
+    }
 }
 
 #[tauri::command]
@@ -892,6 +922,8 @@ pub fn run() {
             add_alert_simplify,
             get_alerts,
             change_alert_status,
+            update_alert,
+            delete_alert,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
