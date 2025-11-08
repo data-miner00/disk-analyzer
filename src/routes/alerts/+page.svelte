@@ -107,6 +107,7 @@
 
   let isCreateDialogOpen = $state(false);
   let isEditDialogOpen = $state(false);
+  let isDeleteDialogOpen = $state(false);
 
   async function getAlerts() {
     const alerts = await invoke<AlertSetting[]>("get_alerts");
@@ -272,6 +273,22 @@
 
   function submitEditForm() {
     editForm.submit();
+  }
+
+  async function deleteAlert() {
+    await invoke("delete_alert", {
+      alertId: currentSelectedAlertForUpdate?.id,
+    });
+
+    isDeleteDialogOpen = false;
+
+    alertSettings = alertSettings.filter(
+      (x) => x.id != currentSelectedAlertForUpdate?.id
+    );
+
+    toast.success(
+      `Successfully deleted alert '${currentSelectedAlertForUpdate?.name}'`
+    );
   }
 </script>
 
@@ -531,6 +548,25 @@
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
+
+  <!-- Remove alert dialog -->
+  <Dialog.Root bind:open={isDeleteDialogOpen}>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Delete {currentSelectedAlertForUpdate?.name}</Dialog.Title
+        >
+        <Dialog.Description>
+          Are you sure to delete this alert?
+        </Dialog.Description>
+      </Dialog.Header>
+
+      <Dialog.Footer>
+        <Button type="submit" onclick={deleteAlert} variant="destructive"
+          >Delete</Button
+        >
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
 </div>
 
 {#if alertSettings.length > 0}
@@ -563,7 +599,13 @@
           </p>
         </div>
         <div class="flex items-center gap-4">
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onclick={() => {
+              currentSelectedAlertForUpdate = alert;
+              isDeleteDialogOpen = true;
+            }}
+          >
             <Trash />
           </Button>
 
