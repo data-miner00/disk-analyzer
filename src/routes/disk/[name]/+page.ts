@@ -11,3 +11,5 @@ export async function load({ params }) {
     disk,
   };
 }
+
+export const prerender = false;
