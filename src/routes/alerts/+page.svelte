@@ -101,6 +101,12 @@
 
   let alertSettings = $state<AlertSetting[]>([]);
 
+  let filteredAlerts = $derived(
+    alertSettings.filter((alert) =>
+      alert.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   async function changeAlertStatus(id: number, enabled: boolean) {
     await invoke("change_alert_status", { alertId: id, enable: enabled });
   }
@@ -571,7 +577,7 @@
 
 {#if alertSettings.length > 0}
   <div class="space-y-4">
-    {#each alertSettings as alert}
+    {#each filteredAlerts as alert}
       {@const ruleType = Object.keys(alert.rule)[0]}
       <div
         class="flex gap-2 p-4 border rounded-md justify-between items-center"
