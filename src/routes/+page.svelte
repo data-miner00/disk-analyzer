@@ -1,10 +1,12 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { listen } from "@tauri-apps/api/event";
   import { HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { type Disk } from "$lib/types";
   import { toGB } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
+  import { toast } from "svelte-sonner";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
@@ -56,6 +58,7 @@
   onMount(async () => {
     await get_disks();
     await process_daily_disk_info();
+    await invoke("frontend_loaded");
     isLoading = false;
   });
 
@@ -70,6 +73,12 @@
   );
 
   let searchQuery = $state("");
+
+  listen<DiskDto>("hello", (event) => {
+    toast.success(
+      `hello world received ${JSON.stringify(event.payload, null, 2)}`
+    );
+  });
 </script>
 
 <main class="container my-6">

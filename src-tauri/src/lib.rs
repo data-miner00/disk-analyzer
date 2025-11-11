@@ -8,8 +8,9 @@ use std::ops::{Add, Sub, Mul};
 use std::convert::Into;
 use std::collections::{HashMap, HashSet};
 use serde_json::json;
-use tauri::{Builder, Manager, State};
+use tauri::{Builder, Emitter, Manager, State};
 use tauri::{
+  AppHandle,
   menu::{Menu, MenuItem},
   tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
 };
@@ -792,6 +793,18 @@ fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
     vec![]
 }
 
+#[tauri::command]
+fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
+    // let state = state.lock().unwrap();
+    // process_alerts(&state.connection);
+    app.emit("hello", DiskDto {
+        id: 1,
+        name: "Hello".to_string(),
+        available_space: 1043,
+        date: "2024-01-01".to_string(),
+    });
+}
+
 fn process_alerts(connection: &Connection) {
     todo!()
 }
@@ -834,7 +847,7 @@ fn enable_or_disable_alert_setting(connection: &Connection, alert_id: u32, enabl
     Ok(())
 }
 
-fn maximize_app_window(app: &tauri::AppHandle) {
+fn maximize_app_window(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
         let _ = window.show();
@@ -924,6 +937,7 @@ pub fn run() {
             change_alert_status,
             update_alert,
             delete_alert,
+            frontend_loaded,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
