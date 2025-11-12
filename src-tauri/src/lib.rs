@@ -258,6 +258,72 @@ impl DiskInfo {
 }
 
 #[tauri::command]
+fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
+    let disk_history = read_disk_dtos(Some(20));
+    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
+    let mut aggregated_data: Vec<LayerChartReportData<f64>> = vec![];
+    let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
+    let mut chart_config: Vec<LayerChartConfigItem> = Vec::new();
+    let mut counter = 1; // Start with 1 because the CSS starts with 1
+
+    for disk_name in distinct_disks {
+        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
+        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let mut distinct_days: Vec<String> = distinct_days.into_iter().collect();
+        distinct_days.sort();
+
+        let mut previous_usage_space: Option<u64> = None;
+
+        for day in distinct_days {
+            if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(prev_space) = previous_usage_space {
+                        let change = round_to_two_decimal_places(calculate_usage_change_percentage(prev_space, history.available_space));
+                        current_agg.values.insert(id_disk_name.clone(), change);
+                    } else {
+                        current_agg.values.insert(id_disk_name.clone(), 0f64);
+                    }
+                    previous_usage_space = Some(history.available_space);
+                }
+            } else {
+                let mut new_entry = LayerChartReportData::empty(day.clone());
+                if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
+                    if let Some(prev_space) = previous_usage_space {
+                        let change = round_to_two_decimal_places(calculate_usage_change_percentage(prev_space, history.available_space));
+                        new_entry.values.insert(id_disk_name.clone(), change);
+                    } else {
+                        new_entry.values.insert(id_disk_name.clone(), 0f64);
+                    }
+                    previous_usage_space = Some(history.available_space);
+                }
+                aggregated_data.push(new_entry)
+            }
+        }
+
+        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
+            label: disk_name.clone(),
+            color: format!("var(--chart-{})", counter),
+        });
+        chart_config.push(LayerChartConfigItem {
+            key: id_disk_name,
+            label: disk_name,
+            color: format!("var(--chart-{})", counter),
+        });
+
+        counter += 1;
+    }
+
+    Report::<f64> {
+        report_type: ReportType::ChangeInUsedSpace,
+        data: aggregated_data,
+        container_config,
+        chart_config,
+    }
+}
+
+#[tauri::command]
 fn aggregate_disk_available_space_history() -> Report<u64> {
     let disk_history = read_disk_dtos(Some(20));
     let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
@@ -938,6 +1004,7 @@ pub fn run() {
             update_alert,
             delete_alert,
             frontend_loaded,
+            aggregate_disk_usage_space_changed_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -1012,6 +1079,19 @@ pub fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
+pub fn calculate_usage_change_percentage(previous_available: u64, current_available: u64) -> f64 {
+    if previous_available == 0 {
+        return 0f64;
+    }
+
+    let change = previous_available as i64 - current_available as i64;
+    (change as f64 / previous_available as f64) * 100f64
+}
+
+pub fn round_to_two_decimal_places(value: f64) -> f64 {
+    (value * 100.0).round() / 100.0
+}
+
 mod tests {
     #[test]
     fn test_hostname() {
@@ -1024,5 +1104,38 @@ mod tests {
         let actual = super::to_percentage(45, 73);
         let expected = 61.64383561643836f64;
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_calculate_usage_change_percentage() {
+        let test_cases = vec![
+            (1000u64, 900u64, 10f64),
+            (1000u64, 1100u64, -10f64),
+            (2000u64, 1500u64, 25f64),
+            (500u64, 250u64, 50f64),
+            (0u64, 0u64, 0f64), // Edge case: previous is zero
+            (1000u64, 1000u64, 0f64), // No change
+        ];
+
+        for (previous, current, expected) in test_cases {
+            let actual = super::calculate_usage_change_percentage(previous, current);
+            assert_eq!(actual, expected);
+        }
+    }
+
+    #[test]
+    fn test_round_to_two_decimal_places() {
+        let test_cases = vec![
+            (12.34567f64, 12.35f64),
+            (0.123456f64, 0.12f64),
+            (99.9999f64, 100.0f64),
+            (1.005f64, 1.00f64), // 100.49 precision error
+            (2.674f64, 2.67f64),
+        ];
+
+        for (input, expected) in test_cases {
+            let actual = super::round_to_two_decimal_places(input);
+            assert_eq!(actual, expected);
+        }
     }
 }
