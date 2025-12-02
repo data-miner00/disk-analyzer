@@ -79,6 +79,10 @@
       `hello world received ${JSON.stringify(event.payload, null, 2)}`
     );
   });
+
+  document.cookie = "sveltekit_cookie_test=1; SameSite=Lax;";
+  document.cookie =
+    "sveltekit_cookie_test2=2; domain=.example.com; path=/path1;"; // no max age, cookie always destroyed when browser closed
 </script>
 
 <main class="container my-6">
@@ -129,7 +133,7 @@
     {/each}
   </ul>
 
-  <section class="my-12">
+  <section class="my-12" inert>
     <p>How many files</p>
     <p>Largest file</p>
     <p>Largest file extension</p>
