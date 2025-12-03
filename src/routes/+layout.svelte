@@ -65,8 +65,11 @@
             <Menubar.Separator />
             <Menubar.Item>Print</Menubar.Item>
             <Menubar.Separator />
-            <Menubar.Item>
-              <button onclick={exit_app}>Exit</button>
+            <Menubar.Item class="p-0">
+              <button
+                class="block w-full h-full px-2 py-1.5 text-left cursor-pointer"
+                onclick={exit_app}>Exit</button
+              >
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Menu>
@@ -86,14 +89,18 @@
               Dashboard
               <Menubar.Shortcut>⌘D</Menubar.Shortcut>
             </Menubar.Item>
-            <Menubar.Item>
-              <a href="/alerts">Alerts</a>
+            <Menubar.Item class="p-0">
+              <a class="block w-full h-full px-2 py-1.5" href="/alerts"
+                >Alerts</a
+              >
             </Menubar.Item>
-            <Menubar.Item>
-              <a href="/charts">Charts</a>
+            <Menubar.Item class="p-0">
+              <a class="block w-full h-full px-2 py-1.5" href="/charts"
+                >Charts</a
+              >
             </Menubar.Item>
-            <Menubar.Item>
-              <a href="/utils">Utils</a>
+            <Menubar.Item class="p-0">
+              <a class="block w-full h-full px-2 py-1.5" href="/utils">Utils</a>
             </Menubar.Item>
           </Menubar.Content>
         </Menubar.Menu>
@@ -107,14 +114,23 @@
     <div class="flex items-center gap-4">
       <div>{hostname}</div>
       <div class="flex items-center gap-4">
-        <button class="block p-2">
-          <Minus size={16} onclick={minimize_window} />
+        <button
+          class="block p-2 hover:bg-accent cursor-pointer rounded focus:bg-accent focus:text-accent-foregroun"
+          onclick={minimize_window}
+        >
+          <Minus size={16} />
         </button>
-        <button class="block p-2">
-          <Square size={16} onclick={maximize_window} />
+        <button
+          class="block p-2 hover:bg-accent cursor-pointer rounded focus:bg-accent focus:text-accent-foregroun"
+          onclick={maximize_window}
+        >
+          <Square size={16} />
         </button>
-        <button class="block p-2">
-          <X size={16} onclick={exit_app} />
+        <button
+          class="block p-2 hover:bg-accent cursor-pointer rounded focus:bg-accent focus:text-accent-foregroun"
+          onclick={exit_app}
+        >
+          <X size={16} />
         </button>
       </div>
     </div>
