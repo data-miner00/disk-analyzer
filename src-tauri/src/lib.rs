@@ -863,7 +863,7 @@ fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
 fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
     // let state = state.lock().unwrap();
     // process_alerts(&state.connection);
-    app.emit("hello", DiskDto {
+    let _ = app.emit("hello", DiskDto {
         id: 1,
         name: "Hello".to_string(),
         available_space: 1043,
@@ -872,7 +872,50 @@ fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
 }
 
 fn process_alerts(connection: &Connection) {
-    todo!()
+    let repo = SqliteAlertSettingRepository {
+        connection,
+    };
+
+    let disks = get_disks();
+
+    if let Ok(alerts) = repo.get_all_alerts() {
+        for alert in alerts {
+            if !alert.enabled {
+                continue;
+            }
+
+            println!("Processing alert: {:?}", alert);
+
+            match &alert.rule {
+                AlertRule::DiskAvailableSpaceBelowPct { disk_name, threshold_pct } => {
+                    let maybe_disk = disks.iter().find(|disk| disk_name.starts_with(&disk.name));
+
+                    if let Some(disk) = maybe_disk {
+                        let available_pct = calculate_available_percentage(disk.total_space, disk.available_space);
+
+                        if available_pct < *threshold_pct {
+                            println!("Alert trigered");
+                        }
+                    }
+                },
+                AlertRule::DiskAvailableSpaceBelowBytes { disk_name, threshold_bytes } => {
+                    let maybe_disk = disks.iter().find(|disk| disk_name.starts_with(&disk.name));
+
+                    if let Some(disk) = maybe_disk {
+                        if disk.available_space < *threshold_bytes {
+                            println!("Alert trigered");
+                        }
+                    }
+                },
+                AlertRule::DiskAvailableSpaceChangeInPct { disk_name, change_pct } => {
+                    todo!("not implemented exception");
+                },
+                AlertRule::FolderSizeAboveBytes { folder_path, threshold_bytes } => {
+                    todo!("not implemented exception");
+                },
+            }
+        }
+    }
 }
 
 fn init_db(connection: &Connection) -> Result<(), Box<dyn Error>> {
@@ -930,6 +973,7 @@ pub fn run() {
 
             let connection = Connection::open("database.db").unwrap();
             init_db(&connection).unwrap();
+            process_alerts(&connection);
 
             app.manage(Mutex::new(AppState::new(0, get_disks(), connection)));
 
@@ -1079,6 +1123,14 @@ pub fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
+pub fn calculate_available_percentage(total: u64, available: u64) -> f64 {
+    (available as f64 / total as f64) * 100f64
+}
+
+pub fn calculate_used_percentage(total: u64, available: u64) -> f64 {
+    ((total as f64 - available as f64) / total as f64) * 100f64
+}
+
 pub fn calculate_usage_change_percentage(previous_available: u64, current_available: u64) -> f64 {
     if previous_available == 0 {
         return 0f64;
@@ -1137,5 +1189,43 @@ mod tests {
             let actual = super::round_to_two_decimal_places(input);
             assert_eq!(actual, expected);
         }
+    }
+
+    #[test]
+    fn test_calculate_available_percentage() {
+        // Test basic calculation: 50GB available out of 100GB should be 50%
+        assert_eq!(super::calculate_available_percentage(100, 50), 50.0);
+
+        // Test 100% available
+        assert_eq!(super::calculate_available_percentage(100, 100), 100.0);
+
+        // Test 0% available
+        assert_eq!(super::calculate_available_percentage(100, 0), 0.0);
+
+        // Test with larger numbers (1TB total, 500GB available)
+        assert_eq!(super::calculate_available_percentage(1_000_000_000_000, 500_000_000_000), 50.0);
+
+        // Test with fractional results
+        let result = super::calculate_available_percentage(1000, 333);
+        assert!((result - 33.3).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_calculate_used_percentage() {
+        // Test basic calculation: 50GB used out of 100GB should be 50%
+        assert_eq!(super::calculate_used_percentage(100, 50), 50.0);
+
+        // Test 0% used (all available)
+        assert_eq!(super::calculate_used_percentage(100, 100), 0.0);
+
+        // Test 100% used (nothing available)
+        assert_eq!(super::calculate_used_percentage(100, 0), 100.0);
+
+        // Test with larger numbers (1TB total, 500GB available means 500GB used)
+        assert_eq!(super::calculate_used_percentage(1_000_000_000_000, 500_000_000_000), 50.0);
+
+        // Test with fractional results
+        let result = super::calculate_used_percentage(1000, 333);
+        assert!((result - 66.7).abs() < 0.1);
     }
 }
