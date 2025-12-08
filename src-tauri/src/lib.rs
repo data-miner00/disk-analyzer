@@ -967,7 +967,16 @@ fn maximize_app_window(app: &AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
+            use tauri_plugin_notification::NotificationExt;
+            app.notification()
+                .builder()
+                .title("Tauri")
+                .body("Tauri is awesome")
+                .show()
+                .unwrap();
+
             let now = Local::now();
             println!("Current local time: {}", now);
 
