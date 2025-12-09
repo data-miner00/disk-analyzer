@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "../ui/button";
   import { Input } from "../ui/input";
+  import { Plus, Minus } from "@lucide/svelte";
 
   type Props = {
     title: string;
@@ -42,10 +43,14 @@
     <p>{description}</p>
   </div>
   <div class="flex items-center gap-2">
-    <Button variant="outline" onclick={decrement}>-</Button>
+    <Button class="cursor-pointer" variant="outline" onclick={decrement}>
+      <Minus />
+    </Button>
     <div>
       <Input {min} {max} bind:value type="number" {placeholder} />
     </div>
-    <Button variant="outline" onclick={increment}>+</Button>
+    <Button class="cursor-pointer" variant="outline" onclick={increment}>
+      <Plus />
+    </Button>
   </div>
 </div>
