@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Menubar from "$lib/components/ui/menubar";
-  import { Home, Minus, Square, X } from "@lucide/svelte";
+  import { House, Minus, Square, X } from "@lucide/svelte";
   import { invoke } from "@tauri-apps/api/core";
 
   import { onMount } from "svelte";
@@ -44,7 +44,7 @@
         href="/"
         class="flex items-center justify-center w-full h-full hover:bg-gray-100 rounded-md"
       >
-        <Home size={18} />
+        <House size={18} />
       </a>
     </div>
     <Menubar.Root class="w-fit">
