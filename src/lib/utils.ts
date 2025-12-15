@@ -47,7 +47,7 @@ export function toPercentage(used: number, total: number): number {
  * @returns A string representing the date in "YYYY-MM-DD" format.
  */
 export function toYyyyMmDd(date: Date): string {
-  return date.toISOString().split("T")[0];
+  return date.toLocaleDateString("en-CA");
 }
 
 export function convertObjectKeysToCamelCase<T>(obj: T): T {
