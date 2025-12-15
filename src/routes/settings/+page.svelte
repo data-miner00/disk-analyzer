@@ -14,6 +14,7 @@
     settingsState,
   } from "../../states/settings-state.svelte";
   import { convertObjectKeysToCamelCase } from "$lib/utils";
+  import { locale, type I18n } from "$lib/i18n/translations.svelte";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -80,6 +81,11 @@
       document.documentElement.classList.remove("dark");
       localStorage.theme = "light";
     }
+  });
+
+  $effect(() => {
+    localStorage.locale = settings.language;
+    locale.current = settings.language as keyof I18n;
   });
 
   onMount(async () => {

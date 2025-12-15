@@ -5,6 +5,7 @@
   import { type Disk } from "$lib/types";
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
+  import { HOME, t } from "$lib/i18n/translations.svelte";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
@@ -34,7 +35,7 @@
       lastRecordedDate &&
       lastRecordedDate.toDateString() === today.toDateString()
     ) {
-      console.log("Today's disk info has already been recorded.");
+      console.log(t(HOME.LOG));
       return;
     }
 
@@ -72,7 +73,10 @@
   <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
   <InputGroup.Root class="mb-4">
-    <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
+    <InputGroup.Input
+      bind:value={searchQuery}
+      placeholder={t(HOME.SEARCH_PLACEHOLDER)}
+    />
     <InputGroup.Addon>
       <SearchIcon />
     </InputGroup.Addon>
@@ -115,12 +119,6 @@
       </li>
     {/each}
   </ul>
-
-  <section class="my-12" inert>
-    <p>How many files</p>
-    <p>Largest file</p>
-    <p>Largest file extension</p>
-  </section>
 </main>
 
 <style lang="postcss">
