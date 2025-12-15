@@ -36,6 +36,19 @@ export function snakeToCamelCase(str: string): string {
     group.toUpperCase().replace("-", "").replace("_", "")
   );
 }
+export function toPercentage(used: number, total: number): number {
+  return (used / total) * 100;
+}
+
+/**
+ * Converts a Date object to a string in the format "YYYY-MM-DD".
+ *
+ * @param date - The Date object to convert.
+ * @returns A string representing the date in "YYYY-MM-DD" format.
+ */
+export function toYyyyMmDd(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
 
 export function convertObjectKeysToCamelCase<T>(obj: T): T {
   if (typeof obj !== "object" || obj === null) {

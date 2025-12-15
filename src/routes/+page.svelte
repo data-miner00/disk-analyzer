@@ -3,7 +3,7 @@
   import { HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { type Disk } from "$lib/types";
-  import { toGB } from "$lib/utils";
+  import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
 
   let diskInfo = $state<Disk[]>([]);
@@ -46,7 +46,7 @@
         name:
           disk.name === "Unnamed" ? `Unnamed_${disk.total_space}` : disk.name,
         available_space: disk.available_space,
-        date: today.toISOString().split("T")[0],
+        date: toYyyyMmDd(today),
       });
     }
 
@@ -58,10 +58,6 @@
     await process_daily_disk_info();
     isLoading = false;
   });
-
-  function toPercentage(used: number, total: number): number {
-    return (used / total) * 100;
-  }
 
   let filteredDisk = $derived(
     diskInfo.filter((x) =>
