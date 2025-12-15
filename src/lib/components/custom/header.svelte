@@ -5,6 +5,7 @@
 
   import { onMount } from "svelte";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { t, HEADER } from "$lib/i18n/translations.svelte";
 
   let hostname = $state("Unknown");
 
@@ -49,40 +50,42 @@
     </div>
     <Menubar.Root class="w-fit">
       <Menubar.Menu>
-        <Menubar.Trigger>Misc</Menubar.Trigger>
+        <Menubar.Trigger>{t(HEADER.MISC)}</Menubar.Trigger>
         <Menubar.Content>
           <Menubar.Item onclick={open_file_explorer}>
-            Open Explorer
+            {t(HEADER.OPEN_EXPLORER)}
             <Menubar.Shortcut>⌘E</Menubar.Shortcut>
           </Menubar.Item>
           <Menubar.Item class="p-0">
-            <a class="block w-full h-full px-2 py-1.5" href="/utils">Utility</a>
+            <a class="block w-full h-full px-2 py-1.5" href="/utils"
+              >{t(HEADER.UTILITY)}</a
+            >
           </Menubar.Item>
           <Menubar.Separator />
-          <Menubar.Item>Export</Menubar.Item>
+          <Menubar.Item>{t(HEADER.EXPORT)}</Menubar.Item>
           <Menubar.Separator />
-          <Menubar.Item>Print</Menubar.Item>
+          <Menubar.Item>{t(HEADER.PRINT)}</Menubar.Item>
           <Menubar.Separator />
           <Menubar.Item class="p-0">
             <button
               class="block w-full h-full px-2 py-1.5 text-left cursor-pointer"
-              onclick={exit_app}>Exit</button
+              onclick={exit_app}>{t(HEADER.EXIT)}</button
             >
           </Menubar.Item>
         </Menubar.Content>
       </Menubar.Menu>
       <Menubar.Menu>
         <Menubar.Trigger>
-          <a href="/alerts">Alerts</a>
+          <a href="/alerts">{t(HEADER.ALERTS)}</a>
         </Menubar.Trigger>
       </Menubar.Menu><Menubar.Menu>
         <Menubar.Trigger>
-          <a href="/charts">Charts</a>
+          <a href="/charts">{t(HEADER.CHARTS)}</a>
         </Menubar.Trigger>
       </Menubar.Menu>
       <Menubar.Menu>
         <Menubar.Trigger>
-          <a href="/settings">Settings</a>
+          <a href="/settings">{t(HEADER.SETTINGS)}</a>
         </Menubar.Trigger>
       </Menubar.Menu>
     </Menubar.Root>
