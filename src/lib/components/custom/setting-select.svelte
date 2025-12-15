@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="flex items-center py-4 justify-between px-6 rounded-lg border border-solid border-gray-200"
+  class="flex items-center py-4 justify-between px-6 rounded-lg border border-solid border-gray-200 dark:border-gray-700"
 >
   <div>
     <p class="font-semibold">{title}</p>

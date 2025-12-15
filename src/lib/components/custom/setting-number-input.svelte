@@ -36,7 +36,7 @@
 </script>
 
 <div
-  class="flex flex-col py-4 justify-between px-6 rounded-lg border border-solid border-gray-200"
+  class="flex flex-col py-4 justify-between px-6 rounded-lg border border-solid border-gray-200 dark:border-gray-700"
 >
   <div class="mb-4">
     <p class="font-semibold">{title}</p>

@@ -12,6 +12,7 @@
   import { type DiskDto } from "$lib/types";
 
   onMount(async () => {
+    paintTheme();
     await invoke("frontend_loaded");
 
     document.cookie = "sveltekit_cookie_test=1; SameSite=Lax;";
@@ -24,6 +25,15 @@
       `Received event from backend: ${JSON.stringify(event.payload)}`
     );
   });
+
+  function paintTheme() {
+    document.documentElement.classList.toggle(
+      "dark",
+      localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
+  }
 </script>
 
 <Toaster position="bottom-center" />

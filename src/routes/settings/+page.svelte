@@ -72,6 +72,16 @@
     { value: "tb", label: "TB", description: "Terabytes" },
   ];
 
+  $effect(() => {
+    if (settings.darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.theme = "dark";
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
+    }
+  });
+
   onMount(async () => {
     await getSettings();
     isLoading = false;

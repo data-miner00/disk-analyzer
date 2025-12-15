@@ -36,13 +36,13 @@
 
 <header
   data-tauri-drag-region
-  class="flex justify-between items-center sticky top-0 bg-white z-10 py-2 w-full"
+  class="flex justify-between items-center sticky top-0 z-10 py-2 w-full backdrop-blur-xs"
 >
   <div class="flex items-center gap-1">
     <div class="shadow-xs h-9 w-9 p-1 rounded-md border">
       <a
         href="/"
-        class="flex items-center justify-center w-full h-full hover:bg-gray-100 rounded-md"
+        class="flex items-center justify-center w-full h-full hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
       >
         <House size={18} />
       </a>
