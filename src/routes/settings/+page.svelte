@@ -13,6 +13,7 @@
     type Settings,
     settingsState,
   } from "../../states/settings-state.svelte";
+  import { convertObjectKeysToCamelCase } from "$lib/utils";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -75,31 +76,6 @@
     await getSettings();
     isLoading = false;
   });
-
-  function snakeToCamelCase(str: string): string {
-    return str.replace(/([-_][a-z])/g, (group) =>
-      group.toUpperCase().replace("-", "").replace("_", "")
-    );
-  }
-
-  function convertObjectKeysToCamelCase<T>(obj: T): T {
-    if (typeof obj !== "object" || obj === null) {
-      return obj; // Return non-objects and null directly
-    }
-
-    if (Array.isArray(obj)) {
-      return obj.map((item) => convertObjectKeysToCamelCase(item)) as T; // Recursively convert array elements
-    }
-
-    const newObj: { [key: string]: any } = {};
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        const camelKey = snakeToCamelCase(key);
-        newObj[camelKey] = convertObjectKeysToCamelCase((obj as any)[key]); // Recursively convert nested objects
-      }
-    }
-    return newObj as T;
-  }
 </script>
 
 <main>
