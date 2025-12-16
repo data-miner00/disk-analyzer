@@ -3,7 +3,7 @@ export type Translations = {
 };
 
 export type I18n = {
-  [locale in "en" | "zh" | "ja" | "ms" | "ko" | "pt"]: Translations;
+  [locale in "en" | "zh" | "ja" | "ms" | "ko" | "pt" | "es"]: Translations;
 };
 
 export const HOME = {
@@ -107,6 +107,20 @@ export const translations: I18n = {
 
     "home.log": "As informações do disco de hoje já foram registradas.",
     "home.search.placeholder": "Pesquisar...",
+  },
+  es: {
+    "header.misc": "Varios",
+    "header.misc.openExplorer": "Abrir Explorador",
+    "header.misc.utility": "Utilidad",
+    "header.misc.export": "Exportar",
+    "header.misc.print": "Imprimir",
+    "header.misc.exit": "Salir",
+    "header.alerts": "Alertas",
+    "header.charts": "Gráficos",
+    "header.settings": "Configuraciones",
+
+    "home.log": "La información del disco de hoy ya ha sido registrada.",
+    "home.search.placeholder": "Buscar...",
   },
 };
 

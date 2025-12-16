@@ -15,6 +15,7 @@
   } from "../../states/settings-state.svelte";
   import { convertObjectKeysToCamelCase } from "$lib/utils";
   import { locale, type I18n } from "$lib/i18n/translations.svelte";
+  import { availableLanguages } from "$lib/i18n/languages";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -51,19 +52,6 @@
 
     toast.success("Settings saved successfully!");
   }
-
-  type Language = {
-    value: string;
-    label: string;
-  };
-
-  const availableLanguages: Language[] = [
-    { value: "en", label: "English" },
-    { value: "ko", label: "한국어" },
-    { value: "ja", label: "日本語" },
-    { value: "ms", label: "Bahasa Melayu" },
-    { value: "pt", label: "Português" },
-  ];
 
   const availableByteFormats: ByteFormat[] = [
     { value: "b", label: "B", description: "Bytes" },
