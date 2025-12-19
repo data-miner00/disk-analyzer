@@ -33,13 +33,14 @@
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import SearchIcon from "@lucide/svelte/icons/search";
   import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import { Label } from "$lib/components/ui/label";
   import { Input } from "$lib/components/ui/input";
   import * as Select from "$lib/components/ui/select/index.js";
   import { toast } from "svelte-sonner";
   import * as Form from "$lib/components/ui/form/index.js";
   import { type Disk } from "$lib/types";
   import { Switch } from "$lib/components/ui/switch";
+  import { getSettings } from "$lib/utils.tauri";
+  import { type Settings } from "../../states/settings-state.svelte";
 
   let searchQuery = $state("");
   let currentSelectedAlertForUpdate = $state<AlertSetting>();
@@ -65,6 +66,7 @@
   ] as const;
 
   let availableDisks = $state<string[]>([]);
+  let settings = $state<Settings | null>(null);
 
   type AlertSetting = {
     id: number;
@@ -125,6 +127,7 @@
   }
 
   onMount(async () => {
+    settings = await getSettings();
     await getAlerts();
     const disks = await invoke<Disk[]>("get_disks_rust");
     availableDisks = disks.map((d) => d.name);
@@ -299,15 +302,18 @@
 </script>
 
 <div class="my-4 flex gap-2 items-center">
-  <InputGroup.Root>
-    <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
-    <InputGroup.Addon>
-      <SearchIcon />
-    </InputGroup.Addon>
-    <InputGroup.Addon align="inline-end">
-      <InputGroup.Button>Search</InputGroup.Button>
-    </InputGroup.Addon>
-  </InputGroup.Root>
+  {#if settings?.searchBar == true}
+    <InputGroup.Root>
+      <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
+      <InputGroup.Addon>
+        <SearchIcon />
+      </InputGroup.Addon>
+      <InputGroup.Addon align="inline-end">
+        <InputGroup.Button>Search</InputGroup.Button>
+      </InputGroup.Addon>
+    </InputGroup.Root>
+  {/if}
+
   <Dialog.Root bind:open={isCreateDialogOpen}>
     <Dialog.Trigger
       ><Button>

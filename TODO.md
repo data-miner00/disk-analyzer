@@ -9,7 +9,7 @@
 - [ ] Identify and list largest files/folders
 - [ ] Find duplicate files
 - [x] Background process
-- [ ] Search bar
+- [x] Search bar
 
 ## Reporting & Export
 
@@ -37,6 +37,8 @@
 - [ ] User-configurable scan locations
 - [ ] File/folder exclusion rules
 - [ ] Integration with OS notifications
+- [ ] Remove randomization of name. Prompt user to name the disk if it is unnamed.
+- [ ] Add vitest
 
 ---
 

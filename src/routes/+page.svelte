@@ -6,9 +6,12 @@
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
+  import { type Settings } from "../states/settings-state.svelte";
+  import { getSettings } from "$lib/utils.tauri";
 
   let diskInfo = $state<Disk[]>([]);
   let isLoading = $state(true);
+  let settings = $state<Settings | null>(null);
 
   type DiskDto = {
     id: number;
@@ -55,6 +58,7 @@
   }
 
   onMount(async () => {
+    settings = await getSettings();
     await get_disks();
     await process_daily_disk_info();
     isLoading = false;
@@ -72,18 +76,20 @@
 <main class="container my-6">
   <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
-  <InputGroup.Root class="mb-4">
-    <InputGroup.Input
-      bind:value={searchQuery}
-      placeholder={t(HOME.SEARCH_PLACEHOLDER)}
-    />
-    <InputGroup.Addon>
-      <SearchIcon />
-    </InputGroup.Addon>
-    <InputGroup.Addon align="inline-end">
-      <InputGroup.Button>Search</InputGroup.Button>
-    </InputGroup.Addon>
-  </InputGroup.Root>
+  {#if settings?.searchBar == true}
+    <InputGroup.Root class="mb-4">
+      <InputGroup.Input
+        bind:value={searchQuery}
+        placeholder={t(HOME.SEARCH_PLACEHOLDER)}
+      />
+      <InputGroup.Addon>
+        <SearchIcon />
+      </InputGroup.Addon>
+      <InputGroup.Addon align="inline-end">
+        <InputGroup.Button>Search</InputGroup.Button>
+      </InputGroup.Addon>
+    </InputGroup.Root>
+  {/if}
 
   <ul class="flex gap-4 items-center flex-wrap">
     {#each filteredDisk as disk}

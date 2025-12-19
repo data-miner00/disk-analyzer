@@ -13,9 +13,9 @@
     type Settings,
     settingsState,
   } from "../../states/settings-state.svelte";
-  import { convertObjectKeysToCamelCase } from "$lib/utils";
   import { locale, type I18n } from "$lib/i18n/translations.svelte";
   import { availableLanguages } from "$lib/i18n/languages";
+  import { getSettings } from "$lib/utils.tauri";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -25,11 +25,6 @@
 
   let settings = $state<Settings>(settingsState);
   let isLoading = $state(true);
-
-  async function getSettings() {
-    const setting = await invoke("get_settings");
-    settings = convertObjectKeysToCamelCase(setting) as Settings;
-  }
 
   async function setSettings() {
     await invoke("set_settings", {
