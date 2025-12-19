@@ -25,6 +25,8 @@
   const triggerContent = $derived(
     options.find((f) => f.value === value)?.label ?? defaultLabel
   );
+
+  const id = $props.id();
 </script>
 
 <div
@@ -35,18 +37,17 @@
     <p>{description}</p>
   </div>
   <div>
-    <Select.Root type="single" name="favoriteFruit" bind:value>
+    <Select.Root type="single" name={id} bind:value>
       <Select.Trigger class="w-[180px]">
         {triggerContent}
       </Select.Trigger>
       <Select.Content>
         <Select.Group>
-          <!-- <Select.Label>Fruits</Select.Label> -->
           {#each options as option (option.value)}
             <Select.Item
               value={option.value}
               label={option.label}
-              disabled={option.value === "grapes"}
+              disabled={option.value === value}
             >
               {option.label}
             </Select.Item>
