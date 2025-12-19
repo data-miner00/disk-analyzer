@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Settings } from "../states/settings-state.svelte";
+import type { Settings } from "$lib/types";
 import { convertObjectKeysToCamelCase } from "./utils";
 
 export async function getSettings(): Promise<Settings> {

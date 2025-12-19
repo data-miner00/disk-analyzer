@@ -4,10 +4,9 @@ use tauri::tray::MouseButton;
 use std::sync::Mutex;
 use std::{error::Error, io};
 use std::fs;
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Mul};
 use std::convert::Into;
 use std::collections::{HashMap, HashSet};
-use serde_json::json;
 use tauri::{Builder, Emitter, Manager, State};
 use tauri::{
   AppHandle,
@@ -96,7 +95,7 @@ trait DiskInfoRepository {
     fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
 }
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Settings {
     dark_mode: bool,
     search_bar: bool,
@@ -111,6 +110,26 @@ struct Settings {
     enable_backup: bool,
     backup_path: String,
     backup_frequency_days: i32,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            dark_mode: false,
+            search_bar: true,
+            language: "en".to_string(),
+            byte_format: "gb".to_string(),
+            prefetch_count: 20,
+            desktop_noti: true,
+            minimize_close: false,
+            start_logon: true,
+            enable_logging: false,
+            log_path: "logs".to_string(),
+            enable_backup: false,
+            backup_path: "backup".to_string(),
+            backup_frequency_days: 7,
+        }
+    }
 }
 
 trait SettingsRepository {
@@ -138,14 +157,12 @@ struct DiskDto {
 }
 
 struct CsvSettingsRepository {
-    settings: Settings,
     file_path: String,
 }
 
 impl CsvSettingsRepository {
     fn new(file_path: String) -> Self {
         Self {
-            settings: Settings::default(),
             file_path,
         }
     }

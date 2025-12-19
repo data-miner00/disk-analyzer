@@ -9,13 +9,10 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import { Spinner } from "$lib/components/ui/spinner";
   import { toast } from "svelte-sonner";
-  import {
-    type Settings,
-    settingsState,
-  } from "../../states/settings-state.svelte";
   import { locale, type I18n } from "$lib/i18n/translations.svelte";
   import { availableLanguages } from "$lib/i18n/languages";
   import { getSettings } from "$lib/utils.tauri";
+  import type { Settings } from "$lib/types";
 
   type ByteFormat = {
     value: "b" | "kb" | "mb" | "gb" | "tb";
@@ -23,10 +20,10 @@
     description: string;
   };
 
-  let settings = $state<Settings>(settingsState);
-  let isLoading = $state(true);
+  let settings = $state<Settings | null>(null);
 
   async function setSettings() {
+    if (!settings) return;
     await invoke("set_settings", {
       settings: {
         dark_mode: settings.darkMode,
@@ -57,6 +54,8 @@
   ];
 
   $effect(() => {
+    if (!settings) return;
+
     if (settings.darkMode) {
       document.documentElement.classList.add("dark");
       localStorage.theme = "dark";
@@ -67,20 +66,20 @@
   });
 
   $effect(() => {
+    if (!settings) return;
     localStorage.locale = settings.language;
     locale.current = settings.language as keyof I18n;
   });
 
   onMount(async () => {
-    await getSettings();
-    isLoading = false;
+    settings = await getSettings();
   });
 </script>
 
 <main>
   <h1 class="text-xl font-semibold mb-6">Settings</h1>
 
-  {#if isLoading}
+  {#if !settings}
     <div
       class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
     >

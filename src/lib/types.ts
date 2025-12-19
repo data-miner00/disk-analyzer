@@ -20,3 +20,19 @@ export type DiskDto = {
   available_space: number;
   date: string;
 };
+
+export type Settings = {
+  darkMode: boolean;
+  searchBar: boolean;
+  language: string;
+  byteFormat: string;
+  prefetchCount: number;
+  desktopNoti: boolean;
+  minimizeClose: boolean;
+  startLogon: boolean;
+  enableLogging: boolean;
+  logPath: string;
+  enableBackup: boolean;
+  backupPath: string;
+  backupFrequencyDays: number;
+};

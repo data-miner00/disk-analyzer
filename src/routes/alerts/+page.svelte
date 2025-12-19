@@ -37,10 +37,9 @@
   import * as Select from "$lib/components/ui/select/index.js";
   import { toast } from "svelte-sonner";
   import * as Form from "$lib/components/ui/form/index.js";
-  import { type Disk } from "$lib/types";
+  import type { Disk, Settings } from "$lib/types";
   import { Switch } from "$lib/components/ui/switch";
   import { getSettings } from "$lib/utils.tauri";
-  import { type Settings } from "../../states/settings-state.svelte";
 
   let searchQuery = $state("");
   let currentSelectedAlertForUpdate = $state<AlertSetting>();

@@ -2,11 +2,10 @@
   import { invoke } from "@tauri-apps/api/core";
   import { HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
-  import { type Disk } from "$lib/types";
+  import type { Disk, Settings } from "$lib/types";
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
-  import { type Settings } from "../states/settings-state.svelte";
   import { getSettings } from "$lib/utils.tauri";
 
   let diskInfo = $state<Disk[]>([]);
