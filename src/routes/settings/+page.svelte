@@ -9,7 +9,12 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import { Spinner } from "$lib/components/ui/spinner";
   import { toast } from "svelte-sonner";
-  import { locale, type I18n } from "$lib/i18n/translations.svelte";
+  import {
+    locale,
+    type I18n,
+    SETTINGS,
+    t,
+  } from "$lib/i18n/translations.svelte";
   import { availableLanguages } from "$lib/i18n/languages";
   import { getSettings } from "$lib/utils.tauri";
   import type { Settings } from "$lib/types";
@@ -77,7 +82,7 @@
 </script>
 
 <main>
-  <h1 class="text-xl font-semibold mb-6">Settings</h1>
+  <h1 class="text-xl font-semibold mb-6">{t(SETTINGS.TITLE)}</h1>
 
   {#if !settings}
     <div
@@ -87,29 +92,29 @@
     </div>
   {:else}
     <section class="my-2">
-      <h2 class="text-lg mb-4">Presentation</h2>
+      <h2 class="text-lg mb-4">{t(SETTINGS.PRESENTATION)}</h2>
 
       <div class="my-4">
         <SettingSwitch
-          title="Dark Mode"
-          description="The themes available currently are light and dark. Dark mode eases the eyes drastically."
+          title={t(SETTINGS.DARK_MODE)}
+          description={t(SETTINGS.DARK_MODE_DESCIPTION)}
           bind:value={settings.darkMode}
         />
       </div>
 
       <div class="my-4">
         <SettingSwitch
-          title="Search bar"
-          description="Whether to enable the search bar functionality for applicable pages."
+          title={t(SETTINGS.SEARCH_BAR)}
+          description={t(SETTINGS.SEARCH_BAR_DESCIPTION)}
           bind:value={settings.searchBar}
         />
       </div>
 
       <div class="my-4">
         <SettingSelect
-          title="Language"
-          description="The language used for the user interface from a limited preset."
-          defaultLabel="Select language"
+          title={t(SETTINGS.LANGUAGE)}
+          description={t(SETTINGS.LANGUAGE_DESCIPTION)}
+          defaultLabel={t(SETTINGS.LANGUAGE_DEFAULT_LABEL)}
           options={availableLanguages}
           bind:value={settings.language}
         />
@@ -117,9 +122,9 @@
 
       <div class="my-4">
         <SettingNumberInput
-          title="Prefetch Count"
-          description="The number of data points that is preferred to fetch from the history. Optimal suggestion is 20."
-          placeholder="Count"
+          title={t(SETTINGS.PREFETCH_COUNT)}
+          description={t(SETTINGS.PREFETCH_COUNT_DESCIPTION)}
+          placeholder={t(SETTINGS.PREFETCH_COUNT_PLACEHOLDER)}
           bind:value={settings.prefetchCount}
           min={0}
           max={30}
@@ -128,84 +133,84 @@
 
       <div class="my-4">
         <SettingSelect
-          title="Byte Display"
-          description="The format for which the bytes will be displayed by default."
-          defaultLabel="Select byte format"
+          title={t(SETTINGS.BYTE_DISPLAY)}
+          description={t(SETTINGS.BYTE_DISPLAY_DESCIPTION)}
+          defaultLabel={t(SETTINGS.BYTE_DISPLAY_DEFAULT_LABEL)}
           options={availableByteFormats}
           bind:value={settings.byteFormat}
         />
       </div>
     </section>
     <section>
-      <h2 class="text-lg mb-4">Service</h2>
+      <h2 class="text-lg mb-4">{t(SETTINGS.SERVICES)}</h2>
       <div class="my-4">
         <SettingSwitch
-          title="Desktop Notification"
-          description="Notify through the desktop notification when the alert configured has reached its threshold."
+          title={t(SETTINGS.SERVICES_DESKTOP_NOTIFICATION)}
+          description={t(SETTINGS.SERVICES_DESKTOP_NOTIFICATION_DESCIPTION)}
           bind:value={settings.desktopNoti}
         />
       </div>
       <div class="my-4">
         <SettingSwitch
-          title="Minimize On Close"
-          description="Upon clicking the exit button, instead of exiting the program, it minimize to tray instead."
+          title={t(SETTINGS.SERVICES_MINIMIZE_ON_CLOSE)}
+          description={t(SETTINGS.SERVICES_MINIMIZE_ON_CLOSE_DESCIPTION)}
           bind:value={settings.minimizeClose}
         />
       </div>
       <div class="my-4">
         <SettingSwitch
-          title="Start On Logon"
-          description="Automatically start the program upon logon. Recommended to have consistent logs recorded."
+          title={t(SETTINGS.SERVICES_START_ON_BOOT)}
+          description={t(SETTINGS.SERVICES_START_ON_BOOT_DESCIPTION)}
           bind:value={settings.startLogon}
         />
       </div>
     </section>
 
     <section>
-      <h2 class="text-lg mb-4">Logging</h2>
+      <h2 class="text-lg mb-4">{t(SETTINGS.LOGGING)}</h2>
 
       <div class="my-4">
         <SettingSwitch
-          title="Activity Logging"
-          description="Log the activities that is happening when the program is running. Useful to find out bugs."
+          title={t(SETTINGS.ENABLE_LOGGING)}
+          description={t(SETTINGS.ENABLE_LOGGING_DESCIPTION)}
           bind:value={settings.enableLogging}
         />
       </div>
 
       <div class="my-4">
         <SettingPathInput
-          title="Log Path"
-          description="The folder or directory to keep track of the generated logs. Defaults to the application log path."
+          title={t(SETTINGS.LOGGING_PATH)}
+          description={t(SETTINGS.LOGGING_PATH_DESCIPTION)}
           bind:value={settings.logPath}
-          placeholder="Select a logging directory"
+          placeholder={t(SETTINGS.LOGGING_PATH_PLACEHOLDER)}
         />
       </div>
     </section>
 
     <section>
-      <h2 class="text-lg mb-4">Backup</h2>
+      <h2 class="text-lg mb-4">{t(SETTINGS.BACKUP)}</h2>
 
       <div class="my-4">
         <SettingSwitch
-          title="Data Backup"
-          description="Safely creates a restore point that can be restored from a previous snapshot."
-          bind:value={settings.enableLogging}
+          title={t(SETTINGS.ENABLE_BACKUP)}
+          description={t(SETTINGS.ENABLE_BACKUP_DESCIPTION)}
+          bind:value={settings.enableBackup}
         />
       </div>
 
       <div class="my-4">
         <SettingPathInput
-          title="Backup Path"
-          description="The folder or directory to keep the backup for the application data. Defaults to the application data path."
+          title={t(SETTINGS.BACKUP_PATH)}
+          description={t(SETTINGS.BACKUP_PATH_DESCIPTION)}
           bind:value={settings.backupPath}
-          placeholder="Select a backup directory"
+          placeholder={t(SETTINGS.BACKUP_PATH_PLACEHOLDER)}
         />
       </div>
 
       <div class="my-4">
         <SettingSlider
-          title="Frequency"
-          description="The interval of which the data will be backed-up to create restorable snapshots. Defaults to 7 days."
+          title={t(SETTINGS.BACKUP_FREQUENCY)}
+          description={t(SETTINGS.BACKUP_FREQUENCY_DESCIPTION)}
           bind:value={settings.backupFrequencyDays}
           min={1}
           max={30}
@@ -214,6 +219,6 @@
       </div>
     </section>
 
-    <Button onclick={setSettings}>Save Changes</Button>
+    <Button onclick={setSettings}>{t(SETTINGS.SAVE_CHANGES)}</Button>
   {/if}
 </main>
