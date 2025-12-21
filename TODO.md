@@ -18,10 +18,10 @@
 
 ## User Experience
 
-- [ ] Alerts/notifications for low disk space
+- [x] Alerts/notifications for low disk space
 - [ ] Scheduled scans (daily, weekly, etc.)
-- [ ] Dark/Light theme support
-- [ ] Multi-language support
+- [x] Dark/Light theme support
+- [x] Multi-language support
 
 ---
 
@@ -36,8 +36,8 @@
 
 - [ ] User-configurable scan locations
 - [ ] File/folder exclusion rules
-- [ ] Integration with OS notifications
-- [ ] Remove randomization of name. Prompt user to name the disk if it is unnamed.
+- [x] Integration with OS notifications
+- [x] Remove randomization of name. Prompt user to name the disk if it is unnamed.
 - [ ] Add vitest
 
 ---
