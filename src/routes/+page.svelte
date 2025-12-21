@@ -1,15 +1,19 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import { HardDrive, SearchIcon } from "@lucide/svelte";
+  import { AlertCircleIcon, HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
   import type { Disk, Settings, DiskHistory } from "$lib/types";
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
   import { getSettings, getLastHistoryEntry } from "$lib/utils.tauri";
+  import * as Alert from "$lib/components/ui/alert/index.js";
 
   let diskInfo = $state<Disk[]>([]);
   let settings = $state<Settings | null>(null);
+  let hasUnnamedDisk = $derived(
+    diskInfo.some((disk) => disk.name.trim() === "Unnamed")
+  );
 
   async function get_disks() {
     const disks = await invoke("get_disks_rust");
@@ -56,6 +60,17 @@
   let searchQuery = $state("");
 </script>
 
+{#if hasUnnamedDisk}
+  <Alert.Root class="mb-4">
+    <AlertCircleIcon />
+    <Alert.Title>You have an unnamed disk</Alert.Title>
+    <Alert.Description
+      >One or more disks on your system have no name assigned. To prevent
+      unwanted behavior, please name them accordingly.</Alert.Description
+    >
+  </Alert.Root>
+{/if}
+
 <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
 {#if settings?.searchBar == true}
@@ -66,9 +81,6 @@
     />
     <InputGroup.Addon>
       <SearchIcon />
-    </InputGroup.Addon>
-    <InputGroup.Addon align="inline-end">
-      <InputGroup.Button>Search</InputGroup.Button>
     </InputGroup.Addon>
   </InputGroup.Root>
 {/if}
