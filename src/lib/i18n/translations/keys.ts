@@ -63,3 +63,7 @@ export const SETTINGS = {
 
   SAVE_CHANGES: "settings.saveChanges",
 };
+
+export const DISK_DETAIL = {
+  DESCRIPTION: "diskDetail.description",
+};

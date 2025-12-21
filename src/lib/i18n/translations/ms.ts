@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
 
 export const MS: Translations = {
   [HEADER.MISC]: "Pelbagai",
@@ -67,6 +67,9 @@ export const MS: Translations = {
   [SETTINGS.BACKUP_FREQUENCY_DESCIPTION]:
     "Selang masa di mana data akan disandarkan untuk mencipta petikan yang boleh dipulihkan. Lalai kepada 7 hari.",
   [SETTINGS.SAVE_CHANGES]: "Simpan Perubahan",
+
+  [DISK_DETAIL.DESCRIPTION]:
+    "Maklumat terperinci tentang cakera bernama {diskName} dalam sistem anda.",
 };
 
 export default MS;

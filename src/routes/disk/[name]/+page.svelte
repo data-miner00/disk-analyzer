@@ -2,6 +2,7 @@
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import { HardDrive, Info } from "@lucide/svelte";
   import { toMode, toDetatchable, toGB } from "$lib/utils.js";
+  import { t, DISK_DETAIL } from "$lib/i18n/translations.svelte.js";
 
   const { data } = $props();
 
@@ -46,10 +47,7 @@
         {disk.name}
       </h1>
     </span>
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam maxime eum,
-      placeat vel ullam animi!
-    </p>
+    <p>{t(DISK_DETAIL.DESCRIPTION, { diskName: disk.name })}</p>
   </div>
 
   <Separator class="mb-4" />

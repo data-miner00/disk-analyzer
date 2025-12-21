@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
 
 export const KO: Translations = {
   [HEADER.MISC]: "기타",
@@ -67,6 +67,9 @@ export const KO: Translations = {
   [SETTINGS.BACKUP_FREQUENCY_DESCIPTION]:
     "복원 가능한 스냅샷을 생성하기 위해 데이터가 백업되는 간격입니다. 기본값은 7일입니다.",
   [SETTINGS.SAVE_CHANGES]: "변경 사항 저장",
+
+  [DISK_DETAIL.DESCRIPTION]:
+    "시스템 상의 {diskName}라는 이름의 디스크에 대한 자세한 정보.",
 };
 
 export default KO;

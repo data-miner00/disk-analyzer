@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
 
 export const PT: Translations = {
   [HEADER.MISC]: "Diversos",
@@ -67,6 +67,9 @@ export const PT: Translations = {
   [SETTINGS.BACKUP_FREQUENCY_DESCIPTION]:
     "O intervalo no qual os dados serão copiados para criar instantâneos restauráveis. O padrão é 7 dias.",
   [SETTINGS.SAVE_CHANGES]: "Salvar Alterações",
+
+  [DISK_DETAIL.DESCRIPTION]:
+    "Informações detalhadas sobre o disco chamado {diskName} no seu sistema.",
 };
 
 export default PT;

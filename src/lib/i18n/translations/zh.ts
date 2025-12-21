@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
 
 export const ZH: Translations = {
   [HEADER.MISC]: "杂项",
@@ -64,6 +64,8 @@ export const ZH: Translations = {
   [SETTINGS.BACKUP_FREQUENCY_DESCIPTION]:
     "数据备份以创建可还原快照的时间间隔。默认为7天。",
   [SETTINGS.SAVE_CHANGES]: "保存更改",
+
+  [DISK_DETAIL.DESCRIPTION]: "系统上名为 {diskName} 的磁盘的详细信息。",
 };
 
 export default ZH;
