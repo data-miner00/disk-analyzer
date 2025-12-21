@@ -6,10 +6,9 @@
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
-  import { getSettings } from "$lib/utils.tauri";
+  import { getSettings, getLastHistoryEntry } from "$lib/utils.tauri";
 
   let diskInfo = $state<Disk[]>([]);
-  let isLoading = $state(true);
   let settings = $state<Settings | null>(null);
 
   type DiskDto = {
@@ -25,18 +24,12 @@
   }
 
   async function process_daily_disk_info() {
-    const disksHistory = (await invoke("read_disk_dtos", {
-      count: 20,
-    })) as DiskDto[];
-    const lastEntry = disksHistory[disksHistory.length - 1];
+    const lastEntry = await getLastHistoryEntry();
     let newIndex = lastEntry ? lastEntry.id + 1 : 1;
     const lastRecordedDate = lastEntry ? new Date(lastEntry.date) : null;
     const today = new Date();
 
-    if (
-      lastRecordedDate &&
-      lastRecordedDate.toDateString() === today.toDateString()
-    ) {
+    if (lastRecordedDate?.toDateString() === today.toDateString()) {
       console.log(t(HOME.LOG));
       return;
     }
@@ -46,8 +39,7 @@
     for (let disk of diskInfo) {
       newDiskDtos.push({
         id: newIndex++,
-        name:
-          disk.name === "Unnamed" ? `Unnamed_${disk.total_space}` : disk.name,
+        name: disk.name,
         available_space: disk.available_space,
         date: toYyyyMmDd(today),
       });
@@ -60,7 +52,6 @@
     settings = await getSettings();
     await get_disks();
     await process_daily_disk_info();
-    isLoading = false;
   });
 
   let filteredDisk = $derived(
