@@ -56,59 +56,57 @@
   let searchQuery = $state("");
 </script>
 
-<main class="container my-6">
-  <h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
+<h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
 
-  {#if settings?.searchBar == true}
-    <InputGroup.Root class="mb-4">
-      <InputGroup.Input
-        bind:value={searchQuery}
-        placeholder={t(HOME.SEARCH_PLACEHOLDER)}
-      />
-      <InputGroup.Addon>
-        <SearchIcon />
-      </InputGroup.Addon>
-      <InputGroup.Addon align="inline-end">
-        <InputGroup.Button>Search</InputGroup.Button>
-      </InputGroup.Addon>
-    </InputGroup.Root>
-  {/if}
+{#if settings?.searchBar == true}
+  <InputGroup.Root class="mb-4">
+    <InputGroup.Input
+      bind:value={searchQuery}
+      placeholder={t(HOME.SEARCH_PLACEHOLDER)}
+    />
+    <InputGroup.Addon>
+      <SearchIcon />
+    </InputGroup.Addon>
+    <InputGroup.Addon align="inline-end">
+      <InputGroup.Button>Search</InputGroup.Button>
+    </InputGroup.Addon>
+  </InputGroup.Root>
+{/if}
 
-  <ul class="flex gap-4 items-center flex-wrap">
-    {#each filteredDisk as disk}
-      {@const usedSpacePercentage = toPercentage(
-        disk.total_space - disk.available_space,
-        disk.total_space
-      )}
+<ul class="flex gap-4 items-center flex-wrap">
+  {#each filteredDisk as disk}
+    {@const usedSpacePercentage = toPercentage(
+      disk.total_space - disk.available_space,
+      disk.total_space
+    )}
 
-      <li>
-        <a href={`/disk/${disk.name}`} class="cursor-pointer">
-          <article class="flex gap-4 border p-4 rounded-md shadow-xs">
-            <div class="pt-1">
-              <HardDrive color="#999" strokeWidth={2} size={20} />
-            </div>
+    <li>
+      <a href={`/disk/${disk.name}`} class="cursor-pointer">
+        <article class="flex gap-4 border p-4 rounded-md shadow-xs">
+          <div class="pt-1">
+            <HardDrive color="#999" strokeWidth={2} size={20} />
+          </div>
+          <div>
+            <div class="font-semibold">{disk.name}</div>
             <div>
-              <div class="font-semibold">{disk.name}</div>
-              <div>
-                {toGB(disk.total_space - disk.available_space)} / {toGB(
-                  disk.total_space
-                )}
-              </div>
-              <meter
-                value={usedSpacePercentage}
-                min="0"
-                max="100"
-                low="30"
-                high="80"
-                optimum="0">{usedSpacePercentage}%</meter
-              >
+              {toGB(disk.total_space - disk.available_space)} / {toGB(
+                disk.total_space
+              )}
             </div>
-          </article>
-        </a>
-      </li>
-    {/each}
-  </ul>
-</main>
+            <meter
+              value={usedSpacePercentage}
+              min="0"
+              max="100"
+              low="30"
+              high="80"
+              optimum="0">{usedSpacePercentage}%</meter
+            >
+          </div>
+        </article>
+      </a>
+    </li>
+  {/each}
+</ul>
 
 <style lang="postcss">
   @reference "tailwindcss";

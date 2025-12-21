@@ -40,6 +40,8 @@
 
 <div class="px-2 pb-2 min-h-screen max-w-3xl mx-auto">
   <Header />
-  {@render children()}
+  <main class="container my-6">
+    {@render children()}
+  </main>
   <Footer />
 </div>

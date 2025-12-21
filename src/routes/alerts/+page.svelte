@@ -300,7 +300,7 @@
   }
 </script>
 
-<div class="my-4 flex gap-2 items-center">
+<div class="mb-4 flex gap-2 items-center">
   {#if settings?.searchBar == true}
     <InputGroup.Root>
       <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
