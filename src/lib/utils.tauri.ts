@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { DiskDto, Settings } from "$lib/types";
+import type { DiskHistory, Settings } from "$lib/types";
 import { convertObjectKeysToCamelCase } from "./utils";
 
 export async function getSettings(): Promise<Settings> {
@@ -7,10 +7,10 @@ export async function getSettings(): Promise<Settings> {
   return convertObjectKeysToCamelCase(setting) as Settings;
 }
 
-export async function getLastHistoryEntry(): Promise<DiskDto> {
+export async function getLastHistoryEntry(): Promise<DiskHistory> {
   const diskHistory = (await invoke("read_disk_dtos", {
     count: 1,
-  })) as DiskDto[];
+  })) as DiskHistory[];
 
   if (diskHistory.length === 0) {
     return {

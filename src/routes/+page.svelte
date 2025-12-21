@@ -2,7 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { HardDrive, SearchIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
-  import type { Disk, Settings } from "$lib/types";
+  import type { Disk, Settings, DiskHistory } from "$lib/types";
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
@@ -10,13 +10,6 @@
 
   let diskInfo = $state<Disk[]>([]);
   let settings = $state<Settings | null>(null);
-
-  type DiskDto = {
-    id: number;
-    name: string;
-    available_space: number;
-    date: string;
-  };
 
   async function get_disks() {
     const disks = await invoke("get_disks_rust");
@@ -34,7 +27,7 @@
       return;
     }
 
-    const newDiskDtos: DiskDto[] = [];
+    const newDiskDtos: DiskHistory[] = [];
 
     for (let disk of diskInfo) {
       newDiskDtos.push({

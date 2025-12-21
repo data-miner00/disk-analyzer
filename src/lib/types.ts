@@ -14,7 +14,7 @@ export type Disk = {
   kind: string;
 };
 
-export type DiskDto = {
+export type DiskHistory = {
   id: number;
   name: string;
   available_space: number;

@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { listen } from "@tauri-apps/api/event";
-  import { type DiskDto } from "$lib/types";
+  import { type DiskHistory } from "$lib/types";
 
   onMount(async () => {
     paintTheme();
@@ -20,7 +20,7 @@
       "sveltekit_cookie_test2=2; domain=.example.com; path=/path1;"; // no max age, cookie always destroyed when browser closed
   });
 
-  listen<DiskDto>("hello", (event) => {
+  listen<DiskHistory>("hello", (event) => {
     toast.success(
       `Received event from backend: ${JSON.stringify(event.payload)}`
     );
