@@ -14,6 +14,9 @@ export const EN: Translations = {
 
   [HOME.LOG]: "Today's disk info has already been recorded.",
   [HOME.SEARCH_PLACEHOLDER]: "Search...",
+  [HOME.WARNING_NO_DISKS]: "You have an unnamed disk",
+  [HOME.WARNING_NO_DISKS_DESCRIPTION]:
+    "One or more disks on your system have no name assigned. To prevent unwanted behavior, please name them accordingly.",
 
   [SETTINGS.TITLE]: "Settings",
   [SETTINGS.PRESENTATION]: "Presentation",

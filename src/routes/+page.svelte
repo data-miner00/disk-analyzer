@@ -63,11 +63,10 @@
 {#if hasUnnamedDisk}
   <Alert.Root class="mb-4">
     <AlertCircleIcon />
-    <Alert.Title>You have an unnamed disk</Alert.Title>
-    <Alert.Description
-      >One or more disks on your system have no name assigned. To prevent
-      unwanted behavior, please name them accordingly.</Alert.Description
-    >
+    <Alert.Title>{t(HOME.WARNING_NO_DISKS)}</Alert.Title>
+    <Alert.Description>
+      {t(HOME.WARNING_NO_DISKS_DESCRIPTION)}
+    </Alert.Description>
   </Alert.Root>
 {/if}
 

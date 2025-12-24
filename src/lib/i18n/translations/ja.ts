@@ -14,6 +14,9 @@ export const JA: Translations = {
 
   [HOME.LOG]: "本日のディスク情報は既に記録されています。",
   [HOME.SEARCH_PLACEHOLDER]: "検索...",
+  [HOME.WARNING_NO_DISKS]: "名前のないディスクがあります",
+  [HOME.WARNING_NO_DISKS_DESCRIPTION]:
+    "システム上の1つ以上のディスクに名前が割り当てられていません。予期しない動作を防ぐために、適切に名前を付けてください。",
 
   [SETTINGS.TITLE]: "設定",
   [SETTINGS.PRESENTATION]: "表示",

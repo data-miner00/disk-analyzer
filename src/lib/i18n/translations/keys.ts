@@ -1,6 +1,9 @@
 export const HOME = {
   LOG: "home.log",
   SEARCH_PLACEHOLDER: "home.search.placeholder",
+
+  WARNING_NO_DISKS: "home.warning.noDisks",
+  WARNING_NO_DISKS_DESCRIPTION: "home.warning.noDisks.description",
 };
 
 export const HEADER = {

@@ -14,6 +14,9 @@ export const MS: Translations = {
 
   [HOME.LOG]: "Maklumat cakera hari ini telah direkodkan.",
   [HOME.SEARCH_PLACEHOLDER]: "Cari...",
+  [HOME.WARNING_NO_DISKS]: "Anda mempunyai cakera tanpa nama",
+  [HOME.WARNING_NO_DISKS_DESCRIPTION]:
+    "Satu atau lebih cakera dalam sistem anda tidak mempunyai nama yang ditetapkan. Untuk mengelakkan kelakuan tidak diingini, sila namakan mereka dengan betul.",
 
   [SETTINGS.TITLE]: "Tetapan",
   [SETTINGS.PRESENTATION]: "Persembahan",

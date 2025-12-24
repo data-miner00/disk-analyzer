@@ -14,6 +14,9 @@ export const ZH: Translations = {
 
   [HOME.LOG]: "今日的磁盘信息已被记录。",
   [HOME.SEARCH_PLACEHOLDER]: "搜索...",
+  [HOME.WARNING_NO_DISKS]: "你有一个未命名的磁盘",
+  [HOME.WARNING_NO_DISKS_DESCRIPTION]:
+    "系统上的一个或多个磁盘没有分配名称。为防止意外行为，请相应地为它们命名。",
 
   [SETTINGS.TITLE]: "设置",
   [SETTINGS.PRESENTATION]: "展示",
