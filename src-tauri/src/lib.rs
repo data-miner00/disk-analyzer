@@ -986,6 +986,9 @@ pub fn run() {
     Builder::default()
         .plugin(tauri_plugin_notification::init())
         .setup(|app| {
+            let window = app.get_webview_window("main").unwrap();
+            window.hide().unwrap();
+
             use tauri_plugin_notification::NotificationExt;
             app.notification()
                 .builder()
