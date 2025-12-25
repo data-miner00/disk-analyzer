@@ -1,0 +1,31 @@
+trigger:
+  - master
+
+pool: default
+
+steps:
+  - task: CmdLine@2
+    inputs:
+      script: |
+        echo  'Default Working Directory: $(System.DefaultWorkingDirectory)'
+        echo  'Pipeline Workspace: $(Pipeline.Workspace)'
+        dir
+    displayName: Show working directory
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "22.x"
+    displayName: "Install Node.js"
+
+  - script: |
+      npm install
+    displayName: "Install dependencies"
+
+  - script: |
+      cargo test
+    displayName: "Run cargo tests"
+    workingDirectory: src-tauri
+
+  - script: |
+      npm run tauri build
+    displayName: "Build for production"
