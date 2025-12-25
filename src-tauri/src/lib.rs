@@ -1085,53 +1085,6 @@ where T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64> {
     amount.clone().into() / total.clone().into() * 100f64
 }
 
-fn read_msg() {
-    let mut message: String = String::new();
-    println!("Enter message: ");
-
-    let _ = std::fs::OpenOptions::new().read(true).open(message.clone());
-
-    std::io::stdin().read_line(&mut message).unwrap();
-
-    println!("Your message is: {message}");
-}
-
-fn sqlite_example() -> Result<(), Box<dyn Error>> {
-    let conn = Connection::open_in_memory()?;
-
-    conn.execute(
-        "CREATE TABLE person (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            yob INTEGER,
-            data BLOB
-    ) STRICT",
-     ()
-    )?;
-
-    // Insert
-    conn.execute(
-        "INSERT INTO person (name, yob, data) VALUES (?1, ?2, ?3)",
-        (&"Steven", &1985, &None::<Vec<u8>>),
-    )?;
-
-    // Query
-    let sql = "SELECT id, name, yob, data FROM person WHERE yob > :yob";
-    let mut stmt = conn.prepare(sql)?;
-    let mut rows = stmt.query(&[(":yob", &1990)])?;
-
-    while let Some(row) = rows.next()? {
-        let id: i32 = row.get(0)?;
-        let name: String = row.get(1)?;
-        let yob: i32 = row.get(2)?;
-        let data: Option<Vec<u8>> = row.get(3)?;
-
-        println!("Found person: {} {} {} {:?}", id, name, yob, data);
-    }
-
-    Ok(())
-}
-
 /// Adds two numbers
 /// 
 /// ### Arguments
