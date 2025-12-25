@@ -14,6 +14,7 @@ export const KO: Translations = {
 
   [HOME.LOG]: "오늘의 디스크 정보가 이미 기록되었습니다.",
   [HOME.SEARCH_PLACEHOLDER]: "검색...",
+  [HOME.DISK_COUNT]: "디스크 {diskCount}개",
   [HOME.WARNING_NO_DISKS]: "이름 없는 디스크가 있습니다",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
     "시스템 상의 하나 이상의 디스크에 이름이 할당되어 있지 않습니다. 예기치 않은 동작을 방지하려면 적절히 이름을 지정해 주세요.",

@@ -70,7 +70,9 @@
   </Alert.Root>
 {/if}
 
-<h2 class="font-semibold text-lg mb-4">{diskInfo.length} disk(s)</h2>
+<h2 class="font-semibold text-lg mb-4">
+  {t(HOME.DISK_COUNT, { diskCount: diskInfo.length })}
+</h2>
 
 {#if settings?.searchBar == true}
   <InputGroup.Root class="mb-4">

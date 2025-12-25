@@ -2,6 +2,8 @@ export const HOME = {
   LOG: "home.log",
   SEARCH_PLACEHOLDER: "home.search.placeholder",
 
+  DISK_COUNT: "home.diskCount",
+
   WARNING_NO_DISKS: "home.warning.noDisks",
   WARNING_NO_DISKS_DESCRIPTION: "home.warning.noDisks.description",
 };

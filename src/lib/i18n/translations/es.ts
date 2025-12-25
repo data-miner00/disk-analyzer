@@ -14,6 +14,7 @@ export const ES: Translations = {
 
   [HOME.LOG]: "La información del disco de hoy ya ha sido registrada.",
   [HOME.SEARCH_PLACEHOLDER]: "Buscar...",
+  [HOME.DISK_COUNT]: "{diskCount} disco(s)",
   [HOME.WARNING_NO_DISKS]: "Tienes un disco sin nombre",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
     "Uno o más discos de su sistema no tienen nombre asignado. Para evitar problemas, asígneles un nombre adecuado.",
