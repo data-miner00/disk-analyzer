@@ -9,6 +9,7 @@ use std::convert::Into;
 use std::collections::{HashMap, HashSet};
 use tauri::{Builder, Emitter, Manager, State};
 use tauri::{
+  App,
   AppHandle,
   menu::{Menu, MenuItem},
   tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
@@ -888,7 +889,7 @@ fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
     });
 }
 
-fn process_alerts(connection: &Connection) {
+fn process_alerts(app: &App, connection: &Connection) {
     let repo = SqliteAlertSettingRepository {
         connection,
     };
@@ -901,6 +902,9 @@ fn process_alerts(connection: &Connection) {
                 continue;
             }
 
+            use tauri_plugin_notification::NotificationExt;
+
+
             println!("Processing alert: {:?}", alert);
 
             match &alert.rule {
@@ -911,7 +915,12 @@ fn process_alerts(connection: &Connection) {
                         let available_pct = calculate_available_percentage(disk.total_space, disk.available_space);
 
                         if available_pct < *threshold_pct {
-                            println!("Alert trigered");
+                            app.notification()
+                                .builder()
+                                .title("Available Space Alert")
+                                .body(format!("The available space of '{}' is lower than {}%.", disk.name, threshold_pct))
+                                .show()
+                                .unwrap();
                         }
                     }
                 },
@@ -920,7 +929,12 @@ fn process_alerts(connection: &Connection) {
 
                     if let Some(disk) = maybe_disk {
                         if disk.available_space < *threshold_bytes {
-                            println!("Alert trigered");
+                            app.notification()
+                                .builder()
+                                .title("Available Space Alert")
+                                .body(format!("The available space of '{}' is lower than {} bytes.", disk.name, disk.available_space))
+                                .show()
+                                .unwrap();
                         }
                     }
                 },
@@ -989,20 +1003,12 @@ pub fn run() {
             let window = app.get_webview_window("main").unwrap();
             window.hide().unwrap();
 
-            use tauri_plugin_notification::NotificationExt;
-            app.notification()
-                .builder()
-                .title("Tauri")
-                .body("Tauri is awesome")
-                .show()
-                .unwrap();
-
             let now = Local::now();
             println!("Current local time: {}", now);
 
             let connection = Connection::open("database.db").unwrap();
             init_db(&connection).unwrap();
-            process_alerts(&connection);
+            process_alerts(&app, &connection);
 
             app.manage(Mutex::new(AppState::new(0, get_disks(), connection)));
 

@@ -10,6 +10,7 @@
 - [ ] Find duplicate files
 - [x] Background process
 - [x] Search bar
+- [ ] Logger
 
 ## Reporting & Export
 
