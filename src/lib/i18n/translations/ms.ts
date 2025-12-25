@@ -74,6 +74,15 @@ export const MS: Translations = {
 
   [DISK_DETAIL.DESCRIPTION]:
     "Maklumat terperinci tentang cakera bernama {diskName} dalam sistem anda.",
+  [DISK_DETAIL.SIZE]: "Saiz",
+  [DISK_DETAIL.SIZE_AVAILABLE_SPACE]: "Ruang tersedia",
+  [DISK_DETAIL.SIZE_TOTAL_SPACE]: "Jumlah ruang",
+  [DISK_DETAIL.SIZE_USED_SPACE]: "Ruang digunakan",
+  [DISK_DETAIL.PROPERTIES]: "Ciri-ciri",
+  [DISK_DETAIL.PROPERTIES_MODE]: "Mod",
+  [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Boleh tanggal",
+  [DISK_DETAIL.PROPERTIES_FS]: "Sistem Fail",
+  [DISK_DETAIL.PROPERTIES_TYPE]: "Jenis",
 };
 
 export default MS;

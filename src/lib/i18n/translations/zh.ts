@@ -70,6 +70,15 @@ export const ZH: Translations = {
   [SETTINGS.SAVE_CHANGES]: "保存更改",
 
   [DISK_DETAIL.DESCRIPTION]: "系统上名为 {diskName} 的磁盘的详细信息。",
+  [DISK_DETAIL.SIZE]: "大小",
+  [DISK_DETAIL.SIZE_AVAILABLE_SPACE]: "可用空间",
+  [DISK_DETAIL.SIZE_TOTAL_SPACE]: "总空间",
+  [DISK_DETAIL.SIZE_USED_SPACE]: "已用空间",
+  [DISK_DETAIL.PROPERTIES]: "属性",
+  [DISK_DETAIL.PROPERTIES_MODE]: "模式",
+  [DISK_DETAIL.PROPERTIES_REMOVABLE]: "可移动",
+  [DISK_DETAIL.PROPERTIES_FS]: "文件系统",
+  [DISK_DETAIL.PROPERTIES_TYPE]: "类型",
 };
 
 export default ZH;

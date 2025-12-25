@@ -73,6 +73,15 @@ export const JA: Translations = {
 
   [DISK_DETAIL.DESCRIPTION]:
     "システム上の {diskName} という名前のディスクに関する詳細情報。",
+  [DISK_DETAIL.SIZE]: "サイズ",
+  [DISK_DETAIL.SIZE_AVAILABLE_SPACE]: "利用可能な容量",
+  [DISK_DETAIL.SIZE_TOTAL_SPACE]: "合計容量",
+  [DISK_DETAIL.SIZE_USED_SPACE]: "使用済み容量",
+  [DISK_DETAIL.PROPERTIES]: "プロパティ",
+  [DISK_DETAIL.PROPERTIES_MODE]: "モード",
+  [DISK_DETAIL.PROPERTIES_REMOVABLE]: "リムーバブル",
+  [DISK_DETAIL.PROPERTIES_FS]: "ファイルシステム",
+  [DISK_DETAIL.PROPERTIES_TYPE]: "タイプ",
 };
 
 export default JA;

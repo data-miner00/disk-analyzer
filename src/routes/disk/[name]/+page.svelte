@@ -1,6 +1,6 @@
 <script lang="ts">
   import Separator from "$lib/components/ui/separator/separator.svelte";
-  import { HardDrive, Info } from "@lucide/svelte";
+  import { HardDrive, Info, Tally5 } from "@lucide/svelte";
   import { toMode, toDetatchable, toGB } from "$lib/utils.js";
   import { t, DISK_DETAIL } from "$lib/i18n/translations.svelte.js";
 
@@ -55,25 +55,25 @@
   <div>
     <h2 class="flex items-center gap-1 mb-1">
       <span class="font-semibold block">
-        <Info size={16} />
+        <Tally5 size={16} />
       </span>
-      <span class="block text-lg">Size</span>
+      <span class="block text-lg">{t(DISK_DETAIL.SIZE)}</span>
     </h2>
   </div>
 
   <div class="flex gap-8">
     <div>
-      <p class="text-gray-500">Total space</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.SIZE_TOTAL_SPACE)}</p>
       <p>{toGB(disk.total_space)}</p>
     </div>
     <div>
-      <p class="text-gray-500">Available space</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.SIZE_AVAILABLE_SPACE)}</p>
       <p class="">
         {toGB(disk.available_space)} ({available_percentage}%)
       </p>
     </div>
     <div>
-      <p class="text-gray-500">Used space</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.SIZE_USED_SPACE)}</p>
       <p class="">
         {toGB(disk.total_space - disk.available_space)} ({used_percentage}%)
       </p>
@@ -87,23 +87,23 @@
       <span class="font-semibold block">
         <Info size={16} />
       </span>
-      <span class="block text-lg">Properties</span>
+      <span class="block text-lg">{t(DISK_DETAIL.PROPERTIES)}</span>
     </h2>
   </div>
 
   <div class="flex gap-4">
     <div>
-      <p class="text-gray-500">Mode</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.PROPERTIES_MODE)}</p>
       <p>{toMode(disk.is_read_only)}</p>
     </div>
 
     <div>
-      <p class="text-gray-500">Removable</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.PROPERTIES_REMOVABLE)}</p>
       <p>{toDetatchable(disk.is_removable)}</p>
     </div>
 
     <div>
-      <p class="text-gray-500">File System</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.PROPERTIES_FS)}</p>
       <p class="flex items-center gap-1 mb-1">
         <span class="block">
           {disk.file_system}
@@ -117,7 +117,7 @@
     </div>
 
     <div>
-      <p class="text-gray-500">Type</p>
+      <p class="text-gray-500">{t(DISK_DETAIL.PROPERTIES_TYPE)}</p>
 
       <p>{disk_kind_verbose} ({disk.kind})</p>
     </div>

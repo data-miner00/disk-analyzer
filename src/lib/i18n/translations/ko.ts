@@ -74,6 +74,16 @@ export const KO: Translations = {
 
   [DISK_DETAIL.DESCRIPTION]:
     "시스템 상의 {diskName}라는 이름의 디스크에 대한 자세한 정보.",
+
+  [DISK_DETAIL.SIZE]: "크기",
+  [DISK_DETAIL.SIZE_AVAILABLE_SPACE]: "사용 가능한 공간",
+  [DISK_DETAIL.SIZE_TOTAL_SPACE]: "전체 공간",
+  [DISK_DETAIL.SIZE_USED_SPACE]: "사용된 공간",
+  [DISK_DETAIL.PROPERTIES]: "속성",
+  [DISK_DETAIL.PROPERTIES_MODE]: "모드",
+  [DISK_DETAIL.PROPERTIES_REMOVABLE]: "이동식",
+  [DISK_DETAIL.PROPERTIES_FS]: "파일 시스템",
+  [DISK_DETAIL.PROPERTIES_TYPE]: "유형",
 };
 
 export default KO;

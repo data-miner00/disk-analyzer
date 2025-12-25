@@ -74,6 +74,15 @@ export const EN: Translations = {
 
   [DISK_DETAIL.DESCRIPTION]:
     "Detailed information about the disk named {diskName} on your system.",
+  [DISK_DETAIL.SIZE]: "Size",
+  [DISK_DETAIL.SIZE_AVAILABLE_SPACE]: "Available space",
+  [DISK_DETAIL.SIZE_TOTAL_SPACE]: "Total space",
+  [DISK_DETAIL.SIZE_USED_SPACE]: "Used space",
+  [DISK_DETAIL.PROPERTIES]: "Properties",
+  [DISK_DETAIL.PROPERTIES_MODE]: "Mode",
+  [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Removable",
+  [DISK_DETAIL.PROPERTIES_FS]: "File System",
+  [DISK_DETAIL.PROPERTIES_TYPE]: "Type",
 };
 
 export default EN;

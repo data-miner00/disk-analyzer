@@ -71,4 +71,15 @@ export const SETTINGS = {
 
 export const DISK_DETAIL = {
   DESCRIPTION: "diskDetail.description",
+
+  SIZE_TOTAL_SPACE: "diskDetail.totalSpace",
+  SIZE: "diskDetail.size",
+  SIZE_AVAILABLE_SPACE: "diskDetail.availableSpace",
+  SIZE_USED_SPACE: "diskDetail.usedSpace",
+
+  PROPERTIES: "diskDetail.properties",
+  PROPERTIES_MODE: "diskDetail.mode",
+  PROPERTIES_REMOVABLE: "diskDetail.removable",
+  PROPERTIES_FS: "diskDetail.fileSystem",
+  PROPERTIES_TYPE: "diskDetail.diskType",
 };
