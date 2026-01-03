@@ -8,6 +8,7 @@
   import { HOME, t } from "$lib/i18n/translations.svelte";
   import { getSettings, getLastHistoryEntry } from "$lib/utils.tauri";
   import * as Alert from "$lib/components/ui/alert/index.js";
+  import { toast } from "svelte-sonner";
 
   let diskInfo = $state<Disk[]>([]);
   let settings = $state<Settings | null>(null);
@@ -27,7 +28,7 @@
     const today = new Date();
 
     if (lastRecordedDate?.toDateString() === today.toDateString()) {
-      console.log(t(HOME.LOG));
+      toast.info(t(HOME.LOG));
       return;
     }
 
@@ -79,6 +80,7 @@
     <InputGroup.Input
       bind:value={searchQuery}
       placeholder={t(HOME.SEARCH_PLACEHOLDER)}
+      autofocus
     />
     <InputGroup.Addon>
       <SearchIcon />
