@@ -40,6 +40,7 @@
   import type { Disk, Settings } from "$lib/types";
   import { Switch } from "$lib/components/ui/switch";
   import { getSettings } from "$lib/utils.tauri";
+  import { ALERTS, t } from "@/i18n/translations.svelte";
 
   let searchQuery = $state("");
   let currentSelectedAlertForUpdate = $state<AlertSetting>();
@@ -134,12 +135,12 @@
 
   const triggerContent = $derived(
     alertRuleOptions.find((f) => f.value === $formData.alertRule)?.label ??
-      "Select a rule"
+      t(ALERTS.LABEL_SELECT_RULE)
   );
 
   const editTriggerContent = $derived(
     alertRuleOptions.find((f) => f.value === $editFormData.alertRule)?.label ??
-      "Select a rule"
+      t(ALERTS.LABEL_SELECT_RULE)
   );
 
   async function onCreateAlert() {
@@ -253,7 +254,7 @@
         // toast.success(`Alert "${f.data.name}" created successfully.`);
         toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
       } else {
-        toast.error("Please fix the errors in the form.");
+        toast.error(t(ALERTS.FORM_ERROR));
       }
     },
   });
@@ -268,7 +269,7 @@
         await onEditAlert();
         toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
       } else {
-        toast.error("Please fix the errors in the form.");
+        toast.error(t(ALERTS.FORM_ERROR));
       }
     },
   });
@@ -303,12 +304,12 @@
 <div class="mb-4 flex gap-2 items-center">
   {#if settings?.searchBar == true}
     <InputGroup.Root>
-      <InputGroup.Input bind:value={searchQuery} placeholder="Search..." />
+      <InputGroup.Input
+        bind:value={searchQuery}
+        placeholder={t(ALERTS.SEARCH)}
+      />
       <InputGroup.Addon>
         <SearchIcon />
-      </InputGroup.Addon>
-      <InputGroup.Addon align="inline-end">
-        <InputGroup.Button>Search</InputGroup.Button>
       </InputGroup.Addon>
     </InputGroup.Root>
   {/if}
@@ -317,31 +318,33 @@
     <Dialog.Trigger
       ><Button>
         <Plus />
-        Create Alert
+        {t(ALERTS.CREATE_ALERT_BUTTON)}
       </Button></Dialog.Trigger
     >
     <Dialog.Content>
       <Dialog.Header>
-        <Dialog.Title>Create New Alert</Dialog.Title>
+        <Dialog.Title>{t(ALERTS.CREATE_DIALOG_TITLE)}</Dialog.Title>
         <Dialog.Description>
-          Configure the settings for your new alert below.
+          {t(ALERTS.CREATE_DIALOG_DESCRIPTION)}
         </Dialog.Description>
       </Dialog.Header>
       <form method="POST" class="space-y-6 h-72 overflow-y-auto" use:enhance>
         <Form.Field {form} name="name">
           <Form.Control>
             {#snippet children({ props })}
-              <Form.Label>Name</Form.Label>
+              <Form.Label>{t(ALERTS.CREATE_DIALOG_NAME_LABEL)}</Form.Label>
               <Input {...props} bind:value={$formData.name} />
             {/snippet}
           </Form.Control>
-          <Form.Description>The name of the alert setting.</Form.Description>
+          <Form.Description
+            >{t(ALERTS.CREATE_DIALOG_NAME_DESCRIPTION)}</Form.Description
+          >
           <Form.FieldErrors />
         </Form.Field>
         <Form.Field {form} name="frequency_days">
           <Form.Control>
             {#snippet children({ props })}
-              <Form.Label>Frequency</Form.Label>
+              <Form.Label>{t(ALERTS.CREATE_DIALOG_FREQ_LABEL)}</Form.Label>
               <Input
                 type="number"
                 {...props}
@@ -350,14 +353,14 @@
             {/snippet}
           </Form.Control>
           <Form.Description
-            >The frequency of the alert setting checking.</Form.Description
+            >{t(ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION)}</Form.Description
           >
           <Form.FieldErrors />
         </Form.Field>
         <Form.Field {form} name="threshold">
           <Form.Control>
             {#snippet children({ props })}
-              <Form.Label>Threshold</Form.Label>
+              <Form.Label>{t(ALERTS.CREATE_DIALOG_THRESHOLD_LABEL)}</Form.Label>
               <Input
                 type="number"
                 {...props}
@@ -366,14 +369,14 @@
             {/snippet}
           </Form.Control>
           <Form.Description
-            >The threshold value to be hit for triggering an alert.</Form.Description
+            >{t(ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION)}</Form.Description
           >
           <Form.FieldErrors />
         </Form.Field>
         <Form.Field {form} name="alertRule">
           <Form.Control>
             {#snippet children({ props })}
-              <Form.Label>Alert Rule</Form.Label>
+              <Form.Label>{t(ALERTS.CREATE_DIALOG_RULE_LABEL)}</Form.Label>
 
               <Select.Root
                 type="single"
@@ -385,7 +388,9 @@
                 </Select.Trigger>
                 <Select.Content>
                   <Select.Group>
-                    <Select.Label>Rules</Select.Label>
+                    <Select.Label
+                      >{t(ALERTS.CREATE_DIALOG_RULE_LABEL)}</Select.Label
+                    >
                     {#each alertRuleOptions as option (option.value)}
                       <Select.Item value={option.value} label={option.label}>
                         {option.label}
@@ -397,14 +402,14 @@
             {/snippet}
           </Form.Control>
           <Form.Description
-            >The rule for the alert setting checking.</Form.Description
+            >{t(ALERTS.CREATE_DIALOG_RULE_DESCRIPTION)}</Form.Description
           >
           <Form.FieldErrors />
         </Form.Field>
         <Form.Field {form} name="diskName">
           <Form.Control>
             {#snippet children({ props })}
-              <Form.Label>Disk Name</Form.Label>
+              <Form.Label>{t(ALERTS.CREATE_DIALOG_DISKNAME_LABEL)}</Form.Label>
               <Select.Root
                 {...props}
                 type="single"
@@ -412,11 +417,16 @@
                 bind:value={$formData.diskName}
               >
                 <Select.Trigger class="w-[280px]">
-                  {$formData.diskName || "Select a disk"}
+                  {$formData.diskName ||
+                    t(ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT)}
                 </Select.Trigger>
                 <Select.Content>
                   <Select.Group>
-                    <Select.Label>Disk</Select.Label>
+                    <Select.Label
+                      >{t(
+                        ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN
+                      )}</Select.Label
+                    >
                     {#each availableDisks as disk}
                       <Select.Item value={disk} label={disk}>
                         {disk}
@@ -428,13 +438,15 @@
             {/snippet}
           </Form.Control>
           <Form.Description
-            >The name of the disk to be alerted.</Form.Description
+            >{t(ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION)}</Form.Description
           >
           <Form.FieldErrors />
         </Form.Field>
       </form>
       <Dialog.Footer>
-        <Button type="submit" onclick={submitForm}>Create</Button>
+        <Button type="submit" onclick={submitForm}
+          >{t(ALERTS.CREATE_DIALOG_CREATE_BUTTON)}</Button
+        >
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
@@ -672,21 +684,21 @@
       <Empty.Media variant="icon">
         <Bell />
       </Empty.Media>
-      <Empty.Title>No Alerts Yet</Empty.Title>
-      <Empty.Description>
-        You haven't created any alerts yet. Get started by creating your first
-        alert.
-      </Empty.Description>
+      <Empty.Title>{t(ALERTS.EMPTY_TITLE)}</Empty.Title>
+      <Empty.Description>{t(ALERTS.EMPTY_DESCRIPTION)}</Empty.Description>
     </Empty.Header>
     <Empty.Content>
       <div class="flex gap-2">
-        <Button>Create Alert</Button>
+        <Button onclick={() => (isCreateDialogOpen = true)}
+          >{t(ALERTS.CREATE_ALERT_BUTTON)}</Button
+        >
         <Button variant="outline">Import Alert</Button>
       </div>
     </Empty.Content>
     <Button variant="link" class="text-muted-foreground" size="sm">
       <a href="#/">
-        Learn More <ArrowUpRightIcon class="inline" />
+        {t(ALERTS.EMPTY_LEARN_MORE)}
+        <ArrowUpRightIcon class="inline" />
       </a>
     </Button>
   </Empty.Root>

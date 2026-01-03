@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const PT: Translations = {
   [HEADER.MISC]: "Diversos",
@@ -83,6 +83,35 @@ export const PT: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Removível",
   [DISK_DETAIL.PROPERTIES_FS]: "Sistema de Arquivos",
   [DISK_DETAIL.PROPERTIES_TYPE]: "Tipo",
+
+  [ALERTS.EMPTY_TITLE]: "Ainda Sem Alertas",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "Você ainda não criou nenhum alerta. Comece criando seu primeiro alerta.",
+  [ALERTS.EMPTY_LEARN_MORE]: "Saiba Mais",
+  [ALERTS.SEARCH]: "Pesquisar alertas...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "Criar Alerta",
+  [ALERTS.CREATE_DIALOG_TITLE]: "Criar Novo Alerta",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "Configure as definições para o seu novo alerta abaixo.",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "Nome",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "O nome da configuração do alerta.",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "Frequência",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]:
+    "A frequência da verificação da configuração do alerta.",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "Limite",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "O valor limite a ser atingido para acionar um alerta.",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "Regras",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]:
+    "A regra para verificação da configuração do alerta.",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "Nome do Disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "Selecione um disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "Disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "O nome do disco a ser alertado.",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Criar",
+  [ALERTS.LABEL_SELECT_RULE]: "Selecione uma regra",
+  [ALERTS.FORM_ERROR]: "Por favor, corrija os erros no formulário.",
 };
 
 export default PT;

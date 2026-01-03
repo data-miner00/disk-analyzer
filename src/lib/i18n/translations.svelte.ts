@@ -6,7 +6,13 @@ import KO from "./translations/ko";
 import PT from "./translations/pt";
 import ES from "./translations/es";
 
-export { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./translations/keys";
+export {
+  SETTINGS,
+  HEADER,
+  HOME,
+  DISK_DETAIL,
+  ALERTS,
+} from "./translations/keys";
 
 export type Translations = {
   [key: string]: string;

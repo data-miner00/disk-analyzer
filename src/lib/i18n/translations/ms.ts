@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const MS: Translations = {
   [HEADER.MISC]: "Pelbagai",
@@ -83,6 +83,35 @@ export const MS: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Boleh tanggal",
   [DISK_DETAIL.PROPERTIES_FS]: "Sistem Fail",
   [DISK_DETAIL.PROPERTIES_TYPE]: "Jenis",
+
+  [ALERTS.EMPTY_TITLE]: "Tiada Makluman Lagi",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "Anda belum mencipta sebarang makluman lagi. Mulakan dengan mencipta makluman pertama anda.",
+  [ALERTS.EMPTY_LEARN_MORE]: "Ketahui Lebih Lanjut",
+  [ALERTS.SEARCH]: "Cari makluman...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "Cipta Makluman",
+  [ALERTS.CREATE_DIALOG_TITLE]: "Cipta Makluman Baharu",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "Konfigurasikan tetapan untuk makluman baharu anda di bawah.",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "Nama",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "Nama tetapan makluman.",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "Kekerapan",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]:
+    "Kekerapan pemeriksaan tetapan makluman.",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "Ambang",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "Nilai ambang yang perlu dicapai untuk mencetuskan makluman.",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "Peraturan",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]:
+    "Peraturan untuk pemeriksaan tetapan makluman.",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "Nama Cakera",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "Pilih cakera",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "Cakera",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "Nama cakera yang akan dimaklumkan.",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Cipta",
+  [ALERTS.LABEL_SELECT_RULE]: "Pilih peraturan",
+  [ALERTS.FORM_ERROR]: "Sila betulkan ralat dalam borang.",
 };
 
 export default MS;

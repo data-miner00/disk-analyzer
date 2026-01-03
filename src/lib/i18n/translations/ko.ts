@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const KO: Translations = {
   [HEADER.MISC]: "기타",
@@ -84,6 +84,33 @@ export const KO: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "이동식",
   [DISK_DETAIL.PROPERTIES_FS]: "파일 시스템",
   [DISK_DETAIL.PROPERTIES_TYPE]: "유형",
+
+  [ALERTS.EMPTY_TITLE]: "아직 알림이 없습니다",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "아직 알림을 생성하지 않았습니다. 첫 번째 알림을 생성하여 시작하세요.",
+  [ALERTS.EMPTY_LEARN_MORE]: "자세히 알아보기",
+  [ALERTS.SEARCH]: "알림 검색...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "알림 생성",
+  [ALERTS.CREATE_DIALOG_TITLE]: "새 알림 생성",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "아래에서 새 알림에 대한 설정을 구성하세요.",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "이름",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "알림 설정의 이름입니다.",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "빈도",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]: "알림 설정 확인 빈도입니다.",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "임계값",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "알림을 트리거하기 위한 임계값입니다.",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "규칙",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]: "알림 설정 확인을 위한 규칙입니다.",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "디스크 이름",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "디스크 선택",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "디스크",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "알림을 받을 디스크의 이름입니다.",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "생성",
+  [ALERTS.LABEL_SELECT_RULE]: "규칙 선택",
+  [ALERTS.FORM_ERROR]: "양식의 오류를 수정해 주세요.",
 };
 
 export default KO;

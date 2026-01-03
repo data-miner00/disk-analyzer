@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const ZH: Translations = {
   [HEADER.MISC]: "杂项",
@@ -79,6 +79,30 @@ export const ZH: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "可移动",
   [DISK_DETAIL.PROPERTIES_FS]: "文件系统",
   [DISK_DETAIL.PROPERTIES_TYPE]: "类型",
+
+  [ALERTS.EMPTY_TITLE]: "暂无警报",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "您还没有创建任何警报。立即开始创建您的第一个警报。",
+  [ALERTS.EMPTY_LEARN_MORE]: "了解更多",
+  [ALERTS.SEARCH]: "搜索警报...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "创建警报",
+  [ALERTS.CREATE_DIALOG_TITLE]: "创建新警报",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]: "在下方配置新警报的设置。",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "名称",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "警报设置的名称。",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "频率",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]: "警报设置检查的频率。",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "阈值",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]: "触发警报的阈值。",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "规则",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]: "警报设置检查的规则。",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "磁盘名称",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "选择磁盘",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "磁盘",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]: "要接收警报的磁盘名称。",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "创建",
+  [ALERTS.LABEL_SELECT_RULE]: "选择规则",
+  [ALERTS.FORM_ERROR]: "请修正表单中的错误。",
 };
 
 export default ZH;

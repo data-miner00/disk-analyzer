@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const EN: Translations = {
   [HEADER.MISC]: "Misc",
@@ -83,6 +83,35 @@ export const EN: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Removable",
   [DISK_DETAIL.PROPERTIES_FS]: "File System",
   [DISK_DETAIL.PROPERTIES_TYPE]: "Type",
+
+  [ALERTS.EMPTY_TITLE]: "No Alerts Yet",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "You haven't created any alerts yet. Get started by creating your first alert.",
+  [ALERTS.EMPTY_LEARN_MORE]: "Learn More",
+  [ALERTS.SEARCH]: "Search alerts...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "Create Alert",
+  [ALERTS.CREATE_DIALOG_TITLE]: "Create New Alert",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "Configure the settings for your new alert below.",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "Name",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "The name of the alert setting.",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "Frequency",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]:
+    "The frequency of the alert setting checking.",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "Threshold",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "The threshold value to be hit for triggering an alert.",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "Rules",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]:
+    "The rule for alert setting checking.",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "Disk Name",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "Select a disk",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "Disk",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "The name of the disk to be alerted.",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Create",
+  [ALERTS.LABEL_SELECT_RULE]: "Select a rule",
+  [ALERTS.FORM_ERROR]: "Please fix the errors in the form.",
 };
 
 export default EN;

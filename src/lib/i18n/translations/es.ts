@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const ES: Translations = {
   [HEADER.MISC]: "Varios",
@@ -84,6 +84,36 @@ export const ES: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "Extraíble",
   [DISK_DETAIL.PROPERTIES_FS]: "Sistema de Archivos",
   [DISK_DETAIL.PROPERTIES_TYPE]: "Tipo",
+
+  [ALERTS.EMPTY_TITLE]: "Aún No Hay Alertas",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "Aún no has creado ninguna alerta. Comienza creando tu primera alerta.",
+  [ALERTS.EMPTY_LEARN_MORE]: "Más Información",
+  [ALERTS.SEARCH]: "Buscar alertas...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "Crear Alerta",
+  [ALERTS.CREATE_DIALOG_TITLE]: "Crear Nueva Alerta",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "Configure los ajustes para su nueva alerta a continuación.",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "Nombre",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]:
+    "El nombre de la configuración de alerta.",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "Frecuencia",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]:
+    "La frecuencia de verificación de la configuración de alerta.",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "Umbral",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "El valor umbral que debe alcanzarse para activar una alerta.",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "Reglas",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]:
+    "La regla para la verificación de la configuración de alerta.",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "Nombre del Disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "Seleccione un disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "Disco",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "El nombre del disco que será alertado.",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Crear",
+  [ALERTS.LABEL_SELECT_RULE]: "Seleccione una regla",
+  [ALERTS.FORM_ERROR]: "Por favor, corrija los errores en el formulario.",
 };
 
 export default ES;

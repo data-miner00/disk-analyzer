@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
 
 export const JA: Translations = {
   [HEADER.MISC]: "その他",
@@ -82,6 +82,33 @@ export const JA: Translations = {
   [DISK_DETAIL.PROPERTIES_REMOVABLE]: "リムーバブル",
   [DISK_DETAIL.PROPERTIES_FS]: "ファイルシステム",
   [DISK_DETAIL.PROPERTIES_TYPE]: "タイプ",
+
+  [ALERTS.EMPTY_TITLE]: "まだアラートがありません",
+  [ALERTS.EMPTY_DESCRIPTION]:
+    "まだアラートを作成していません。最初のアラートを作成して始めましょう。",
+  [ALERTS.EMPTY_LEARN_MORE]: "詳細を見る",
+  [ALERTS.SEARCH]: "アラートを検索...",
+  [ALERTS.CREATE_ALERT_BUTTON]: "アラートを作成",
+  [ALERTS.CREATE_DIALOG_TITLE]: "新しいアラートを作成",
+  [ALERTS.CREATE_DIALOG_DESCRIPTION]:
+    "以下で新しいアラートの設定を構成してください。",
+  [ALERTS.CREATE_DIALOG_NAME_LABEL]: "名前",
+  [ALERTS.CREATE_DIALOG_NAME_DESCRIPTION]: "アラート設定の名前です。",
+  [ALERTS.CREATE_DIALOG_FREQ_LABEL]: "頻度",
+  [ALERTS.CREATE_DIALOG_FREQ_DESCRIPTION]: "アラート設定チェックの頻度です。",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_LABEL]: "しきい値",
+  [ALERTS.CREATE_DIALOG_THRESHOLD_DESCRIPTION]:
+    "アラートをトリガーするためのしきい値です。",
+  [ALERTS.CREATE_DIALOG_RULE_LABEL]: "ルール",
+  [ALERTS.CREATE_DIALOG_RULE_DESCRIPTION]: "アラート設定チェックのルールです。",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL]: "ディスク名",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_SELECT]: "ディスクを選択",
+  [ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN]: "ディスク",
+  [ALERTS.CREATE_DIALOG_DISKNAME_DESCRIPTION]:
+    "アラートを受け取るディスクの名前です。",
+  [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "作成",
+  [ALERTS.LABEL_SELECT_RULE]: "ルールを選択",
+  [ALERTS.FORM_ERROR]: "フォームのエラーを修正してください。",
 };
 
 export default JA;

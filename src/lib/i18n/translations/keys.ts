@@ -83,3 +83,36 @@ export const DISK_DETAIL = {
   PROPERTIES_FS: "diskDetail.fileSystem",
   PROPERTIES_TYPE: "diskDetail.diskType",
 };
+
+export const ALERTS = {
+  EMPTY_TITLE: "alerts.empty.title",
+  EMPTY_DESCRIPTION: "alerts.empty.description",
+  EMPTY_LEARN_MORE: "alerts.empty.learnMore",
+
+  SEARCH: "alerts.search",
+  CREATE_ALERT_BUTTON: "alerts.createButton",
+
+  CREATE_DIALOG_TITLE: "alerts.createDialog.title",
+  CREATE_DIALOG_DESCRIPTION: "alerts.createDialog.description",
+  CREATE_DIALOG_NAME_LABEL: "alerts.createDialog.name.label",
+  CREATE_DIALOG_NAME_DESCRIPTION: "alerts.createDialog.name.description",
+  CREATE_DIALOG_FREQ_LABEL: "alerts.createDialog.freq.label",
+  CREATE_DIALOG_FREQ_DESCRIPTION: "alerts.createDialog.freq.description",
+  CREATE_DIALOG_THRESHOLD_LABEL: "alerts.createDialog.threshold.label",
+  CREATE_DIALOG_THRESHOLD_DESCRIPTION:
+    "alerts.createDialog.threshold.description",
+  CREATE_DIALOG_RULE_LABEL: "alerts.createDialog.rule.label",
+  CREATE_DIALOG_RULE_DESCRIPTION: "alerts.createDialog.rule.description",
+  CREATE_DIALOG_DISKNAME_LABEL: "alerts.createDialog.diskName.label",
+  CREATE_DIALOG_DISKNAME_LABEL_SELECT:
+    "alerts.createDialog.diskName.label.select",
+  CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN:
+    "alerts.createDialog.diskName.label.dropdown",
+  CREATE_DIALOG_DISKNAME_DESCRIPTION:
+    "alerts.createDialog.diskName.description",
+  CREATE_DIALOG_CREATE_BUTTON: "alerts.createDialog.createButton",
+
+  LABEL_SELECT_RULE: "alerts.label.selectRule",
+
+  FORM_ERROR: "alerts.formError",
+};
