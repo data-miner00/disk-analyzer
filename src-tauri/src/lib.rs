@@ -605,6 +605,18 @@ fn exit(code: i32) {
 }
 
 #[tauri::command]
+fn smart_exit(app: AppHandle) {
+    let settings = get_settings();
+
+    if settings.minimize_close {
+        let window = app.get_webview_window("main").unwrap();
+        window.hide().unwrap();
+    } else {
+        std::process::exit(0);
+    }
+}
+
+#[tauri::command]
 fn open_file_explorer(path: &str) {
     let res = tauri_plugin_opener::open_path(path, None::<&str>);
 
@@ -1084,6 +1096,7 @@ pub fn run() {
             delete_alert,
             frontend_loaded,
             aggregate_disk_usage_space_changed_history,
+            smart_exit,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

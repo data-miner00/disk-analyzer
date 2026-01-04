@@ -18,6 +18,10 @@
     await invoke("exit", { code: 0 });
   }
 
+  async function smart_exit_app() {
+    await invoke("smart_exit");
+  }
+
   async function open_file_explorer() {
     await invoke("open_file_explorer", { path: "." });
   }
@@ -108,7 +112,7 @@
       </button>
       <button
         class="block p-2 hover:bg-accent cursor-pointer rounded focus:bg-accent focus:text-accent-foregroun"
-        onclick={exit_app}
+        onclick={smart_exit_app}
       >
         <X size={16} />
       </button>
