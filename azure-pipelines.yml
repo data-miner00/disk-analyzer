@@ -5,6 +5,9 @@ trigger:
 
 pool: default
 
+variables:
+  projectName: disk-analyzer
+
 steps:
   - task: CmdLine@2
     inputs:
@@ -35,7 +38,7 @@ steps:
   # Artifacts produced requires the end user to have Microsoft Edge WebView2 installed
   - task: CopyFiles@2
     inputs:
-      Contents: "**/src-tauri/**/*.exe"
+      Contents: "**/src-tauri/target/release/$(projectName).exe"
       TargetFolder: drop
     displayName: "Copy files to drop folder"
 
