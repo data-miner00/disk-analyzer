@@ -1,21 +1,20 @@
+use chrono::Local;
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
-use sysinfo::{Disks, System};
-use tauri::tray::MouseButton;
-use std::sync::Mutex;
-use std::{error::Error, io};
+use std::collections::{HashMap, HashSet};
+use std::convert::Into;
 use std::fs;
 use std::ops::{Add, Mul};
-use std::convert::Into;
-use std::collections::{HashMap, HashSet};
-use tauri::{Builder, Emitter, Manager, State};
+use std::sync::Mutex;
+use std::{error::Error, io};
+use sysinfo::{Disks, System};
+use tauri::tray::MouseButton;
 use tauri::{
-  App,
-  AppHandle,
-  menu::{Menu, MenuItem},
-  tray::{TrayIconBuilder, TrayIconEvent, MouseButtonState},
+    menu::{Menu, MenuItem},
+    tray::{MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    App, AppHandle,
 };
-use rusqlite::Connection;
-use chrono::Local;
+use tauri::{Builder, Emitter, Manager, State};
 
 #[derive(Debug)]
 struct AppState {
@@ -25,11 +24,7 @@ struct AppState {
 }
 
 impl AppState {
-    fn new(
-        counter: u32,
-        disks: Vec<DiskInfo>,
-        connection: Connection,
-    ) -> Self {
+    fn new(counter: u32, disks: Vec<DiskInfo>, connection: Connection) -> Self {
         Self {
             counter,
             disks,
@@ -49,7 +44,9 @@ enum ReportType {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Report<T>
-where T: Add<Output = T> + Mul<Output = T> + Copy, {
+where
+    T: Add<Output = T> + Mul<Output = T> + Copy,
+{
     report_type: ReportType,
     data: Vec<LayerChartReportData<T>>,
     container_config: HashMap<String, LayerChartContainerConfigItem>,
@@ -58,22 +55,23 @@ where T: Add<Output = T> + Mul<Output = T> + Copy, {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct LayerChartReportData<T>
-where T: Add<Output = T> + Mul<Output = T> + Copy, {
+where
+    T: Add<Output = T> + Mul<Output = T> + Copy,
+{
     date: String,
-    values: HashMap<String, T>
+    values: HashMap<String, T>,
 }
 
 impl<T> LayerChartReportData<T>
-where T: Add<Output = T> + Mul<Output = T> + Copy, {
+where
+    T: Add<Output = T> + Mul<Output = T> + Copy,
+{
     pub fn empty(date: String) -> Self {
         Self::new(date, HashMap::new())
     }
 
     pub fn new(date: String, values: HashMap<String, T>) -> Self {
-        Self {
-            date,
-            values,
-        }
+        Self { date, values }
     }
 }
 
@@ -163,9 +161,7 @@ struct CsvSettingsRepository {
 
 impl CsvSettingsRepository {
     fn new(file_path: String) -> Self {
-        Self {
-            file_path,
-        }
+        Self { file_path }
     }
 
     fn init(&self) -> Result<(), io::Error> {
@@ -264,7 +260,7 @@ impl DiskInfo {
         };
 
         Self {
-            name: name,
+            name,
             total_space: disk.total_space(),
             available_space: disk.available_space(),
             file_system: disk.file_system().to_str().unwrap_or_default().to_string(),
@@ -278,7 +274,10 @@ impl DiskInfo {
 #[tauri::command]
 fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
     let disk_history = read_disk_dtos(Some(20));
-    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: HashSet<_> = disk_history
+        .iter()
+        .map(|record| record.name.clone())
+        .collect();
     let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
     let mut aggregated_data: Vec<LayerChartReportData<f64>> = vec![];
     let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
@@ -286,9 +285,16 @@ fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
     let mut counter = 1; // Start with 1 because the CSS starts with 1
 
     for disk_name in distinct_disks {
-        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let relevant_history: Vec<DiskDto> = disk_history
+            .iter()
+            .filter(|record| record.name == disk_name)
+            .cloned()
+            .collect();
         let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
-        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: HashSet<_> = relevant_history
+            .iter()
+            .map(|record| record.date.clone())
+            .collect();
         let mut distinct_days: Vec<String> = distinct_days.into_iter().collect();
         distinct_days.sort();
 
@@ -298,7 +304,9 @@ fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
             if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(prev_space) = previous_usage_space {
-                        let change = round_to_two_decimal_places(calculate_usage_change_percentage(prev_space, history.available_space));
+                        let change = round_to_two_decimal_places(
+                            calculate_usage_change_percentage(prev_space, history.available_space),
+                        );
                         current_agg.values.insert(id_disk_name.clone(), change);
                     } else {
                         current_agg.values.insert(id_disk_name.clone(), 0f64);
@@ -309,7 +317,9 @@ fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
                 let mut new_entry = LayerChartReportData::empty(day.clone());
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(prev_space) = previous_usage_space {
-                        let change = round_to_two_decimal_places(calculate_usage_change_percentage(prev_space, history.available_space));
+                        let change = round_to_two_decimal_places(
+                            calculate_usage_change_percentage(prev_space, history.available_space),
+                        );
                         new_entry.values.insert(id_disk_name.clone(), change);
                     } else {
                         new_entry.values.insert(id_disk_name.clone(), 0f64);
@@ -320,10 +330,13 @@ fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
             }
         }
 
-        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
-            label: disk_name.clone(),
-            color: format!("var(--chart-{})", counter),
-        });
+        container_config.insert(
+            id_disk_name.clone(),
+            LayerChartContainerConfigItem {
+                label: disk_name.clone(),
+                color: format!("var(--chart-{})", counter),
+            },
+        );
         chart_config.push(LayerChartConfigItem {
             key: id_disk_name,
             label: disk_name,
@@ -344,7 +357,10 @@ fn aggregate_disk_usage_space_changed_history() -> Report<f64> {
 #[tauri::command]
 fn aggregate_disk_available_space_history() -> Report<u64> {
     let disk_history = read_disk_dtos(Some(20));
-    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: HashSet<_> = disk_history
+        .iter()
+        .map(|record| record.name.clone())
+        .collect();
     let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
     let mut aggregated_data: Vec<LayerChartReportData<u64>> = vec![];
     let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
@@ -352,29 +368,43 @@ fn aggregate_disk_available_space_history() -> Report<u64> {
     let mut counter = 1; // Start with 1 because the CSS starts with 1
 
     for disk_name in distinct_disks {
-        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let relevant_history: Vec<DiskDto> = disk_history
+            .iter()
+            .filter(|record| record.name == disk_name)
+            .cloned()
+            .collect();
         let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
-        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: HashSet<_> = relevant_history
+            .iter()
+            .map(|record| record.date.clone())
+            .collect();
         let distinct_days: Vec<String> = distinct_days.into_iter().collect();
 
         for day in distinct_days {
             if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
-                    current_agg.values.insert(id_disk_name.clone(), history.available_space);
+                    current_agg
+                        .values
+                        .insert(id_disk_name.clone(), history.available_space);
                 }
             } else {
                 let mut new_entry = LayerChartReportData::empty(day.clone());
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
-                    new_entry.values.insert(id_disk_name.clone(), history.available_space);
+                    new_entry
+                        .values
+                        .insert(id_disk_name.clone(), history.available_space);
                 }
                 aggregated_data.push(new_entry)
             }
         }
 
-        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
-            label: disk_name.clone(),
-            color: format!("var(--chart-{})", counter),
-        });
+        container_config.insert(
+            id_disk_name.clone(),
+            LayerChartContainerConfigItem {
+                label: disk_name.clone(),
+                color: format!("var(--chart-{})", counter),
+            },
+        );
 
         chart_config.push(LayerChartConfigItem {
             key: id_disk_name,
@@ -397,7 +427,10 @@ fn aggregate_disk_available_space_history() -> Report<u64> {
 fn aggregate_disk_usage_history(state: State<'_, Mutex<AppState>>) -> Report<u64> {
     let state = state.lock().unwrap();
     let disk_history = read_disk_dtos(Some(20));
-    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: HashSet<_> = disk_history
+        .iter()
+        .map(|record| record.name.clone())
+        .collect();
     let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
     let mut aggregated_data: Vec<LayerChartReportData<u64>> = vec![];
     let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
@@ -405,34 +438,53 @@ fn aggregate_disk_usage_history(state: State<'_, Mutex<AppState>>) -> Report<u64
     let mut counter = 1; // Start with 1 because the CSS starts with 1
 
     for disk_name in distinct_disks {
-        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let relevant_history: Vec<DiskDto> = disk_history
+            .iter()
+            .filter(|record| record.name == disk_name)
+            .cloned()
+            .collect();
         let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
-        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: HashSet<_> = relevant_history
+            .iter()
+            .map(|record| record.date.clone())
+            .collect();
         let distinct_days: Vec<String> = distinct_days.into_iter().collect();
-        let disk_general_info: Option<&DiskInfo> = state.disks.iter().find(|info| disk_name.starts_with(&info.name));
+        let disk_general_info: Option<&DiskInfo> = state
+            .disks
+            .iter()
+            .find(|info| disk_name.starts_with(&info.name));
 
         for day in distinct_days {
             if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(info) = disk_general_info {
-                        current_agg.values.insert(id_disk_name.clone(), info.total_space - history.available_space);
+                        current_agg.values.insert(
+                            id_disk_name.clone(),
+                            info.total_space - history.available_space,
+                        );
                     }
                 }
             } else {
                 let mut new_entry = LayerChartReportData::empty(day.clone());
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(info) = disk_general_info {
-                        new_entry.values.insert(id_disk_name.clone(), info.total_space - history.available_space);
+                        new_entry.values.insert(
+                            id_disk_name.clone(),
+                            info.total_space - history.available_space,
+                        );
                     }
                 }
                 aggregated_data.push(new_entry)
             }
         }
 
-        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
-            label: disk_name.clone(),
-            color: format!("var(--chart-{})", counter),
-        });
+        container_config.insert(
+            id_disk_name.clone(),
+            LayerChartContainerConfigItem {
+                label: disk_name.clone(),
+                color: format!("var(--chart-{})", counter),
+            },
+        );
 
         chart_config.push(LayerChartConfigItem {
             key: id_disk_name,
@@ -455,7 +507,10 @@ fn aggregate_disk_usage_history(state: State<'_, Mutex<AppState>>) -> Report<u64
 fn aggregate_disk_usage_pct_history(state: State<'_, Mutex<AppState>>) -> Report<f64> {
     let state = state.lock().unwrap();
     let disk_history = read_disk_dtos(Some(20));
-    let distinct_disks: HashSet<_> = disk_history.iter().map(|record| record.name.clone()).collect();
+    let distinct_disks: HashSet<_> = disk_history
+        .iter()
+        .map(|record| record.name.clone())
+        .collect();
     let distinct_disks: Vec<String> = distinct_disks.into_iter().collect();
     let mut aggregated_data: Vec<LayerChartReportData<f64>> = vec![];
     let mut container_config: HashMap<String, LayerChartContainerConfigItem> = HashMap::new();
@@ -463,34 +518,57 @@ fn aggregate_disk_usage_pct_history(state: State<'_, Mutex<AppState>>) -> Report
     let mut counter = 1; // Start with 1 because the CSS starts with 1
 
     for disk_name in distinct_disks {
-        let relevant_history: Vec<DiskDto> = disk_history.iter().filter(|record| record.name == disk_name).cloned().collect();
+        let relevant_history: Vec<DiskDto> = disk_history
+            .iter()
+            .filter(|record| record.name == disk_name)
+            .cloned()
+            .collect();
         let id_disk_name = disk_name.to_lowercase().replace(" ", "_");
-        let distinct_days: HashSet<_> = relevant_history.iter().map(|record| record.date.clone()).collect();
+        let distinct_days: HashSet<_> = relevant_history
+            .iter()
+            .map(|record| record.date.clone())
+            .collect();
         let distinct_days: Vec<String> = distinct_days.into_iter().collect();
-        let disk_general_info: Option<&DiskInfo> = state.disks.iter().find(|info| disk_name.starts_with(&info.name));
+        let disk_general_info: Option<&DiskInfo> = state
+            .disks
+            .iter()
+            .find(|info| disk_name.starts_with(&info.name));
 
         for day in distinct_days {
             if let Some(current_agg) = aggregated_data.iter_mut().find(|data| data.date == day) {
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(info) = disk_general_info {
-                        current_agg.values.insert(id_disk_name.clone(), ((info.total_space - history.available_space) as f64) / (info.total_space as f64) * 100f64);
+                        current_agg.values.insert(
+                            id_disk_name.clone(),
+                            ((info.total_space - history.available_space) as f64)
+                                / (info.total_space as f64)
+                                * 100f64,
+                        );
                     }
                 }
             } else {
                 let mut new_entry = LayerChartReportData::empty(day.clone());
                 if let Some(history) = relevant_history.iter().find(|data| data.date == day) {
                     if let Some(info) = disk_general_info {
-                        new_entry.values.insert(id_disk_name.clone(), ((info.total_space - history.available_space) as f64) / (info.total_space as f64) * 100f64);
+                        new_entry.values.insert(
+                            id_disk_name.clone(),
+                            ((info.total_space - history.available_space) as f64)
+                                / (info.total_space as f64)
+                                * 100f64,
+                        );
                     }
                 }
                 aggregated_data.push(new_entry)
             }
         }
 
-        container_config.insert(id_disk_name.clone(), LayerChartContainerConfigItem {
-            label: disk_name.clone(),
-            color: format!("var(--chart-{})", counter),
-        });
+        container_config.insert(
+            id_disk_name.clone(),
+            LayerChartContainerConfigItem {
+                label: disk_name.clone(),
+                color: format!("var(--chart-{})", counter),
+            },
+        );
 
         chart_config.push(LayerChartConfigItem {
             key: id_disk_name,
@@ -522,7 +600,10 @@ fn read_disk_dtos(count: Option<i32>) -> Vec<DiskDto> {
 
         return match count {
             Some(n) if n > 0 => disks.into_iter().rev().take(n as usize).rev().collect(),
-            Some(n) if n < 0 => disks.into_iter().skip(size.saturating_sub((-n) as usize)).collect(),
+            Some(n) if n < 0 => disks
+                .into_iter()
+                .skip(size.saturating_sub((-n) as usize))
+                .collect(),
             _ => disks,
         };
     }
@@ -652,7 +733,8 @@ fn calculate_size_by_file_type(folder_path: String) -> HashMap<String, u64> {
                     Err(_) => continue,
                 };
 
-                let ext = path.extension()
+                let ext = path
+                    .extension()
                     .and_then(|n| n.to_str())
                     .unwrap_or("others")
                     .to_string();
@@ -701,7 +783,7 @@ trait AlertSettingRepository {
 
 #[derive(Debug)]
 struct SqliteAlertSettingRepository<'a> {
-    connection: &'a Connection
+    connection: &'a Connection,
 }
 
 impl AlertSettingRepository for SqliteAlertSettingRepository<'_> {
@@ -755,8 +837,16 @@ impl AlertSettingRepository for SqliteAlertSettingRepository<'_> {
     fn update_alert(&mut self, alert: AlertSetting) -> Result<(), Box<dyn Error>> {
         let sql = "UPDATE alert_settings SET name = ?1, last_check = ?2, frequency_days = ?3, enabled = ?4, updated_at = ?5, rule = ?6 WHERE id = ?7";
         let mut stmt = self.connection.prepare(sql)?;
-        stmt.execute((&alert.name, &alert.last_check, &alert.frequency_days, &alert.enabled, &alert.updated_at, &serde_json::to_string(&alert.rule)?, &alert.id))?;
-    
+        stmt.execute((
+            &alert.name,
+            &alert.last_check,
+            &alert.frequency_days,
+            &alert.enabled,
+            &alert.updated_at,
+            &serde_json::to_string(&alert.rule)?,
+            &alert.id,
+        ))?;
+
         Ok(())
     }
 
@@ -801,24 +891,36 @@ struct AlertSettingDbDto {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 enum AlertRule {
-    DiskAvailableSpaceBelowPct { disk_name: String, threshold_pct: f64 },
-    DiskAvailableSpaceBelowBytes { disk_name: String, threshold_bytes: u64 },
-    DiskAvailableSpaceChangeInPct { disk_name: String, change_pct: f64 },
-    FolderSizeAboveBytes { folder_path: String, threshold_bytes: u64 },
+    DiskAvailableSpaceBelowPct {
+        disk_name: String,
+        threshold_pct: f64,
+    },
+    DiskAvailableSpaceBelowBytes {
+        disk_name: String,
+        threshold_bytes: u64,
+    },
+    DiskAvailableSpaceChangeInPct {
+        disk_name: String,
+        change_pct: f64,
+    },
+    FolderSizeAboveBytes {
+        folder_path: String,
+        threshold_bytes: u64,
+    },
 }
 
 #[tauri::command]
 fn add_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
     let state = state.lock().unwrap();
     let mut repo = SqliteAlertSettingRepository {
-        connection: &state.connection
+        connection: &state.connection,
     };
 
     if let Err(e) = repo.add_alert(alert.clone()) {
         eprintln!("Failed to add alert: {}", e);
         return;
     }
-    
+
     println!("{:?}", alert);
 }
 
@@ -826,7 +928,7 @@ fn add_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
 fn add_alert_simplify(alert: AlertSettingCreateDto, state: State<'_, Mutex<AppState>>) {
     let state = state.lock().unwrap();
     let mut repo = SqliteAlertSettingRepository {
-        connection: &state.connection
+        connection: &state.connection,
     };
 
     let new_alert = AlertSetting {
@@ -844,7 +946,7 @@ fn add_alert_simplify(alert: AlertSettingCreateDto, state: State<'_, Mutex<AppSt
         eprintln!("Failed to add alert: {}", e);
         return;
     }
-    
+
     println!("{:?}", new_alert);
 }
 
@@ -852,7 +954,7 @@ fn add_alert_simplify(alert: AlertSettingCreateDto, state: State<'_, Mutex<AppSt
 fn update_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
     let state = state.lock().unwrap();
     let mut repo = SqliteAlertSettingRepository {
-        connection: &state.connection
+        connection: &state.connection,
     };
 
     if let Err(e) = repo.update_alert(alert.clone()) {
@@ -865,7 +967,7 @@ fn update_alert(alert: AlertSetting, state: State<'_, Mutex<AppState>>) {
 fn delete_alert(alert_id: u32, state: State<'_, Mutex<AppState>>) {
     let state = state.lock().unwrap();
     let mut repo = SqliteAlertSettingRepository {
-        connection: &state.connection
+        connection: &state.connection,
     };
 
     if let Err(e) = repo.delete_alert(alert_id) {
@@ -878,9 +980,8 @@ fn delete_alert(alert_id: u32, state: State<'_, Mutex<AppState>>) {
 fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
     let state = state.lock().unwrap();
     let repo = SqliteAlertSettingRepository {
-        connection: &state.connection
+        connection: &state.connection,
     };
-
 
     if let Ok(alerts) = repo.get_all_alerts() {
         return alerts;
@@ -893,18 +994,19 @@ fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
 fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
     // let state = state.lock().unwrap();
     // process_alerts(&state.connection);
-    let _ = app.emit("hello", DiskDto {
-        id: 1,
-        name: "Hello".to_string(),
-        available_space: 1043,
-        date: "2024-01-01".to_string(),
-    });
+    let _ = app.emit(
+        "hello",
+        DiskDto {
+            id: 1,
+            name: "Hello".to_string(),
+            available_space: 1043,
+            date: "2024-01-01".to_string(),
+        },
+    );
 }
 
 fn process_alerts(app: &App, connection: &Connection) {
-    let repo = SqliteAlertSettingRepository {
-        connection,
-    };
+    let repo = SqliteAlertSettingRepository { connection };
 
     let disks = get_disks();
 
@@ -916,27 +1018,36 @@ fn process_alerts(app: &App, connection: &Connection) {
 
             use tauri_plugin_notification::NotificationExt;
 
-
             println!("Processing alert: {:?}", alert);
 
             match &alert.rule {
-                AlertRule::DiskAvailableSpaceBelowPct { disk_name, threshold_pct } => {
+                AlertRule::DiskAvailableSpaceBelowPct {
+                    disk_name,
+                    threshold_pct,
+                } => {
                     let maybe_disk = disks.iter().find(|disk| disk_name.starts_with(&disk.name));
 
                     if let Some(disk) = maybe_disk {
-                        let available_pct = calculate_available_percentage(disk.total_space, disk.available_space);
+                        let available_pct =
+                            calculate_available_percentage(disk.total_space, disk.available_space);
 
                         if available_pct < *threshold_pct {
                             app.notification()
                                 .builder()
                                 .title("Available Space Alert")
-                                .body(format!("The available space of '{}' is lower than {}%.", disk.name, threshold_pct))
+                                .body(format!(
+                                    "The available space of '{}' is lower than {}%.",
+                                    disk.name, threshold_pct
+                                ))
                                 .show()
                                 .unwrap();
                         }
                     }
-                },
-                AlertRule::DiskAvailableSpaceBelowBytes { disk_name, threshold_bytes } => {
+                }
+                AlertRule::DiskAvailableSpaceBelowBytes {
+                    disk_name,
+                    threshold_bytes,
+                } => {
                     let maybe_disk = disks.iter().find(|disk| disk_name.starts_with(&disk.name));
 
                     if let Some(disk) = maybe_disk {
@@ -944,18 +1055,27 @@ fn process_alerts(app: &App, connection: &Connection) {
                             app.notification()
                                 .builder()
                                 .title("Available Space Alert")
-                                .body(format!("The available space of '{}' is lower than {} bytes.", disk.name, disk.available_space))
+                                .body(format!(
+                                    "The available space of '{}' is lower than {} bytes.",
+                                    disk.name, disk.available_space
+                                ))
                                 .show()
                                 .unwrap();
                         }
                     }
-                },
-                AlertRule::DiskAvailableSpaceChangeInPct { disk_name, change_pct } => {
+                }
+                AlertRule::DiskAvailableSpaceChangeInPct {
+                    disk_name,
+                    change_pct,
+                } => {
                     todo!("not implemented exception");
-                },
-                AlertRule::FolderSizeAboveBytes { folder_path, threshold_bytes } => {
+                }
+                AlertRule::FolderSizeAboveBytes {
+                    folder_path,
+                    threshold_bytes,
+                } => {
                     todo!("not implemented exception");
-                },
+                }
             }
         }
     }
@@ -973,7 +1093,7 @@ fn init_db(connection: &Connection) -> Result<(), Box<dyn Error>> {
             updated_at TEXT,
             rule TEXT
         ) STRICT",
-     ()
+        (),
     )?;
 
     Ok(())
@@ -988,13 +1108,21 @@ fn change_alert_status(alert_id: u32, enable: bool, state: State<'_, Mutex<AppSt
     }
 }
 
-fn enable_or_disable_alert_setting(connection: &Connection, alert_id: u32, enable: bool) -> Result<(), Box<dyn Error>> {
+fn enable_or_disable_alert_setting(
+    connection: &Connection,
+    alert_id: u32,
+    enable: bool,
+) -> Result<(), Box<dyn Error>> {
     let sql = "UPDATE alert_settings SET enabled = ?1, updated_at = ?2 WHERE id = ?3";
     let enabled_i: i32 = if enable { 1 } else { 0 };
     let mut stmt = connection.prepare(sql)?;
     stmt.execute((&enabled_i, &chrono::Utc::now().to_rfc3339(), &alert_id))?;
 
-    println!("Alert ID {} has been {}", alert_id, if enable { "enabled" } else { "disabled" });
+    println!(
+        "Alert ID {} has been {}",
+        alert_id,
+        if enable { "enabled" } else { "disabled" }
+    );
 
     Ok(())
 }
@@ -1061,14 +1189,12 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .on_window_event(|window, event| {
-            match event {
-                tauri::WindowEvent::CloseRequested { api, .. } => {
-                    window.hide().unwrap();
-                    api.prevent_close();
-                }
-                _ => {}
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                window.hide().unwrap();
+                api.prevent_close();
             }
+            _ => {}
         })
         .invoke_handler(tauri::generate_handler![
             get_disks,
@@ -1103,17 +1229,19 @@ pub fn run() {
 }
 
 fn to_percentage<T>(amount: T, total: T) -> f64
-where T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64> {
+where
+    T: Add<Output = T> + Mul<Output = T> + Copy + Into<f64>,
+{
     amount.clone().into() / total.clone().into() * 100f64
 }
 
 /// Adds two numbers
-/// 
+///
 /// ### Arguments
-/// 
+///
 /// * `a` - A 32 bit integer
 /// * `b` - A 32 bit integer
-/// 
+///
 /// Examples
 /// ```
 /// use disk_analyzer_lib::add;
@@ -1166,7 +1294,7 @@ mod tests {
             (1000u64, 1100u64, -10f64),
             (2000u64, 1500u64, 25f64),
             (500u64, 250u64, 50f64),
-            (0u64, 0u64, 0f64), // Edge case: previous is zero
+            (0u64, 0u64, 0f64),       // Edge case: previous is zero
             (1000u64, 1000u64, 0f64), // No change
         ];
 
@@ -1204,7 +1332,10 @@ mod tests {
         assert_eq!(super::calculate_available_percentage(100, 0), 0.0);
 
         // Test with larger numbers (1TB total, 500GB available)
-        assert_eq!(super::calculate_available_percentage(1_000_000_000_000, 500_000_000_000), 50.0);
+        assert_eq!(
+            super::calculate_available_percentage(1_000_000_000_000, 500_000_000_000),
+            50.0
+        );
 
         // Test with fractional results
         let result = super::calculate_available_percentage(1000, 333);
@@ -1223,7 +1354,10 @@ mod tests {
         assert_eq!(super::calculate_used_percentage(100, 0), 100.0);
 
         // Test with larger numbers (1TB total, 500GB available means 500GB used)
-        assert_eq!(super::calculate_used_percentage(1_000_000_000_000, 500_000_000_000), 50.0);
+        assert_eq!(
+            super::calculate_used_percentage(1_000_000_000_000, 500_000_000_000),
+            50.0
+        );
 
         // Test with fractional results
         let result = super::calculate_used_percentage(1000, 333);
