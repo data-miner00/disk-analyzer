@@ -39,7 +39,7 @@ steps:
   - task: CopyFiles@2
     inputs:
       SourceFolder: "$(buildArtifactStaging)"
-      Contents: "src-tauri/target/release/disk-analyzer.exe"
+      Contents: "**/src-tauri/target/release/disk-analyzer.exe"
       TargetFolder: drop
     displayName: "Copy files to drop folder"
 
