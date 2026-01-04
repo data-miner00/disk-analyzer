@@ -5,9 +5,6 @@ trigger:
 
 pool: default
 
-variables:
-  buildArtifactStaging: "$(Build.ArtifactStagingDirectory)"
-
 steps:
   - task: CmdLine@2
     inputs:
@@ -35,18 +32,10 @@ steps:
       npm run tauri build
     displayName: "Build for production"
 
-  - task: CmdLine@2
-    inputs:
-      script: |
-        dir
-      workingDirectory: src-tauri
-    displayName: Show working directory
-
   # Artifacts produced requires the end user to have Microsoft Edge WebView2 installed
   - task: CopyFiles@2
     inputs:
-      SourceFolder: "$(buildArtifactStaging)"
-      Contents: "**/*"
+      Contents: "**/*.exe"
       TargetFolder: drop
     displayName: "Copy files to drop folder"
 
