@@ -1,7 +1,12 @@
+name: $(semanticVersion)-build$(rev:rrr)
+
 trigger:
   - main
 
 pool: default
+
+variables:
+  buildArtifactStaging: "$(Build.ArtifactStagingDirectory)"
 
 steps:
   - task: CmdLine@2
@@ -29,3 +34,16 @@ steps:
   - script: |
       npm run tauri build
     displayName: "Build for production"
+
+  # Artifacts produced requires the end user to have Microsoft Edge WebView2 installed
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: "$(buildArtifactStaging)"
+      Contents: "src-tauri/target/release/disk-analyzer.exe"
+      TargetFolder: drop
+    displayName: "Copy files to drop folder"
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: drop"
+    inputs:
+      PathtoPublish: drop
