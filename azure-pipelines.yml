@@ -46,7 +46,7 @@ steps:
   - task: CopyFiles@2
     inputs:
       SourceFolder: "$(buildArtifactStaging)"
-      Contents: "**/*.exe"
+      Contents: "**/*"
       TargetFolder: drop
     displayName: "Copy files to drop folder"
 
