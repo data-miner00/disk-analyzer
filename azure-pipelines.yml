@@ -35,7 +35,7 @@ steps:
   # Artifacts produced requires the end user to have Microsoft Edge WebView2 installed
   - task: CopyFiles@2
     inputs:
-      Contents: "**/*.exe"
+      Contents: "**/src-tauri/**/*.exe"
       TargetFolder: drop
     displayName: "Copy files to drop folder"
 
