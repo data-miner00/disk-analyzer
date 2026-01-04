@@ -39,7 +39,7 @@ steps:
     inputs:
       script: |
         dir
-    workingDirectory: src-tauri
+      workingDirectory: src-tauri
     displayName: Show working directory
 
   # Artifacts produced requires the end user to have Microsoft Edge WebView2 installed
