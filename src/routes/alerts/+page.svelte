@@ -41,6 +41,7 @@
   import { Switch } from "$lib/components/ui/switch";
   import { getSettings } from "$lib/utils.tauri";
   import { ALERTS, t } from "@/i18n/translations.svelte";
+  import * as ButtonGroup from "$lib/components/ui/button-group/index.js";
 
   let searchQuery = $state("");
   let currentSelectedAlertForUpdate = $state<AlertSetting>();
@@ -634,52 +635,55 @@
           </p>
         </div>
         <div class="flex items-center gap-4">
-          <Button
-            variant="outline"
-            onclick={() => {
-              currentSelectedAlertForUpdate = alert;
-              isDeleteDialogOpen = true;
-            }}
-          >
-            <Trash />
-          </Button>
+          <ButtonGroup.Root>
+            <Button
+              variant="outline"
+              size="icon"
+              onclick={() => {
+                currentSelectedAlertForUpdate = alert;
+                isDeleteDialogOpen = true;
+              }}
+            >
+              <Trash />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onclick={() => {
+                const key: string = Object.keys(alert.rule)[0]!;
 
-          <Button
-            variant="outline"
-            onclick={() => {
-              const key: string = Object.keys(alert.rule)[0]!;
+                const rule = alert.rule[key] as any;
 
-              const rule = alert.rule[key] as any;
+                // Use the rule key (discriminant) to determine shape
+                if (key === "DiskAvailableSpaceBelowPct") {
+                  $editFormData.threshold = (
+                    rule as DiskAvailableSpaceBelowPct
+                  ).threshold_pct;
+                } else if (key === "DiskAvailableSpaceBelowBytes") {
+                  $editFormData.threshold = (
+                    rule as DiskAvailableSpaceBelowBytes
+                  ).threshold_bytes;
+                } else if (key === "DiskAvailableSpaceChangeInPct") {
+                  $editFormData.threshold = (
+                    rule as DiskAvailableSpaceChangeInPct
+                  ).change_pct;
+                } else {
+                  $editFormData.threshold = 0;
+                }
 
-              // Use the rule key (discriminant) to determine shape
-              if (key === "DiskAvailableSpaceBelowPct") {
-                $editFormData.threshold = (
-                  rule as DiskAvailableSpaceBelowPct
-                ).threshold_pct;
-              } else if (key === "DiskAvailableSpaceBelowBytes") {
-                $editFormData.threshold = (
-                  rule as DiskAvailableSpaceBelowBytes
-                ).threshold_bytes;
-              } else if (key === "DiskAvailableSpaceChangeInPct") {
-                $editFormData.threshold = (
-                  rule as DiskAvailableSpaceChangeInPct
-                ).change_pct;
-              } else {
-                $editFormData.threshold = 0;
-              }
-
-              currentSelectedAlertForUpdate = alert;
-              $editFormData.alertRule = key;
-              $editFormData.id = alert.id;
-              $editFormData.diskName = alert.rule[key].disk_name;
-              $editFormData.name = alert.name;
-              $editFormData.enabled = alert.enabled;
-              $editFormData.frequency_days = alert.frequency_days;
-              isEditDialogOpen = true;
-            }}
-          >
-            <Pencil />
-          </Button>
+                currentSelectedAlertForUpdate = alert;
+                $editFormData.alertRule = key;
+                $editFormData.id = alert.id;
+                $editFormData.diskName = alert.rule[key].disk_name;
+                $editFormData.name = alert.name;
+                $editFormData.enabled = alert.enabled;
+                $editFormData.frequency_days = alert.frequency_days;
+                isEditDialogOpen = true;
+              }}
+            >
+              <Pencil />
+            </Button>
+          </ButtonGroup.Root>
 
           <Switch
             checked={alert.enabled}
