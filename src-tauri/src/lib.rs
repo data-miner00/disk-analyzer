@@ -94,6 +94,64 @@ trait DiskInfoRepository {
     fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct NotificationHistory {
+    id: i32,
+    title: String,
+    body: String,
+    call_to_action: Option<String>,
+    created_at: String,
+}
+
+trait NotificationHistoryRepository {
+    fn get_all(&self) -> Result<Vec<NotificationHistory>, Box<dyn Error>>;
+    fn add_history(&mut self, history: NotificationHistory) -> Result<(), Box<dyn Error>>;
+}
+
+#[derive(Debug)]
+struct SqliteNotificationHistoryRepository<'a> {
+    connection: &'a Connection,
+}
+
+impl NotificationHistoryRepository for SqliteNotificationHistoryRepository<'_> {
+    fn get_all(&self) -> Result<Vec<NotificationHistory>, Box<dyn Error>> {
+        let mut stmt = self.connection.prepare(
+            "SELECT id, title, body, call_to_action, created_at FROM notification_histories",
+        )?;
+        let mut rows = stmt.query([])?;
+
+        let mut results: Vec<NotificationHistory> = Vec::new();
+
+        while let Some(row) = rows.next()? {
+            let id_i64: i64 = row.get(0)?;
+            let id = id_i64 as i32;
+            let title: String = row.get(1)?;
+            let body: String = row.get(2)?;
+            let call_to_action: Option<String> = row.get(3)?;
+            let created_at: String = row.get(4)?;
+
+            results.push(NotificationHistory {
+                id,
+                title,
+                body,
+                call_to_action, 
+                created_at 
+            });
+        }
+
+        Ok(results)
+    }
+
+    fn add_history(&mut self, history: NotificationHistory) -> Result<(), Box<dyn Error>> {
+        self.connection.execute(
+            "INSERT INTO notification_histories (title, body, call_to_action, created_at) VALUES (?1, ?2, ?3, ?4)",
+            (&history.title, &history.body, &history.call_to_action, &history.created_at),
+        )?;
+
+        Ok(())
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 struct Settings {
     dark_mode: bool,
@@ -1005,8 +1063,23 @@ fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
     );
 }
 
+#[tauri::command]
+fn get_histories(state: State<'_, Mutex<AppState>>) -> Vec<NotificationHistory> {
+    let state = state.lock().unwrap();
+    let repo = SqliteNotificationHistoryRepository {
+        connection: &state.connection,
+    };
+
+    if let Ok(histories) = repo.get_all() {
+        return histories;
+    }
+
+    vec![]
+}
+
 fn process_alerts(app: &App, connection: &Connection) {
     let repo = SqliteAlertSettingRepository { connection };
+    let mut history_repo = SqliteNotificationHistoryRepository { connection };
 
     let disks = get_disks();
 
@@ -1032,15 +1105,30 @@ fn process_alerts(app: &App, connection: &Connection) {
                             calculate_available_percentage(disk.total_space, disk.available_space);
 
                         if available_pct < *threshold_pct {
+                            let title = "Available Space Below Percentage";
+                            let body = format!(
+                                "The available space of '{}' is lower than {}%.",
+                                disk.name, threshold_pct
+                            );
+
                             app.notification()
                                 .builder()
-                                .title("Available Space Alert")
-                                .body(format!(
-                                    "The available space of '{}' is lower than {}%.",
-                                    disk.name, threshold_pct
-                                ))
+                                .title(title)
+                                .body(&body)
                                 .show()
                                 .unwrap();
+
+                            let history = NotificationHistory {
+                                id: 999,
+                                title: title.to_string(),
+                                body: body.to_string(),
+                                created_at: chrono::Utc::now().to_rfc3339(),
+                                call_to_action: None,
+                            };
+
+                            if let Ok(()) = history_repo.add_history(history) {
+                                println!("Successfully persisted notification to database");
+                            };
                         }
                     }
                 }
@@ -1052,15 +1140,29 @@ fn process_alerts(app: &App, connection: &Connection) {
 
                     if let Some(disk) = maybe_disk {
                         if disk.available_space < *threshold_bytes {
+                            let title = "Available Space Below Bytes";
+                            let body = format!(
+                                "The available space of '{}' is lower than {} bytes.",
+                                disk.name, disk.available_space
+                            );
                             app.notification()
                                 .builder()
-                                .title("Available Space Alert")
-                                .body(format!(
-                                    "The available space of '{}' is lower than {} bytes.",
-                                    disk.name, disk.available_space
-                                ))
+                                .title(title)
+                                .body(&body)
                                 .show()
                                 .unwrap();
+
+                            let history = NotificationHistory {
+                                id: 999,
+                                title: title.to_string(),
+                                body: body.to_string(),
+                                created_at: chrono::Utc::now().to_rfc3339(),
+                                call_to_action: None,
+                            };
+
+                            if let Ok(()) = history_repo.add_history(history) {
+                                println!("Successfully persisted notification to database");
+                            };
                         }
                     }
                 }
@@ -1082,6 +1184,17 @@ fn process_alerts(app: &App, connection: &Connection) {
 }
 
 fn init_db(connection: &Connection) -> Result<(), Box<dyn Error>> {
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS notification_histories (
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            body TEXT NOT NULL,
+            call_to_action TEXT,
+            created_at TEXT
+        ) STRICT",
+        (),
+    )?;
+
     connection.execute(
         "CREATE TABLE IF NOT EXISTS alert_settings (
             id INTEGER PRIMARY KEY,
@@ -1223,6 +1336,7 @@ pub fn run() {
             frontend_loaded,
             aggregate_disk_usage_space_changed_history,
             smart_exit,
+            get_histories,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

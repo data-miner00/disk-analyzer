@@ -25,7 +25,7 @@
   import { zod4 } from "sveltekit-superforms/adapters";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { Bell, Pencil, Plus, Trash } from "@lucide/svelte";
+  import { Bell, History, Pencil, Plus, Trash } from "@lucide/svelte";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { toGB } from "$lib/utils";
   import { invoke } from "@tauri-apps/api/core";
@@ -105,8 +105,8 @@
 
   let filteredAlerts = $derived(
     alertSettings.filter((alert) =>
-      alert.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+      alert.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    ),
   );
 
   async function changeAlertStatus(id: number, enabled: boolean) {
@@ -135,12 +135,12 @@
 
   const triggerContent = $derived(
     alertRuleOptions.find((f) => f.value === $formData.alertRule)?.label ??
-      t(ALERTS.LABEL_SELECT_RULE)
+      t(ALERTS.LABEL_SELECT_RULE),
   );
 
   const editTriggerContent = $derived(
     alertRuleOptions.find((f) => f.value === $editFormData.alertRule)?.label ??
-      t(ALERTS.LABEL_SELECT_RULE)
+      t(ALERTS.LABEL_SELECT_RULE),
   );
 
   async function onCreateAlert() {
@@ -292,11 +292,11 @@
     isDeleteDialogOpen = false;
 
     alertSettings = alertSettings.filter(
-      (x) => x.id != currentSelectedAlertForUpdate?.id
+      (x) => x.id != currentSelectedAlertForUpdate?.id,
     );
 
     toast.success(
-      `Successfully deleted alert '${currentSelectedAlertForUpdate?.name}'`
+      `Successfully deleted alert '${currentSelectedAlertForUpdate?.name}'`,
     );
   }
 </script>
@@ -424,7 +424,7 @@
                   <Select.Group>
                     <Select.Label
                       >{t(
-                        ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN
+                        ALERTS.CREATE_DIALOG_DISKNAME_LABEL_DROPDOWN,
                       )}</Select.Label
                     >
                     {#each availableDisks as disk}
@@ -450,6 +450,10 @@
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
+
+  <Button size="icon" variant="outline" href="/alerts/history">
+    <History />
+  </Button>
 
   <!-- Edit dialog -->
   <Dialog.Root bind:open={isEditDialogOpen}>

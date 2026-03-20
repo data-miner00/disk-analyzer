@@ -11,6 +11,7 @@
 - [x] Background process
 - [x] Search bar
 - [ ] Logger
+- [x] Notification History
 
 ## Reporting & Export
 
