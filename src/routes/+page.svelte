@@ -1,6 +1,6 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import { AlertCircleIcon, HardDrive, SearchIcon } from "@lucide/svelte";
+  import { AlertCircleIcon, HardDrive, SearchIcon, X } from "@lucide/svelte";
   import { onMount } from "svelte";
   import type { Disk, Settings, DiskHistory } from "$lib/types";
   import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
@@ -13,7 +13,7 @@
   let diskInfo = $state<Disk[]>([]);
   let settings = $state<Settings | null>(null);
   let hasUnnamedDisk = $derived(
-    diskInfo.some((disk) => disk.name.trim() === "Unnamed")
+    diskInfo.some((disk) => disk.name.trim() === "Unnamed"),
   );
 
   async function get_disks() {
@@ -54,8 +54,8 @@
 
   let filteredDisk = $derived(
     diskInfo.filter((x) =>
-      x.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+      x.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    ),
   );
 
   let searchQuery = $state("");
@@ -85,6 +85,14 @@
     <InputGroup.Addon>
       <SearchIcon />
     </InputGroup.Addon>
+
+    {#if searchQuery}
+      <InputGroup.Addon align="inline-end">
+        <InputGroup.Button onclick={() => (searchQuery = "")}>
+          <X />
+        </InputGroup.Button>
+      </InputGroup.Addon>
+    {/if}
   </InputGroup.Root>
 {/if}
 
@@ -92,7 +100,7 @@
   {#each filteredDisk as disk}
     {@const usedSpacePercentage = toPercentage(
       disk.total_space - disk.available_space,
-      disk.total_space
+      disk.total_space,
     )}
 
     <li>
@@ -105,7 +113,7 @@
             <div class="font-semibold">{disk.name}</div>
             <div>
               {toGB(disk.total_space - disk.available_space)} / {toGB(
-                disk.total_space
+                disk.total_space,
               )}
             </div>
             <meter

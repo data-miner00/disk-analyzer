@@ -25,7 +25,7 @@
   import { zod4 } from "sveltekit-superforms/adapters";
   import * as Empty from "$lib/components/ui/empty/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { Bell, History, Pencil, Plus, Trash } from "@lucide/svelte";
+  import { Bell, History, Pencil, Plus, Trash, X } from "@lucide/svelte";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { toGB } from "$lib/utils";
   import { invoke } from "@tauri-apps/api/core";
@@ -311,6 +311,14 @@
       <InputGroup.Addon>
         <SearchIcon />
       </InputGroup.Addon>
+
+      {#if searchQuery}
+        <InputGroup.Addon align="inline-end">
+          <InputGroup.Button onclick={() => (searchQuery = "")}>
+            <X />
+          </InputGroup.Button>
+        </InputGroup.Addon>
+      {/if}
     </InputGroup.Root>
   {/if}
 
