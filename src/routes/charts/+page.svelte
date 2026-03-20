@@ -1,12 +1,14 @@
 <script lang="ts">
-  import * as Card from "$lib/components/ui/card";
-  import * as Chart from "$lib/components/ui/chart";
-  import { t } from "@/i18n/translations.svelte.js";
-  import { CHARTS } from "@/i18n/translations/keys.js";
   import { TrendingUpIcon } from "@lucide/svelte";
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
   import { LineChart } from "layerchart";
+
+  import { t } from "@/i18n/translations.svelte.js";
+  import { CHARTS } from "@/i18n/translations/keys.js";
+
+  import * as Card from "$lib/components/ui/card";
+  import * as Chart from "$lib/components/ui/chart";
 
   const { data } = $props();
   const {
@@ -17,7 +19,7 @@
   } = data;
 </script>
 
-<h1 class="font-semibold text-lg mb-4">{t(CHARTS.TITLE)}</h1>
+<h1 class="mb-4 text-lg font-semibold">{t(CHARTS.TITLE)}</h1>
 
 <Card.Root>
   <Card.Header>
@@ -50,7 +52,7 @@
           <Chart.Tooltip hideLabel>
             {#snippet formatter({ name, value, item })}
               <div
-                class="w-3 h-3 rounded"
+                class="h-3 w-3 rounded"
                 style={`background: ${item.color}`}
               ></div>
               <div
@@ -73,7 +75,7 @@
   <Card.Footer>
     <div class="flex w-full items-start gap-2 text-sm">
       <div class="grid gap-2">
-        <div class="flex items-center gap-2 font-medium leading-none">
+        <div class="flex items-center gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
         </div>
         <div class="text-muted-foreground flex items-center gap-2 leading-none">
@@ -116,7 +118,7 @@
           <Chart.Tooltip label="Available Space">
             {#snippet formatter({ name, value, item })}
               <div
-                class="w-3 h-3 rounded"
+                class="h-3 w-3 rounded"
                 style={`background: ${item.color}`}
               ></div>
               <div
@@ -139,7 +141,7 @@
   <Card.Footer>
     <div class="flex w-full items-start gap-2 text-sm">
       <div class="grid gap-2">
-        <div class="flex items-center gap-2 font-medium leading-none">
+        <div class="flex items-center gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
         </div>
         <div class="text-muted-foreground flex items-center gap-2 leading-none">
@@ -180,7 +182,7 @@
           <Chart.Tooltip label="Used Space">
             {#snippet formatter({ name, value, item })}
               <div
-                class="w-3 h-3 rounded"
+                class="h-3 w-3 rounded"
                 style={`background: ${item.color}`}
               ></div>
               <div
@@ -203,7 +205,7 @@
   <Card.Footer>
     <div class="flex w-full items-start gap-2 text-sm">
       <div class="grid gap-2">
-        <div class="flex items-center gap-2 font-medium leading-none">
+        <div class="flex items-center gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
         </div>
         <div class="text-muted-foreground flex items-center gap-2 leading-none">
@@ -244,7 +246,7 @@
           <Chart.Tooltip label="Usage Percentage">
             {#snippet formatter({ name, value, item })}
               <div
-                class="w-3 h-3 rounded"
+                class="h-3 w-3 rounded"
                 style={`background: ${item.color}`}
               ></div>
               <div
@@ -267,7 +269,7 @@
   <Card.Footer>
     <div class="flex w-full items-start gap-2 text-sm">
       <div class="grid gap-2">
-        <div class="flex items-center gap-2 font-medium leading-none">
+        <div class="flex items-center gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUpIcon class="size-4" />
         </div>
         <div class="text-muted-foreground flex items-center gap-2 leading-none">
