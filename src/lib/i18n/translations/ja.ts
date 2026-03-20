@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const JA: Translations = {
   [HEADER.MISC]: "その他",
@@ -109,6 +109,20 @@ export const JA: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "作成",
   [ALERTS.LABEL_SELECT_RULE]: "ルールを選択",
   [ALERTS.FORM_ERROR]: "フォームのエラーを修正してください。",
+
+  [CHARTS.TITLE]: "チャート",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]: "ディスク使用率の変化率",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "昨日と比較した個々のディスク使用率の内訳を表示します。",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "ディスクの空き容量",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "現在のPCの個々のディスクの空き容量の内訳を表示します。",
+  [CHARTS.DISK_USAGE_TITLE]: "ディスク使用量(GB)",
+  [CHARTS.DISK_USAGE_DESCRIPTION]:
+    "現在のPCの個々のディスク使用量の内訳を表示します。",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "ディスク使用率(パーセンテージ)",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "現在のPCの個々のディスク使用率をパーセンテージで内訳を表示します。",
 };
 
 export default JA;

@@ -1,6 +1,8 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card";
   import * as Chart from "$lib/components/ui/chart";
+  import { t } from "@/i18n/translations.svelte.js";
+  import { CHARTS } from "@/i18n/translations/keys.js";
   import { TrendingUpIcon } from "@lucide/svelte";
   import { scaleUtc } from "d3-scale";
   import { curveNatural } from "d3-shape";
@@ -15,13 +17,13 @@
   } = data;
 </script>
 
-<h1 class="font-semibold text-lg mb-4">Charts</h1>
+<h1 class="font-semibold text-lg mb-4">{t(CHARTS.TITLE)}</h1>
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Disk Usages Change in Percentage</Card.Title>
+    <Card.Title>{t(CHARTS.DISK_USAGE_CHANGE_PCT_TITLE)}</Card.Title>
     <Card.Description
-      >Showing a breakdown of individual disk usages as compared to yesterday</Card.Description
+      >{t(CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION)}</Card.Description
     >
   </Card.Header>
   <Card.Content class="pl-12">
@@ -86,10 +88,9 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Disk Available Space</Card.Title>
+    <Card.Title>{t(CHARTS.DISK_AVAILABLE_SPACE_TITLE)}</Card.Title>
     <Card.Description
-      >Showing a breakdown of individual disk available space for the current
-      captured PC</Card.Description
+      >{t(CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION)}</Card.Description
     >
   </Card.Header>
   <Card.Content class="pl-12">
@@ -153,10 +154,8 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Disk Usage</Card.Title>
-    <Card.Description
-      >Showing a breakdown of individual disk usages for the current captured PC</Card.Description
-    >
+    <Card.Title>{t(CHARTS.DISK_USAGE_TITLE)}</Card.Title>
+    <Card.Description>{t(CHARTS.DISK_USAGE_DESCRIPTION)}</Card.Description>
   </Card.Header>
   <Card.Content class="pl-12">
     <Chart.Container config={usedSpaceReport.containerConfig}>
@@ -219,11 +218,8 @@
 
 <Card.Root>
   <Card.Header>
-    <Card.Title>Disk Usage in Percentage</Card.Title>
-    <Card.Description
-      >Showing a breakdown of individual disk usages in percentage for the
-      current captured PC</Card.Description
-    >
+    <Card.Title>{t(CHARTS.DISK_USAGE_PCT_TITLE)}</Card.Title>
+    <Card.Description>{t(CHARTS.DISK_USAGE_PCT_DESCRIPTION)}</Card.Description>
   </Card.Header>
   <Card.Content class="pl-12">
     <Chart.Container config={usedSpacePctReport.containerConfig}>

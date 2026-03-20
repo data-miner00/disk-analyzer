@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const KO: Translations = {
   [HEADER.MISC]: "기타",
@@ -111,6 +111,20 @@ export const KO: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "생성",
   [ALERTS.LABEL_SELECT_RULE]: "규칙 선택",
   [ALERTS.FORM_ERROR]: "양식의 오류를 수정해 주세요.",
+
+  [CHARTS.TITLE]: "차트",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]: "디스크 사용량 변화율",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "어제와 비교한 개별 디스크 사용량의 분석을 표시합니다.",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "디스크 사용 가능 공간",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "현재 PC의 개별 디스크 사용 가능 공간의 분석을 표시합니다.",
+  [CHARTS.DISK_USAGE_TITLE]: "디스크 사용량(GB)",
+  [CHARTS.DISK_USAGE_DESCRIPTION]:
+    "현재 PC의 개별 디스크 사용량의 분석을 표시합니다.",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "디스크 사용률(백분율)",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "현재 PC의 개별 디스크 사용률을 백분율로 분석하여 표시합니다.",
 };
 
 export default KO;

@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const ZH: Translations = {
   [HEADER.MISC]: "杂项",
@@ -103,6 +103,19 @@ export const ZH: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "创建",
   [ALERTS.LABEL_SELECT_RULE]: "选择规则",
   [ALERTS.FORM_ERROR]: "请修正表单中的错误。",
+
+  [CHARTS.TITLE]: "图表",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]: "磁盘使用率变化百分比",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "显示与昨天相比各个磁盘使用率的明细。",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "磁盘可用空间",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "显示当前电脑各个磁盘可用空间的明细。",
+  [CHARTS.DISK_USAGE_TITLE]: "磁盘使用量(GB)",
+  [CHARTS.DISK_USAGE_DESCRIPTION]: "显示当前电脑各个磁盘使用量的明细。",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "磁盘使用率百分比",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "显示当前电脑各个磁盘使用率百分比的明细。",
 };
 
 export default ZH;

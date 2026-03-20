@@ -116,3 +116,19 @@ export const ALERTS = {
 
   FORM_ERROR: "alerts.formError",
 };
+
+export const CHARTS = {
+  TITLE: "charts.title",
+
+  DISK_USAGE_CHANGE_PCT_TITLE: "charts.usgPercentage.title",
+  DISK_USAGE_CHANGE_PCT_DESCRIPTION: "charts.usgPercentage.description",
+
+  DISK_AVAILABLE_SPACE_TITLE: "charts.diskAvailSpace.title",
+  DISK_AVAILABLE_SPACE_DESCRIPTION: "charts.diskAvailSpace.description",
+
+  DISK_USAGE_TITLE: "charts.diskUsage.title",
+  DISK_USAGE_DESCRIPTION: "charts.diskUsage.description",
+
+  DISK_USAGE_PCT_TITLE: "charts.diskUsagePct.title",
+  DISK_USAGE_PCT_DESCRIPTION: "charts.diskUsagePct.description",
+};

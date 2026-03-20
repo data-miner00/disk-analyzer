@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const MS: Translations = {
   [HEADER.MISC]: "Pelbagai",
@@ -112,6 +112,21 @@ export const MS: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Cipta",
   [ALERTS.LABEL_SELECT_RULE]: "Pilih peraturan",
   [ALERTS.FORM_ERROR]: "Sila betulkan ralat dalam borang.",
+
+  [CHARTS.TITLE]: "Carta",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]:
+    "Perubahan Penggunaan Cakera dalam Peratus",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "Menunjukkan pecahan penggunaan cakera individu berbanding dengan semalam.",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "Ruang Tersedia Cakera",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "Menunjukkan pecahan ruang tersedia cakera individu untuk PC semasa.",
+  [CHARTS.DISK_USAGE_TITLE]: "Penggunaan Cakera dalam GB",
+  [CHARTS.DISK_USAGE_DESCRIPTION]:
+    "Menunjukkan pecahan penggunaan cakera individu untuk PC semasa.",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "Penggunaan Cakera dalam Peratus",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "Menunjukkan pecahan penggunaan cakera individu dalam peratus untuk PC semasa.",
 };
 
 export default MS;

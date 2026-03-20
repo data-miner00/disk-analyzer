@@ -1,5 +1,5 @@
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const ES: Translations = {
   [HEADER.MISC]: "Varios",
@@ -114,6 +114,20 @@ export const ES: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Crear",
   [ALERTS.LABEL_SELECT_RULE]: "Seleccione una regla",
   [ALERTS.FORM_ERROR]: "Por favor, corrija los errores en el formulario.",
+
+  [CHARTS.TITLE]: "Gráficos",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]: "Cambio de Uso del Disco en Porcentaje",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "Muestra un desglose del uso de discos individuales en comparación con ayer.",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "Espacio Disponible en Disco",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "Muestra un desglose del espacio disponible de discos individuales para el PC actual.",
+  [CHARTS.DISK_USAGE_TITLE]: "Uso del Disco en GB",
+  [CHARTS.DISK_USAGE_DESCRIPTION]:
+    "Muestra un desglose del uso de discos individuales para el PC actual.",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "Uso del Disco en Porcentaje",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "Muestra un desglose del uso de discos individuales en porcentaje para el PC actual.",
 };
 
 export default ES;

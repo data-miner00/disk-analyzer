@@ -1,5 +1,5 @@
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS } from "./keys";
+import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const EN: Translations = {
   [HEADER.MISC]: "Misc",
@@ -112,6 +112,20 @@ export const EN: Translations = {
   [ALERTS.CREATE_DIALOG_CREATE_BUTTON]: "Create",
   [ALERTS.LABEL_SELECT_RULE]: "Select a rule",
   [ALERTS.FORM_ERROR]: "Please fix the errors in the form.",
+
+  [CHARTS.TITLE]: "Charts",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_TITLE]: "Disk Usages Change in Percentage",
+  [CHARTS.DISK_USAGE_CHANGE_PCT_DESCRIPTION]:
+    "Showing a breakdown of individual disk usages as compared to yesterday.",
+  [CHARTS.DISK_AVAILABLE_SPACE_TITLE]: "Disk Available Space",
+  [CHARTS.DISK_AVAILABLE_SPACE_DESCRIPTION]:
+    "Showing a breakdown of individual disk available space for the current PC.",
+  [CHARTS.DISK_USAGE_TITLE]: "Disk Usage in GB",
+  [CHARTS.DISK_USAGE_DESCRIPTION]:
+    "Showing a breakdown of individual disk usages for the current PC.",
+  [CHARTS.DISK_USAGE_PCT_TITLE]: "Disk Usage in Percentage",
+  [CHARTS.DISK_USAGE_PCT_DESCRIPTION]:
+    "Showing a breakdown of individual disk usages in percentage for the current PC.",
 };
 
 export default EN;
