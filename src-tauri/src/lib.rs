@@ -1,6 +1,8 @@
+mod models;
+
+use crate::models::*;
 use chrono::Local;
 use rusqlite::Connection;
-use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::convert::Into;
 use std::fs;
@@ -33,74 +35,10 @@ impl AppState {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-enum ReportType {
-    AvailableSpace,
-    UsedSpace,
-    UsedSpacePct,
-    ChangeInUsedSpace,
-    ChangeInUsedSpacePct,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct Report<T>
-where
-    T: Add<Output = T> + Mul<Output = T> + Copy,
-{
-    report_type: ReportType,
-    data: Vec<LayerChartReportData<T>>,
-    container_config: HashMap<String, LayerChartContainerConfigItem>,
-    chart_config: Vec<LayerChartConfigItem>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct LayerChartReportData<T>
-where
-    T: Add<Output = T> + Mul<Output = T> + Copy,
-{
-    date: String,
-    values: HashMap<String, T>,
-}
-
-impl<T> LayerChartReportData<T>
-where
-    T: Add<Output = T> + Mul<Output = T> + Copy,
-{
-    pub fn empty(date: String) -> Self {
-        Self::new(date, HashMap::new())
-    }
-
-    pub fn new(date: String, values: HashMap<String, T>) -> Self {
-        Self { date, values }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct LayerChartConfigItem {
-    key: String,
-    label: String,
-    color: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct LayerChartContainerConfigItem {
-    label: String,
-    color: String,
-}
-
 trait DiskInfoRepository {
     fn get_all_disks(&self) -> Result<Vec<DiskDto>, Box<dyn Error>>;
     fn add_disk(&mut self, disk: DiskDto) -> Result<(), Box<dyn Error>>;
     fn add_disks(&mut self, disks: Vec<DiskDto>) -> Result<(), Box<dyn Error>>;
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct NotificationHistory {
-    id: i32,
-    title: String,
-    body: String,
-    call_to_action: Option<String>,
-    created_at: String,
 }
 
 trait NotificationHistoryRepository {
@@ -152,65 +90,9 @@ impl NotificationHistoryRepository for SqliteNotificationHistoryRepository<'_> {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Settings {
-    dark_mode: bool,
-    search_bar: bool,
-    language: String,
-    byte_format: String,
-    prefetch_count: i32,
-    desktop_noti: bool,
-    minimize_close: bool,
-    start_logon: bool,
-    enable_logging: bool,
-    log_path: String,
-    enable_backup: bool,
-    backup_path: String,
-    backup_frequency_days: i32,
-}
-
-impl Default for Settings {
-    fn default() -> Self {
-        Self {
-            dark_mode: false,
-            search_bar: true,
-            language: "en".to_string(),
-            byte_format: "gb".to_string(),
-            prefetch_count: 20,
-            desktop_noti: true,
-            minimize_close: false,
-            start_logon: true,
-            enable_logging: false,
-            log_path: "logs".to_string(),
-            enable_backup: false,
-            backup_path: "backup".to_string(),
-            backup_frequency_days: 7,
-        }
-    }
-}
-
 trait SettingsRepository {
     fn get(&self) -> Result<Settings, Box<dyn Error>>;
     fn upsert(&self, settings: Settings) -> Result<(), Box<dyn Error>>;
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct DiskInfo {
-    name: String,
-    total_space: u64,
-    available_space: u64,
-    file_system: String,
-    is_removable: bool,
-    is_read_only: bool,
-    kind: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct DiskDto {
-    id: u32,
-    name: String,
-    available_space: u64,
-    date: String,
 }
 
 struct CsvSettingsRepository {
@@ -306,26 +188,6 @@ impl DiskInfoRepository for CsvDiskInfoRepository {
         }
         wtr.flush()?;
         Ok(())
-    }
-}
-
-impl DiskInfo {
-    fn from_disk(disk: &sysinfo::Disk) -> Self {
-        let name = if disk.name().to_string_lossy().is_empty() {
-            "Unnamed".to_string()
-        } else {
-            disk.name().to_string_lossy().into_owned()
-        };
-
-        Self {
-            name,
-            total_space: disk.total_space(),
-            available_space: disk.available_space(),
-            file_system: disk.file_system().to_str().unwrap_or_default().to_string(),
-            is_removable: disk.is_removable(),
-            is_read_only: disk.is_read_only(),
-            kind: disk.kind().to_string(),
-        }
     }
 }
 
@@ -915,56 +777,6 @@ impl AlertSettingRepository for SqliteAlertSettingRepository<'_> {
 
         Ok(())
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct AlertSetting {
-    id: u32,
-    name: String,
-    last_check: String,
-    frequency_days: i32,
-    enabled: bool,
-    created_at: String,
-    updated_at: String,
-    rule: AlertRule,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct AlertSettingCreateDto {
-    name: String,
-    frequency_days: i32,
-    rule: AlertRule,
-}
-
-struct AlertSettingDbDto {
-    id: u32,
-    name: String,
-    last_check: String,
-    frequency_days: i32,
-    enabled: bool,
-    created_at: String,
-    updated_at: String,
-    rule: String, // JSON serialized AlertRule
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-enum AlertRule {
-    DiskAvailableSpaceBelowPct {
-        disk_name: String,
-        threshold_pct: f64,
-    },
-    DiskAvailableSpaceBelowBytes {
-        disk_name: String,
-        threshold_bytes: u64,
-    },
-    DiskAvailableSpaceChangeInPct {
-        disk_name: String,
-        change_pct: f64,
-    },
-    FolderSizeAboveBytes {
-        folder_path: String,
-        threshold_bytes: u64,
-    },
 }
 
 #[tauri::command]
