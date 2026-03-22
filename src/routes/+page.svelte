@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
   import { AlertCircleIcon, HardDrive, SearchIcon, X } from "@lucide/svelte";
+  import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
-  import type { Disk, Settings, DiskHistory } from "$lib/types";
-  import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
+  import { toast } from "svelte-sonner";
+
+  import * as Alert from "$lib/components/ui/alert/index.js";
   import * as InputGroup from "$lib/components/ui/input-group/index.js";
   import { HOME, t } from "$lib/i18n/translations.svelte";
-  import { getSettings, getLastHistoryEntry } from "$lib/utils.tauri";
-  import * as Alert from "$lib/components/ui/alert/index.js";
-  import { toast } from "svelte-sonner";
+  import type { Disk, DiskHistory, Settings } from "$lib/types";
+  import { toGB, toPercentage, toYyyyMmDd } from "$lib/utils";
+  import { getLastHistoryEntry, getSettings } from "$lib/utils.tauri";
 
   let diskInfo = $state<Disk[]>([]);
   let settings = $state<Settings | null>(null);
@@ -71,7 +72,7 @@
   </Alert.Root>
 {/if}
 
-<h2 class="font-semibold text-lg mb-4">
+<h2 class="mb-4 text-lg font-semibold">
   {t(HOME.DISK_COUNT, { diskCount: diskInfo.length })}
 </h2>
 
@@ -96,7 +97,7 @@
   </InputGroup.Root>
 {/if}
 
-<ul class="flex gap-4 items-center flex-wrap">
+<ul class="flex flex-wrap items-center gap-4">
   {#each filteredDisk as disk}
     {@const usedSpacePercentage = toPercentage(
       disk.total_space - disk.available_space,
@@ -105,7 +106,7 @@
 
     <li>
       <a href={`/disk/${disk.name}`} class="cursor-pointer">
-        <article class="flex gap-4 border p-4 rounded-md shadow-xs">
+        <article class="flex gap-4 rounded-md border p-4 shadow-xs">
           <div class="pt-1">
             <HardDrive color="#999" strokeWidth={2} size={20} />
           </div>
@@ -127,6 +128,12 @@
           </div>
         </article>
       </a>
+    </li>
+  {:else}
+    <li>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        {t(HOME.SEARCH_EMPTY)}
+      </p>
     </li>
   {/each}
 </ul>

@@ -1,6 +1,7 @@
 export const HOME = {
   LOG: "home.log",
   SEARCH_PLACEHOLDER: "home.search.placeholder",
+  SEARCH_EMPTY: "home.search.empty",
 
   DISK_COUNT: "home.diskCount",
 
@@ -90,6 +91,7 @@ export const ALERTS = {
   EMPTY_LEARN_MORE: "alerts.empty.learnMore",
 
   SEARCH: "alerts.search",
+  SEARCH_EMPTY: "alerts.search.empty",
   CREATE_ALERT_BUTTON: "alerts.createButton",
 
   CREATE_DIALOG_TITLE: "alerts.createDialog.title",

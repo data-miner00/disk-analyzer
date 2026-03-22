@@ -1,5 +1,6 @@
+import { ALERTS, CHARTS, DISK_DETAIL, HEADER, HOME, SETTINGS } from "./keys";
+
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const MS: Translations = {
   [HEADER.MISC]: "Pelbagai",
@@ -14,6 +15,7 @@ export const MS: Translations = {
 
   [HOME.LOG]: "Maklumat cakera hari ini telah direkodkan.",
   [HOME.SEARCH_PLACEHOLDER]: "Cari...",
+  [HOME.SEARCH_EMPTY]: "Tiada cakera ditemui sepadan dengan pertanyaan.",
   [HOME.DISK_COUNT]: "{diskCount} cakera",
   [HOME.WARNING_NO_DISKS]: "Anda mempunyai cakera tanpa nama",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
@@ -89,6 +91,8 @@ export const MS: Translations = {
     "Anda belum mencipta sebarang makluman lagi. Mulakan dengan mencipta makluman pertama anda.",
   [ALERTS.EMPTY_LEARN_MORE]: "Ketahui Lebih Lanjut",
   [ALERTS.SEARCH]: "Cari makluman...",
+  [ALERTS.SEARCH_EMPTY]:
+    "Tiada makluman ditemui yang sepadan dengan pertanyaan.",
   [ALERTS.CREATE_ALERT_BUTTON]: "Cipta Makluman",
   [ALERTS.CREATE_DIALOG_TITLE]: "Cipta Makluman Baharu",
   [ALERTS.CREATE_DIALOG_DESCRIPTION]:

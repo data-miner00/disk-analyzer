@@ -1,5 +1,6 @@
+import { ALERTS, CHARTS, DISK_DETAIL, HEADER, HOME, SETTINGS } from "./keys";
+
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const JA: Translations = {
   [HEADER.MISC]: "その他",
@@ -14,6 +15,7 @@ export const JA: Translations = {
 
   [HOME.LOG]: "本日のディスク情報は既に記録されています。",
   [HOME.SEARCH_PLACEHOLDER]: "検索...",
+  [HOME.SEARCH_EMPTY]: "クエリに一致するディスクは見つかりませんでした。",
   [HOME.DISK_COUNT]: "ディスク{diskCount}枚",
   [HOME.WARNING_NO_DISKS]: "名前のないディスクがあります",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
@@ -88,6 +90,7 @@ export const JA: Translations = {
     "まだアラートを作成していません。最初のアラートを作成して始めましょう。",
   [ALERTS.EMPTY_LEARN_MORE]: "詳細を見る",
   [ALERTS.SEARCH]: "アラートを検索...",
+  [ALERTS.SEARCH_EMPTY]: "クエリに一致するアラートは見つかりませんでした。",
   [ALERTS.CREATE_ALERT_BUTTON]: "アラートを作成",
   [ALERTS.CREATE_DIALOG_TITLE]: "新しいアラートを作成",
   [ALERTS.CREATE_DIALOG_DESCRIPTION]:

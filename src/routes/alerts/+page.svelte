@@ -21,27 +21,29 @@
 </script>
 
 <script lang="ts">
-  import { defaults, superForm } from "sveltekit-superforms";
-  import { zod4 } from "sveltekit-superforms/adapters";
-  import * as Empty from "$lib/components/ui/empty/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
   import { Bell, History, Pencil, Plus, Trash, X } from "@lucide/svelte";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
-  import { toGB } from "$lib/utils";
+  import SearchIcon from "@lucide/svelte/icons/search";
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
-  import * as InputGroup from "$lib/components/ui/input-group/index.js";
-  import SearchIcon from "@lucide/svelte/icons/search";
-  import * as Dialog from "$lib/components/ui/dialog/index.js";
-  import { Input } from "$lib/components/ui/input";
-  import * as Select from "$lib/components/ui/select/index.js";
   import { toast } from "svelte-sonner";
-  import * as Form from "$lib/components/ui/form/index.js";
-  import type { Disk, Settings } from "$lib/types";
-  import { Switch } from "$lib/components/ui/switch";
-  import { getSettings } from "$lib/utils.tauri";
+  import { defaults, superForm } from "sveltekit-superforms";
+  import { zod4 } from "sveltekit-superforms/adapters";
+
   import { ALERTS, t } from "@/i18n/translations.svelte";
+
   import * as ButtonGroup from "$lib/components/ui/button-group/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
+  import * as Empty from "$lib/components/ui/empty/index.js";
+  import * as Form from "$lib/components/ui/form/index.js";
+  import { Input } from "$lib/components/ui/input";
+  import * as InputGroup from "$lib/components/ui/input-group/index.js";
+  import * as Select from "$lib/components/ui/select/index.js";
+  import { Switch } from "$lib/components/ui/switch";
+  import type { Disk, Settings } from "$lib/types";
+  import { toGB } from "$lib/utils";
+  import { getSettings } from "$lib/utils.tauri";
 
   let searchQuery = $state("");
   let currentSelectedAlertForUpdate = $state<AlertSetting>();
@@ -302,7 +304,7 @@
   }
 </script>
 
-<div class="mb-4 flex gap-2 items-center">
+<div class="mb-4 flex items-center gap-2">
   {#if settings?.searchBar == true}
     <InputGroup.Root>
       <InputGroup.Input
@@ -337,7 +339,7 @@
           {t(ALERTS.CREATE_DIALOG_DESCRIPTION)}
         </Dialog.Description>
       </Dialog.Header>
-      <form method="POST" class="space-y-6 h-72 overflow-y-auto" use:enhance>
+      <form method="POST" class="h-72 space-y-6 overflow-y-auto" use:enhance>
         <Form.Field {form} name="name">
           <Form.Control>
             {#snippet children({ props })}
@@ -473,7 +475,7 @@
           Configure the settings for your new alert below.
         </Dialog.Description>
       </Dialog.Header>
-      <form method="POST" class="space-y-6 h-72 overflow-y-auto" use:enhance2>
+      <form method="POST" class="h-72 space-y-6 overflow-y-auto" use:enhance2>
         <Form.Field form={editForm} name="name">
           <Form.Control>
             {#snippet children({ props })}
@@ -610,17 +612,17 @@
     {#each filteredAlerts as alert}
       {@const ruleType = Object.keys(alert.rule)[0]}
       <div
-        class="flex gap-2 p-4 border rounded-md justify-between items-center"
+        class="flex items-center justify-between gap-2 rounded-md border p-4"
       >
         <div>
           <h3 class="text-lg font-semibold">{alert.name}</h3>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-muted-foreground text-sm">
             Last Check: {new Date(alert.last_check).toLocaleDateString()}
           </p>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-muted-foreground text-sm">
             Frequency: Every {alert.frequency_days} days
           </p>
-          <p class="text-sm mt-2">
+          <p class="mt-2 text-sm">
             Rule:
             {#if ruleType === "DiskAvailableSpaceBelowPct"}
               Alert when disk "{alert.rule[ruleType].disk_name}" has available
@@ -691,6 +693,12 @@
               changeAlertStatus(alert.id, newState)}
           />
         </div>
+      </div>
+    {:else}
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          {t(ALERTS.SEARCH_EMPTY)}
+        </p>
       </div>
     {/each}
   </div>

@@ -1,5 +1,6 @@
+import { ALERTS, CHARTS, DISK_DETAIL, HEADER, HOME, SETTINGS } from "./keys";
+
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const ES: Translations = {
   [HEADER.MISC]: "Varios",
@@ -14,6 +15,8 @@ export const ES: Translations = {
 
   [HOME.LOG]: "La información del disco de hoy ya ha sido registrada.",
   [HOME.SEARCH_PLACEHOLDER]: "Buscar...",
+  [HOME.SEARCH_EMPTY]:
+    "No se encontró ningún disco que coincidiera con la consulta.",
   [HOME.DISK_COUNT]: "{diskCount} disco(s)",
   [HOME.WARNING_NO_DISKS]: "Tienes un disco sin nombre",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
@@ -90,6 +93,8 @@ export const ES: Translations = {
     "Aún no has creado ninguna alerta. Comienza creando tu primera alerta.",
   [ALERTS.EMPTY_LEARN_MORE]: "Más Información",
   [ALERTS.SEARCH]: "Buscar alertas...",
+  [ALERTS.SEARCH_EMPTY]:
+    "No se encontraron alertas que coincidieran con la consulta.",
   [ALERTS.CREATE_ALERT_BUTTON]: "Crear Alerta",
   [ALERTS.CREATE_DIALOG_TITLE]: "Crear Nueva Alerta",
   [ALERTS.CREATE_DIALOG_DESCRIPTION]:

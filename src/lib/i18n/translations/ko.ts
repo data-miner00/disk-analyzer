@@ -1,5 +1,6 @@
+import { ALERTS, CHARTS, DISK_DETAIL, HEADER, HOME, SETTINGS } from "./keys";
+
 import type { Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const KO: Translations = {
   [HEADER.MISC]: "기타",
@@ -14,6 +15,7 @@ export const KO: Translations = {
 
   [HOME.LOG]: "오늘의 디스크 정보가 이미 기록되었습니다.",
   [HOME.SEARCH_PLACEHOLDER]: "검색...",
+  [HOME.SEARCH_EMPTY]: "쿼리와 일치하는 디스크를 찾을 수 없습니다.",
   [HOME.DISK_COUNT]: "디스크 {diskCount}개",
   [HOME.WARNING_NO_DISKS]: "이름 없는 디스크가 있습니다",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
@@ -90,6 +92,7 @@ export const KO: Translations = {
     "아직 알림을 생성하지 않았습니다. 첫 번째 알림을 생성하여 시작하세요.",
   [ALERTS.EMPTY_LEARN_MORE]: "자세히 알아보기",
   [ALERTS.SEARCH]: "알림 검색...",
+  [ALERTS.SEARCH_EMPTY]: "해당 검색어와 일치하는 알림이 없습니다.",
   [ALERTS.CREATE_ALERT_BUTTON]: "알림 생성",
   [ALERTS.CREATE_DIALOG_TITLE]: "새 알림 생성",
   [ALERTS.CREATE_DIALOG_DESCRIPTION]:

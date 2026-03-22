@@ -1,5 +1,6 @@
+import { ALERTS, CHARTS, DISK_DETAIL, HEADER, HOME, SETTINGS } from "./keys";
+
 import { type Translations } from "../translations.svelte";
-import { SETTINGS, HEADER, HOME, DISK_DETAIL, ALERTS, CHARTS } from "./keys";
 
 export const ZH: Translations = {
   [HEADER.MISC]: "杂项",
@@ -14,6 +15,7 @@ export const ZH: Translations = {
 
   [HOME.LOG]: "今日的磁盘信息已被记录。",
   [HOME.SEARCH_PLACEHOLDER]: "搜索...",
+  [HOME.SEARCH_EMPTY]: "未找到与查询匹配的磁盘。",
   [HOME.DISK_COUNT]: "{diskCount}个磁盘",
   [HOME.WARNING_NO_DISKS]: "你有一个未命名的磁盘",
   [HOME.WARNING_NO_DISKS_DESCRIPTION]:
@@ -85,6 +87,7 @@ export const ZH: Translations = {
     "您还没有创建任何警报。立即开始创建您的第一个警报。",
   [ALERTS.EMPTY_LEARN_MORE]: "了解更多",
   [ALERTS.SEARCH]: "搜索警报...",
+  [ALERTS.SEARCH_EMPTY]: "未找到与查询匹配的警报。",
   [ALERTS.CREATE_ALERT_BUTTON]: "创建警报",
   [ALERTS.CREATE_DIALOG_TITLE]: "创建新警报",
   [ALERTS.CREATE_DIALOG_DESCRIPTION]: "在下方配置新警报的设置。",
