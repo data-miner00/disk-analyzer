@@ -16,7 +16,7 @@ use tauri::{
     tray::{MouseButtonState, TrayIconBuilder, TrayIconEvent},
     App, AppHandle,
 };
-use tauri::{Builder, Emitter, Manager, State};
+use tauri::{Builder, Manager, State};
 
 #[derive(Debug)]
 struct AppState {
@@ -861,21 +861,6 @@ fn get_alerts(state: State<'_, Mutex<AppState>>) -> Vec<AlertSetting> {
 }
 
 #[tauri::command]
-fn frontend_loaded(app: AppHandle, state: State<'_, Mutex<AppState>>) {
-    // let state = state.lock().unwrap();
-    // process_alerts(&state.connection);
-    let _ = app.emit(
-        "hello",
-        DiskDto {
-            id: 1,
-            name: "Hello".to_string(),
-            available_space: 1043,
-            date: "2024-01-01".to_string(),
-        },
-    );
-}
-
-#[tauri::command]
 fn get_histories(state: State<'_, Mutex<AppState>>) -> Vec<NotificationHistory> {
     let state = state.lock().unwrap();
     let repo = SqliteNotificationHistoryRepository {
@@ -1145,7 +1130,6 @@ pub fn run() {
             change_alert_status,
             update_alert,
             delete_alert,
-            frontend_loaded,
             aggregate_disk_usage_space_changed_history,
             smart_exit,
             get_histories,
